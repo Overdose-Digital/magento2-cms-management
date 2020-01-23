@@ -3,6 +3,7 @@
     ``overdose/module-cmscontent``
 
  - [Main Functionalities](#markdown-header-main-functionalities)
+ - [Requirements](#markdown-header-requirements)
  - [Installation](#markdown-header-installation)
  - [Specifications](#markdown-header-specifications)
  - [Description](#markdown-header-description)
@@ -15,10 +16,28 @@
    - Create content backups of cms-blocks and cms-pages
    - Review backup history of CMS-Block/Page
    - Create and Update CMS-Blocks/Pages by using of xml-files
+
+## Requirements
+
+   - Magento 2.3 (CE or EE) and higher
    
 ## Installation
 
-   - Installation via composer will be added soon
+### Type 1: Composer (from github)
+
+   - Add repository to composer.json `composer config repositories.od-cmscontent-github vcs https://github.com/Overdose-Digital/magento2-cms-management.git`
+   - Download package `composer require overdose/module-cmscontent:dev-master`
+   - Apply database updates and generate code by running `php bin/magento setup:upgrade && php bin/magento setup:di:compile`
+   - If production mode generate static content by running `php bin/magento s:s:d`
+   - Flush the cache by running `php bin/magento cache:flush`
+   
+### Type 2: Zip file
+
+   - Download archive from repo
+   - Unzip the zip file in `app/code/Overdose`
+   - Apply database updates and generate code by running `php bin/magento setup:upgrade && php bin/magento setup:di:compile`
+   - If production mode generate static content by running `php bin/magento s:s:d`
+   - Flush the cache by running `php bin/magento cache:flush`
 
 ## Specifications
 
