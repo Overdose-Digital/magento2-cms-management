@@ -26,7 +26,7 @@
 ### Type 1: Composer (from github)
 
    - Add repository to composer.json `composer config repositories.od-cmscontent-github vcs https://github.com/Overdose-Digital/magento2-cms-management.git`
-   - Download package `composer require overdose/module-cmscontent:dev-master`
+   - Download package `composer require overdose/module-cmscontent`
    - Apply database updates and generate code by running `php bin/magento setup:upgrade && php bin/magento setup:di:compile`
    - If production mode generate static content by running `php bin/magento s:s:d`
    - Flush the cache by running `php bin/magento cache:flush`
