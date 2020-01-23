@@ -2,13 +2,13 @@
 
     ``overdose/module-cmscontent``
 
- - [Main Functionalities](#markdown-header-main-functionalities)
- - [Requirements](#markdown-header-requirements)
- - [Installation](#markdown-header-installation)
- - [Specifications](#markdown-header-specifications)
- - [Description](#markdown-header-description)
- - [Managing by using xml files](#markdown-header-managing-by-using-xml-files)
- - [Console commands usage](#markdown-header-console-commands-usage)
+ - [Main Functionalities](#user-content-main-functionalities)
+ - [Requirements](#user-content-requirements)
+ - [Installation](#user-content-installation)
+ - [Specifications](#user-content-specifications)
+ - [Description](#user-content-description)
+ - [Managing by using xml files](#user-content-managing-by-using-xml-files)
+ - [Console commands usage](#user-content-console-commands-usage)
 
 
 ## Main Functionalities
