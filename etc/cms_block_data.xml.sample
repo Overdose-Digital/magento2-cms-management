@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cms_block_data.xsd">
+    <cms_blocks>
+        <cms_block identifier="some-identifier">
+            <attribute code="title">Some block title</attribute>
+            <attribute code="content"><![CDATA[<div>Content here </div>]]></attribute>
+            <attribute code="version">1.0.0</attribute>
+            <attribute code="store_ids"/>
+        </cms_block>
+        <cms_block identifier="some-identifier-2">
+            <attribute code="title">Some block title 2 </attribute>
+            <attribute code="content"><![CDATA[<div>Content here 2</div>]]></attribute>
+            <attribute code="version">1.0.1</attribute>
+            <attribute code="store_ids">1,2,3</attribute>
+        </cms_block>
+    </cms_blocks>
+</config>

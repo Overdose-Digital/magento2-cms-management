@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="history">
+        <settings>
+            <label/>
+        </settings>
+        <htmlContent name="backups" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="additionalClasses" xsi:type="array">
+                        <item name="admin__field" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <block class="Overdose\CMSContent\Block\Adminhtml\Cms\Block\Edit\History" name="overdose.cmscontent.block.history" template="Overdose_CMSContent::cms/backup/history.phtml" />
+        </htmlContent>
+    </fieldset>
+</form>

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add id="Overdose::top_level" module="Overdose_CMSContent" resource="Magento_Backend::content" sortOrder="9999" title="Overdose" dependsOnConfig="cms_content/general/show_menu"/>
+		<add action="cmscontent/history/view" id="Overdose_CMSContent::history_view" module="Overdose_CMSContent" parent="Overdose::top_level" resource="Overdose_CMSContent::history_view" sortOrder="9999" title="history view"/>
+	</menu>
+</config>

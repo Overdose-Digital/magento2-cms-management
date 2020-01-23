@@ -1,0 +1,18 @@
+<?php /** @var \Overdose\CMSContent\Block\Adminhtml\Cms\CmsAbstract $block */ ?>
+<?php $backups = $block->getBackups(); ?>
+<div class="admin__field-label">
+    <label>
+        <span><?= __('Backups History')?></span>
+    </label>
+</div>
+<div class="admin__field-control">
+<?php if (!count($backups)) : ?>
+    <div>
+        <span><?= __('No records found'); ?></span>
+    </div>
+<?php else: ?>
+    <?php foreach ($backups as $backup) : ?>
+        <a href="#" onclick="popWin('<?= $block->getBackupUrl($backup) ?>','backupHistory','width=930,height=760,resizable=yes,scrollbars=yes')" style="display: block"><?= $backup['name']; ?></a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>

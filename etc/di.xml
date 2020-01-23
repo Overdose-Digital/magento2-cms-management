@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Overdose\CMSContent\File\FileInterface" type="Overdose\CMSContent\File\HtmlFile" />
+    <preference for="Overdose\CMSContent\Api\ContentVersionManagementInterface" type="Overdose\CMSContent\Model\ContentVersionManagement"/>
+    <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface" type="Overdose\CMSContent\Model\ContentVersionRepository"/>
+    <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
+    <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
+    <type name="Overdose\CMSContent\Model\Config\Page\Reader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">cms_page_data.xml</argument>
+            <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Converter</argument>
+            <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Page\SchemaLocator</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Config\Block\Reader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">cms_block_data.xml</argument>
+            <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Block\Converter</argument>
+            <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Block\SchemaLocator</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="od_cms_upgrade_command" xsi:type="object">Overdose\CMSContent\Console\Command\CMSUpgradeCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

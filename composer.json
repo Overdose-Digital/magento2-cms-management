@@ -1,0 +1,16 @@
+{
+    "name": "overdose/module-cmscontent",
+    "description": "",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Overdose\\CMSContent\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
