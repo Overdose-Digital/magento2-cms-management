@@ -66,7 +66,7 @@ class BackupManager
      */
     public function createBackup($type, $cmsObject)
     {
-        $this->cmsObject = $cmsObject;
+        $this->setCmsObject($cmsObject);
         $this->file->writeData(
             $this->getBackupPath($type),
             $this->generateBackupName(),
@@ -134,7 +134,11 @@ class BackupManager
      */
     public function getBackupsByCmsEntity($type, $cmsObject)
     {
-        $this->cmsObject = $cmsObject;
+        if (!$cmsObject) {
+            return [];
+        }
+
+        $this->setCmsObject($cmsObject);
         $result = [];
         $backupsDir = $this->getBackupPath($type);
         try {
@@ -152,5 +156,17 @@ class BackupManager
         }
 
         return $result;
+    }
+
+    /**
+     *  Setter for $cmsObject
+     *
+     * @param $cmsObject
+     * @return $this
+     */
+    public function setCmsObject($cmsObject) {
+        $this->cmsObject = $cmsObject;
+
+        return $this;
     }
 }
