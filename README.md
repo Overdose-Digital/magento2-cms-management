@@ -21,6 +21,16 @@
 
    - Magento 2.3 (CE or EE) and higher
    
+
+## Example
+
+   Approach to use this extension:
+   - Create new custom module e.g. Project_CMS.
+   - In etc directory you can create cms_page_data.xml and cms_page_data.xml files (examples of these files https://github.com/Overdose-Digital/magento2-cms-management/blob/master/etc/cms_block_data.xml.sample and https://github.com/Overdose-Digital/magento2-cms-management/blob/master/etc/cms_page_data.xml.sample). In these files developer can create/update CMS block or page and push it to git.
+   - Such files can be created for any extension.
+   
+   The advantage of this approach is that no need to update UpdateData.php with a lot of conditions. You can easily update xml file and specify new version of CMS data. Also, extension creates a backup of previous CMS data.
+   
 ## Installation
 
 ### Type 1: Composer (from github)
