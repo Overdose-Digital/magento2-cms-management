@@ -85,6 +85,9 @@ class BackupManager
     {
         $datePart = date('Y_m_d_h_i_s', time());
         $storeIds = $this->cmsObject->getStoreId();
+        if (!is_array($storeIds)) {
+            $storeIds = explode(',', $storeIds);
+        }
         if (in_array(0, $storeIds)) {
             $storeIds = [0];
         }
