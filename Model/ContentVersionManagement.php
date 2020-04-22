@@ -231,8 +231,6 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
             /* Block or page exists */
             if (count($items)) {
                 $cmsDataModel = array_shift($items);
-                $cmsDataModel->setTitle($data['title'])
-                    ->setContent($data['content']);
 
                 /* Create backup of cms-block/-page */
                 $this->backupManager->createBackup(
@@ -242,15 +240,24 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
             } else { /* Create new block or page */
                 $cmsDataModel = $factory->create()
                     ->setIdentifier($data['identifier'])
-                    ->setTitle($data['title'])
-                    ->setContent($data['content'])
                     ->setStoreId($data['store_ids']);
             }
+
+            $cmsDataModel
+                ->setData('title', $data['title'])
+                ->setData('content', $data['content']);
+
+            if (isset($data['content_heading'])) {
+                $cmsDataModel->setData('content_heading', $data['content_heading']);
+            }
+            if (isset($data['page_layout'])) {
+                $cmsDataModel->setData('page_layout', $data['page_layout']);
+            }
+
             $repository->save($cmsDataModel);
         } catch (\Exception $e) {
             $this->logger->critical(__('Something went wrong during cms_content upgrade'));
         }
-
 
         return $this;
     }
