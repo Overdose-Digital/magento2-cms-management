@@ -1,6 +1,6 @@
 {
     "name": "overdose/module-cmscontent",
-    "description": "Static content hiostory",
+    "description": "Static content update and backups",
     "type": "magento2-module",
     "license": "proprietary",
     "authors": [
