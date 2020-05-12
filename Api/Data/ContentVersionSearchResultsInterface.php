@@ -14,7 +14,7 @@ interface ContentVersionSearchResultsInterface extends \Magento\Framework\Api\Se
     /**
      * Get content_version list as array with identifiers as keys
      *
-     * @return array
+     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface[]
      */
     public function getItemsArray();
 
