@@ -238,6 +238,7 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
                     $cmsDataModel
                 );
             } else { /* Create new block or page */
+                get_class($factory); // FIX: "PHP Fatal error:  Uncaught Error: Call to a member function create() on null"
                 $cmsDataModel = $factory->create()
                     ->setIdentifier($data['identifier'])
                     ->setStoreId($data['store_ids']);
