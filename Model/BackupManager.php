@@ -84,14 +84,7 @@ class BackupManager
     public function generateBackupName()
     {
         $datePart = date('Y_m_d_h_i_s', time());
-        $storeIds = $this->cmsObject->getStoreId();
-        if (!is_array($storeIds)) {
-            $storeIds = explode(',', $storeIds);
-        }
-        if (in_array(0, $storeIds)) {
-            $storeIds = [0];
-        }
-        $storePart = '_store_' . implode('_' , $storeIds);
+        $storePart = '_store_' . implode('_' , $this->prepareStoreIds());
 
         return  $datePart . $storePart;
     }
@@ -171,5 +164,27 @@ class BackupManager
         $this->cmsObject = $cmsObject;
 
         return $this;
+    }
+
+    /**
+     *  Prepare store ids array
+     *
+     * @param mixed $storeIds
+     * @return array
+     */
+    public function prepareStoreIds()
+    {
+        $storeIds = $this->cmsObject->getStoreId();
+        //Fix for import wth  MSP_ImportExport
+        if (null === $storeIds) {
+            $storeIds = $this->cmsObject->getStores();
+        }
+
+        $storeIds = (array)$storeIds;
+        if (empty($storeIds) || in_array(0, $storeIds)) {
+            $storeIds = [0];
+        }
+
+        return $storeIds;
     }
 }
