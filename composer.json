@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": "~5.5.0|~5.6.0|^7.0",
-        "magento/framework": "102.0.*|103.0.*"
+        "magento/framework": "102.0.*|103.0.*",
+        "overdose/module-core": "*"
     },
     "autoload": {
         "psr-4": {
