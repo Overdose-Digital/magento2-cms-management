@@ -26,4 +26,26 @@
             </argument>
         </arguments>
     </type>
+    <type name="Overdose\CMSContent\Model\ContentVersionManagement">
+        <arguments>
+            <argument name="backupManager" xsi:type="object">Overdose\CMSContent\Model\BackupManager\Proxy</argument>
+            <argument name="blockConfigReader" xsi:type="object">Overdose\CMSContent\Model\Config\Block\Reader\Proxy</argument>
+            <argument name="blockInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\BlockInterfaceFactory\Proxy</argument>
+            <argument name="blockRepository" xsi:type="object">Magento\Cms\Api\BlockRepositoryInterface\Proxy</argument>
+            <argument name="contentVersionFactory" xsi:type="object">Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory\Proxy</argument>
+            <argument name="contentVersionRepository" xsi:type="object">\Overdose\CMSContent\Api\ContentVersionRepositoryInterface\Proxy</argument>
+            <argument name="filterBuilder" xsi:type="object">\Magento\Framework\Api\FilterBuilder\Proxy</argument>
+            <argument name="filterGroupBuilder" xsi:type="object">\Magento\Framework\Api\Search\FilterGroupBuilder\Proxy</argument>
+            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+            <argument name="pageInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\PageInterfaceFactory\Proxy</argument>
+            <argument name="pageRepository" xsi:type="object">Magento\Cms\Api\PageRepositoryInterface\Proxy</argument>
+            <argument name="pagesConfigReader" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Reader\Proxy</argument>
+            <argument name="searchCriteriaBuilder" xsi:type="object">Magento\Framework\Api\SearchCriteriaBuilder\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Observer\CmsSaveBefore">
+        <arguments>
+            <argument name="backupManager" xsi:type="object">\Overdose\CMSContent\Model\BackupManager\Proxy</argument>
+        </arguments>
+    </type>
 </config>
