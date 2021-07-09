@@ -3,5 +3,6 @@
 	<menu>
 		<add id="Overdose::top_level" module="Overdose_CMSContent" resource="Magento_Backend::content" sortOrder="9999" title="Overdose" dependsOnConfig="cms_content/general/show_menu"/>
 		<add action="cmscontent/history/view" id="Overdose_CMSContent::history_view" module="Overdose_CMSContent" parent="Overdose::top_level" resource="Overdose_CMSContent::history_view" sortOrder="9999" title="history view"/>
+        <add id="Overdose_CMSContent::import" title="Import" module="Overdose_CMSContent" sortOrder="9999" parent="Magento_Backend::content_elements" action="cmscontent/import" resource="Overdose_CMSContent::import"/>
 	</menu>
 </config>

@@ -175,7 +175,7 @@ class BackupManager
     public function prepareStoreIds()
     {
         $storeIds = $this->cmsObject->getStoreId();
-        //Fix for import wth  MSP_ImportExport
+        //Fix for import wth  Overdose_CMSContent
         if (null === $storeIds) {
             $storeIds = $this->cmsObject->getStores();
         }

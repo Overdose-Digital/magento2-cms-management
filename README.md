@@ -16,6 +16,8 @@
    - Create content backups of cms-blocks and cms-pages
    - Review backup history of CMS-Block/Page
    - Create and Update CMS-Blocks/Pages by using of xml-files
+   - Allowing users to import/export CMS pages or blocks
+   - Supports multistore and wysiwyg images
 
 ## Requirements
 
@@ -86,7 +88,32 @@
     window with backup's content will appear.
     
    - Added two configuration xml-files cms_block_data.xml and cms_page_data.xml for creating and updating cms-blocks or pages.
-    
+
+## How to export contents
+
+   Select one or more pages you wish to export from **CMS > Pages** in your Magento Admin and select **Export** from the mass action menù.
+
+   You will download a **ZIP file** containing pages or blocks information. If your pages or blocks contain one or more images,
+   they will be automatically added in the ZIP file.
+
+## How to import contents
+
+   A new option **Import** will appear in your Magento Admin **Content** menu. Click on it to import a previously exported ZIP file.
+
+### CMS import mode
+
+   **Overwrite existing**: If a page/block with same id and store assignment is found, it will be overwritten by the ZIP file content.
+
+   **Skip existing**: If a page/block with same id and store assignment is found, it will **NOT** be overwritten by the ZIP file content.
+
+### Media import mode
+
+   **Do not import**: Do not import media files in the ZIP file.
+
+   **Overwrite existing**: If an image with same name exists it will be overwritten with version in the ZIP file.
+
+   **Skip existing**: If an image with same name exists it will **NOT** be overwritten with version in the ZIP file.
+ 
 ## Managing by using xml files
    - Main purpose create and update cms-blocks/pages without editing via admin panel. 
         There are to types: cms_block_data.xml and cms_page_data.xml. Mainly they have same scructure, examples you can 
