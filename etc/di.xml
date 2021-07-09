@@ -5,6 +5,7 @@
     <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface" type="Overdose\CMSContent\Model\ContentVersionRepository"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
+    <preference for="Overdose\CMSContent\Api\ContentInterface" type="Overdose\CMSContent\Model\Content" />
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
             <argument name="fileName" xsi:type="string">cms_page_data.xml</argument>
@@ -23,6 +24,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="od_cms_upgrade_command" xsi:type="object">Overdose\CMSContent\Console\Command\CMSUpgradeCommand</item>
+                <item name="import_page" xsi:type="object">Overdose\CMSContent\Command\ImportPage</item>
             </argument>
         </arguments>
     </type>
