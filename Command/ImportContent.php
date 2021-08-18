@@ -3,15 +3,14 @@
 namespace Overdose\CMSContent\Command;
 
 use Magento\Framework\ObjectManagerInterface;
-use Overdose\CMSContent\Api\ContentInterface;
+use Overdose\CMSContent\Api\ContentImportExportInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ImportPage extends Command
+class ImportContent extends Command
 {
-
     protected $pageInterface;
 
     /**
@@ -20,7 +19,7 @@ class ImportPage extends Command
     private $objectManager;
 
     /**
-     * ImportPage constructor.
+     * ImportContent constructor.
      * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
@@ -47,10 +46,10 @@ class ImportPage extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $contentInterface = $this->objectManager->get(ContentInterface::class);
+        $contentImportInterface = $this->objectManager->get(ContentImportExportInterface::class);
 
         $zipFile = $input->getArgument('zipfile');
-        if ($contentInterface->importContentFromZipFile($zipFile, false) == 0) {
+        if ($contentImportInterface->importContentFromZipFile($zipFile, false) == 0) {
             throw new \Exception(__('Archive is empty'));
         }
 

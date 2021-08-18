@@ -15,11 +15,11 @@ use Magento\Cms\Model\PageFactory as CmsPageFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as CmsPageCollectionFactory;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory as CmsBlockCollectionFactory;
 use Magento\Framework\Stdlib\DateTime\DateTime;
-use Overdose\CMSContent\Api\ContentInterface;
+use Overdose\CMSContent\Api\ContentImportExportInterface;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-class Content implements ContentInterface
+class ImportExport implements ContentImportExportInterface
 {
     const JSON_FILENAME = 'cms.json';
     const MEDIA_ARCHIVE_PATH = 'media';
@@ -65,8 +65,8 @@ class Content implements ContentInterface
         $this->file = $file;
         $this->dateTime = $dateTime;
 
-        $this->cmsMode = ContentInterface::OD_CMS_MODE_UPDATE;
-        $this->mediaMode = ContentInterface::OD_MEDIA_MODE_UPDATE;
+        $this->cmsMode = ContentImportExportInterface::OD_CMS_MODE_UPDATE;
+        $this->mediaMode = ContentImportExportInterface::OD_MEDIA_MODE_UPDATE;
 
         $this->storesMap = [];
         $stores = $this->storeRepositoryInterface->getList();
@@ -360,14 +360,14 @@ class Content implements ContentInterface
         }
 
         // Import media
-        if ($archivePath && ($count > 0) && ($this->mediaMode != ContentInterface::OD_MEDIA_MODE_NONE)) {
+        if ($archivePath && ($count > 0) && ($this->mediaMode != ContentImportExportInterface::OD_MEDIA_MODE_NONE)) {
             foreach ($payload['media'] as $mediaFile) {
                 $sourceFile = $archivePath . '/' . self::MEDIA_ARCHIVE_PATH . '/' . $mediaFile;
                 $destFile = $this->filesystem->getMediaPath($mediaFile);
 
                 if ($this->file->fileExists($sourceFile, true)) {
                     if ($this->file->fileExists($destFile, true) &&
-                        ($this->mediaMode == ContentInterface::OD_MEDIA_MODE_SKIP)
+                        ($this->mediaMode == ContentImportExportInterface::OD_MEDIA_MODE_SKIP)
                     ) {
                         continue;
                     }
@@ -423,7 +423,7 @@ class Content implements ContentInterface
         if ($pageId) {
             $page->load($pageId);
 
-            if ($this->cmsMode == ContentInterface::OD_CMS_MODE_SKIP) {
+            if ($this->cmsMode == ContentImportExportInterface::OD_CMS_MODE_SKIP) {
                 return false;
             }
         }
@@ -529,7 +529,7 @@ class Content implements ContentInterface
         if ($blockId) {
             $block->load($blockId);
 
-            if ($this->cmsMode == ContentInterface::OD_CMS_MODE_SKIP) {
+            if ($this->cmsMode == ContentImportExportInterface::OD_CMS_MODE_SKIP) {
                 return false;
             }
         }
@@ -551,9 +551,9 @@ class Content implements ContentInterface
     /**
      * Set CMS mode
      * @param $mode
-     * @return ContentInterface
+     * @return ContentImportExportInterface
      */
-    public function setCmsModeOption($mode): ContentInterface
+    public function setCmsModeOption($mode): ContentImportExportInterface
     {
         $this->cmsMode = $mode;
         return $this;
@@ -562,9 +562,9 @@ class Content implements ContentInterface
     /**
      * Set media mode
      * @param $mode
-     * @return ContentInterface
+     * @return ContentImportExportInterface
      */
-    public function setMediaModeOption($mode): ContentInterface
+    public function setMediaModeOption($mode): ContentImportExportInterface
     {
         $this->mediaMode = $mode;
         return $this;
@@ -573,9 +573,9 @@ class Content implements ContentInterface
     /**
      * Set stores mapping
      * @param array $storesMap
-     * @return ContentInterface
+     * @return ContentImportExportInterface
      */
-    public function setStoresMapValue(array $storesMap): ContentInterface
+    public function setStoresMapValue(array $storesMap): ContentImportExportInterface
     {
         return $this;
     }

@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © MageSpecialist - Skeeller srl. All rights reserved.
- * See COPYING.txt for license details.
- */
 
 namespace Overdose\CMSContent\Controller\Adminhtml\Block;
 
@@ -12,7 +8,7 @@ use Magento\Backend\App\Action;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Overdose\CMSContent\Api\ContentInterface as ImportExportContentInterface;
+use Overdose\CMSContent\Api\ContentImportExportInterface;
 
 class MassExport extends Action
 {
@@ -25,7 +21,7 @@ class MassExport extends Action
     public function __construct(
         Action\Context $context,
         Filter $filter,
-        ImportExportContentInterface $importExportContentInterface,
+        ContentImportExportInterface $importExportContentInterface,
         CollectionFactory $collectionFactory,
         FileFactory $fileFactory,
         DateTime $dateTime
