@@ -2,7 +2,7 @@
 
 namespace Overdose\CMSContent\Model\Source;
 
-use Overdose\CMSContent\Api\ContentInterface;
+use Overdose\CMSContent\Api\ContentImportExportInterface;
 
 class CmsMode
 {
@@ -13,8 +13,8 @@ class CmsMode
     public function toOptionArray()
     {
         return [
-            ['label' => __('Overwrite existing'), 'value' => ContentInterface::OD_CMS_MODE_UPDATE],
-            ['label' => __('Skip existing'), 'value' => ContentInterface::OD_CMS_MODE_SKIP],
+            ['label' => __('Overwrite existing'), 'value' => ContentImportExportInterface::OD_CMS_MODE_UPDATE],
+            ['label' => __('Skip existing'), 'value' => ContentImportExportInterface::OD_CMS_MODE_SKIP],
         ];
     }
 }

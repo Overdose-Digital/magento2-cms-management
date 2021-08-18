@@ -6,7 +6,7 @@ namespace Overdose\CMSContent\Api;
 
 use Magento\Cms\Api\Data\BlockInterface;
 
-interface ContentInterface
+interface ContentImportExportInterface
 {
     const OD_CMS_MODE_UPDATE = 'update';
     const OD_CMS_MODE_SKIP = 'skip';
@@ -18,23 +18,23 @@ interface ContentInterface
     /**
      * Set CMS mode on import
      * @param $mode
-     * @return ContentInterface
+     * @return ContentImportExportInterface
      */
-    public function setCmsModeOption($mode): ContentInterface;
+    public function setCmsModeOption($mode): ContentImportExportInterface;
 
     /**
      * Set media mode on import
      * @param $mode
-     * @return ContentInterface
+     * @return ContentImportExportInterface
      */
-    public function setMediaModeOption($mode): ContentInterface;
+    public function setMediaModeOption($mode): ContentImportExportInterface;
 
     /**
      * Set stores mapping on import
      * @param array $storesMap
-     * @return ContentInterface
+     * @return ContentImportExportInterface
      */
-    public function setStoresMapValue(array $storesMap): ContentInterface;
+    public function setStoresMapValue(array $storesMap): ContentImportExportInterface;
 
     /**
      * Return CMS block to array

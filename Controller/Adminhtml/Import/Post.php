@@ -5,25 +5,28 @@ namespace Overdose\CMSContent\Controller\Adminhtml\Import;
 use Magento\Backend\App\Action;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\File\UploaderFactory;
-use Overdose\CMSContent\Api\ContentInterface;
+use Overdose\CMSContent\Api\ContentImportExportInterface;
 use Overdose\CMSContent\Model\Filesystem;
 
 class Post extends Action
 {
     protected $uploaderFactory;
-    protected $contentInterface;
+
+    protected $importExportInterface;
+
     protected $filesystem;
+
     protected $redirectFactory;
 
     public function __construct(
         Action\Context $context,
         UploaderFactory $uploaderFactory,
-        ContentInterface $contentInterface,
+        ContentImportExportInterface $importExportInterface,
         RedirectFactory $redirectFactory,
         Filesystem $filesystem
     ) {
         $this->uploaderFactory = $uploaderFactory;
-        $this->contentInterface = $contentInterface;
+        $this->importExportInterface = $importExportInterface;
         $this->filesystem = $filesystem;
         $this->redirectFactory = $redirectFactory;
 
@@ -52,12 +55,12 @@ class Post extends Action
 
             $zipFile = $result['path'] . $result['file'];
 
-            $this->contentInterface
+            $this->importExportInterface
                 ->setCmsModeOption($cmsMode)
                 ->setMediaModeOption($mediaMode)
                 ->setStoresMapValue($storesMap);
 
-            $count = $this->contentInterface->importContentFromZipFile($zipFile, true);
+            $count = $this->importExportInterface->importContentFromZipFile($zipFile, true);
 
             $this->messageManager->addSuccessMessage(__('A total of %1 item(s) have been imported/updated.', $count));
 
