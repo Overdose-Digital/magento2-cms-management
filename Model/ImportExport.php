@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Overdose\CMSContent\Model;
 
 use Magento\Cms\Api\BlockRepositoryInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
-use Magento\Framework\Json\DecoderInterface;
-use Magento\Framework\Json\EncoderInterface;
 use Magento\Cms\Api\Data\PageInterface as CmsPageInterface;
 use Magento\Cms\Api\Data\BlockInterface as CmsBlockInterface;
 use Magento\Cms\Model\BlockFactory as CmsBlockFactory;
@@ -25,8 +24,6 @@ class ImportExport implements ContentImportExportInterface
     const MEDIA_ARCHIVE_PATH = 'media';
 
     protected $storeRepositoryInterface;
-    protected $encoderInterface;
-    protected $decoderInterface;
     protected $pageCollectionFactory;
     protected $blockCollectionFactory;
     protected $blockRepositoryInterface;
@@ -39,11 +36,26 @@ class ImportExport implements ContentImportExportInterface
     protected $cmsMode;
     protected $mediaMode;
     protected $storesMap;
+    /**
+     * @var SerializerInterface
+     */
+    protected $serializerInterface;
 
+    /**
+     * @param StoreRepositoryInterface $storeRepositoryInterface
+     * @param SerializerInterface $serializerInterface
+     * @param CmsPageFactory $pageFactory
+     * @param CmsPageCollectionFactory $pageCollectionFactory
+     * @param CmsBlockFactory $blockFactory
+     * @param CmsBlockCollectionFactory $blockCollectionFactory
+     * @param BlockRepositoryInterface $blockRepositoryInterface
+     * @param Filesystem $filesystem
+     * @param File $file
+     * @param DateTime $dateTime
+     */
     public function __construct(
         StoreRepositoryInterface $storeRepositoryInterface,
-        EncoderInterface $encoderInterface,
-        DecoderInterface $decoderInterface,
+        SerializerInterface $serializerInterface,
         CmsPageFactory $pageFactory,
         CmsPageCollectionFactory $pageCollectionFactory,
         CmsBlockFactory $blockFactory,
@@ -54,8 +66,7 @@ class ImportExport implements ContentImportExportInterface
         DateTime $dateTime
     ) {
         $this->storeRepositoryInterface = $storeRepositoryInterface;
-        $this->encoderInterface = $encoderInterface;
-        $this->decoderInterface = $decoderInterface;
+        $this->serializerInterface = $serializerInterface;
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->pageFactory = $pageFactory;
         $this->blockCollectionFactory = $blockCollectionFactory;
@@ -88,7 +99,7 @@ class ImportExport implements ContentImportExportInterface
 
         $contentArray = array_merge_recursive($pagesArray, $blocksArray);
 
-        $jsonPayload = $this->encoderInterface->encode($contentArray);
+        $jsonPayload = $this->serializerInterface->serialize($contentArray);
 
         $exportPath = $this->filesystem->getExportPath();
 
@@ -315,7 +326,7 @@ class ImportExport implements ContentImportExportInterface
 
         // Read and import
         $jsonString = $this->file->read($pagesFile);
-        $cmsData = $this->decoderInterface->decode($jsonString);
+        $cmsData = $this->serializerInterface->unserialize($jsonString);
 
         $count = $this->importContentFromArray($cmsData, $extractPath);
 
