@@ -1,6 +1,6 @@
 <?php
 
-namespace Overdose\CMSContent\Command;
+namespace Overdose\CMSContent\Console\Command;
 
 use Magento\Framework\ObjectManagerInterface;
 use Overdose\CMSContent\Api\ContentImportExportInterface;
@@ -11,8 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportContent extends Command
 {
-    protected $pageInterface;
-
     /**
      * @var ObjectManagerInterface
      */
