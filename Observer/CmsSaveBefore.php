@@ -39,7 +39,7 @@ class CmsSaveBefore implements \Magento\Framework\Event\ObserverInterface
      * @param BackupManager $backupManager
      */
     public function __construct(
-      BackupManager $backupManager
+        BackupManager $backupManager
     ) {
         $this->backupManager = $backupManager;
     }
@@ -61,7 +61,7 @@ class CmsSaveBefore implements \Magento\Framework\Event\ObserverInterface
 
         $cmsObject = $observer->getEvent()->getData('data_object');
         /* Original Model::hasDataChanges() not works here, so we added our custom check */
-        if ($this->hasImportantDataChanges($cmsObject)){
+        if ($this->hasImportantDataChanges($cmsObject)) {
             $this->backupManager->createBackup($this->eventsTypeMap[$eventName], $cmsObject);
         }
     }

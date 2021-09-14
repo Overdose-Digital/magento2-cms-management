@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
 	<system>
-		<tab id="overdose" sortOrder="999" translate="label">
-			<label>Overdose</label>
-		</tab>
-		<section id="cms_content" showInDefault="0" showInStore="0" showInWebsite="0" sortOrder="10" translate="label">
+        <tab id="od_core" translate="label" sortOrder="10">
+            <label>Overdose</label>
+        </tab>
+		<section id="cms_content" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label">
 			<label>CmsContent</label>
-			<tab>overdose</tab>
+            <tab>od_core</tab>
 			<resource>Overdose_CMSContent::config_overdose_cmscontent</resource>
 			<group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
 				<label>General</label>
@@ -15,7 +15,7 @@
 					<comment/>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 				</field>
-				<field id="show_menu" showInDefault="0" showInStore="0" showInWebsite="0" sortOrder="300" translate="label" type="select">
+				<field id="show_menu" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="300" translate="label" type="select">
 					<label>Show Menu</label>
 					<comment/>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
