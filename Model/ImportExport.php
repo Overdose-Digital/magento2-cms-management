@@ -14,13 +14,15 @@ use Magento\Cms\Model\PageFactory as CmsPageFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as CmsPageCollectionFactory;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory as CmsBlockCollectionFactory;
 use Magento\Framework\Stdlib\DateTime\DateTime;
+use Overdose\CMSContent\Api\CmsEntityConverterManagerInterface;
+use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
 use Overdose\CMSContent\Api\ContentImportExportInterface;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class ImportExport implements ContentImportExportInterface
 {
-    const JSON_FILENAME = 'cms.json';
+    const FILENAME = 'cms';
     const MEDIA_ARCHIVE_PATH = 'media';
 
     protected $storeRepositoryInterface;
@@ -40,6 +42,14 @@ class ImportExport implements ContentImportExportInterface
      * @var SerializerInterface
      */
     protected $serializerInterface;
+    /**
+     * @var CmsEntityConverterManagerInterface
+     */
+    private $cmsEntityConverterManager;
+    /**
+     * @var CmsEntityGeneratorManagerInterface
+     */
+    private $cmsEntityGeneratorManager;
 
     /**
      * @param StoreRepositoryInterface $storeRepositoryInterface
@@ -63,7 +73,10 @@ class ImportExport implements ContentImportExportInterface
         BlockRepositoryInterface $blockRepositoryInterface,
         Filesystem $filesystem,
         File $file,
-        DateTime $dateTime
+        DateTime $dateTime,
+
+        CmsEntityConverterManagerInterface $cmsEntityConverterManager,
+        CmsEntityGeneratorManagerInterface $cmsEntityGeneratorManager
     ) {
         $this->storeRepositoryInterface = $storeRepositoryInterface;
         $this->serializerInterface = $serializerInterface;
@@ -84,33 +97,38 @@ class ImportExport implements ContentImportExportInterface
         foreach ($stores as $store) {
             $this->storesMap[$store->getCode()] = $store->getCode();
         }
+        $this->cmsEntityConverterManager = $cmsEntityConverterManager;
+        $this->cmsEntityGeneratorManager = $cmsEntityGeneratorManager;
     }
 
     /**
      * Create a zip file and return its name
-     * @param \Magento\Cms\Api\Data\PageInterface[] $pageInterfaces
-     * @param \Magento\Cms\Api\Data\BlockInterface[] $blockInterfaces
+     * @param \Magento\Cms\Api\Data\PageInterface[] | \Magento\Cms\Api\Data\BlockInterface[] $cmsEntities
+     * @param string $type
+     * @param string $fileName
      * @return string
      */
-    public function createZipFile(array $pageInterfaces, array $blockInterfaces): string
+    public function createZipFile(array $cmsEntities, string $type, string $fileName = null): string
     {
-        $pagesArray = $this->convertPagesToArray($pageInterfaces);
-        $blocksArray = $this->convertBlocksToArray($blockInterfaces);
+        $contentArray = $this->cmsEntityConverterManager
+            ->setEntities($cmsEntities)
+            ->getConverter()
+            ->convertToArray($cmsEntities);
 
-        $contentArray = array_merge_recursive($pagesArray, $blocksArray);
-
-        $jsonPayload = $this->serializerInterface->serialize($contentArray);
+        $payload = $this->cmsEntityGeneratorManager
+            ->getGenerator($type)
+            ->generate($contentArray);
 
         $exportPath = $this->filesystem->getExportPath();
 
-        $zipFile = $exportPath . '/' . sprintf('cms_%s.zip', $this->dateTime->date('Ymd_His'));
-        $relativeZipFile = Filesystem::EXPORT_PATH . '/' . sprintf('cms_%s.zip', $this->dateTime->date('Ymd_His'));
+        $zipFile = $exportPath . '/' . $fileName;
+        $relativeZipFile = Filesystem::EXPORT_PATH . '/' . $fileName;
 
         $zipArchive = new \ZipArchive();
         $zipArchive->open($zipFile, \ZipArchive::CREATE);
 
         // Add pages json
-        $zipArchive->addFromString(self::JSON_FILENAME, $jsonPayload);
+        $zipArchive->addFromString(self::FILENAME . '.' . $type, $payload);
 
         // Add media files
         foreach ($contentArray['media'] as $mediaFile) {

@@ -6,6 +6,8 @@
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
     <preference for="Overdose\CMSContent\Api\ContentImportExportInterface" type="Overdose\CMSContent\Model\ImportExport" />
+    <preference for="Overdose\CMSContent\Api\CmsEntityConverterManagerInterface" type="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager" />
+    <preference for="Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface" type="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager" />
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
             <argument name="fileName" xsi:type="string">cms_page_data.xml</argument>
@@ -48,6 +50,22 @@
     <type name="Overdose\CMSContent\Observer\CmsSaveBefore">
         <arguments>
             <argument name="backupManager" xsi:type="object">\Overdose\CMSContent\Model\BackupManager\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager">
+        <arguments>
+            <argument name="converters" xsi:type="array">
+                <item name="pageConverter" xsi:type="object">Overdose\CMSContent\Model\Converter\Page\Converter</item>
+                <item name="blockConverter" xsi:type="object">Overdose\CMSContent\Model\Converter\Block\Converter</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager">
+        <arguments>
+            <argument name="generators" xsi:type="array">
+                <item name="jsonGenerator" xsi:type="object">Overdose\CMSContent\Model\Generator\Json\Generator</item>
+                <item name="xmlGenerator" xsi:type="object">Overdose\CMSContent\Model\Generator\Xml\Generator</item>
+            </argument>
         </arguments>
     </type>
 </config>

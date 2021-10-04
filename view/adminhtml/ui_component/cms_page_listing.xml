@@ -2,12 +2,21 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <listingToolbar name="listing_top">
         <massaction name="listing_massaction">
-            <action name="export">
+            <action name="export_json">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
-                        <item name="type" xsi:type="string">export</item>
-                        <item name="label" xsi:type="string" translate="true">Export</item>
-                        <item name="url" xsi:type="url" path="cmscontent/page/massExport"/>
+                        <item name="type" xsi:type="string">export_json</item>
+                        <item name="label" xsi:type="string" translate="true">Export Json</item>
+                        <item name="url" xsi:type="url" path="cmscontent/page/massExport/type/json"/>
+                    </item>
+                </argument>
+            </action>
+            <action name="export_xml">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">export_xml</item>
+                        <item name="label" xsi:type="string" translate="true">Export XML</item>
+                        <item name="url" xsi:type="url" path="cmscontent/page/massExport/type/xml"/>
                     </item>
                 </argument>
             </action>

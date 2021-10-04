@@ -49,15 +49,23 @@ class MassExport extends Action
             $pages[] = $page;
         }
 
+        $fileType = $this->getFileType();
+
+        $fileName = sprintf('cms_%s.zip', $this->dateTime->date('Ymd_His'));
         return $this->fileFactory->create(
-            sprintf('cms_%s.zip', $this->dateTime->date('Ymd_His')),
+            $fileName,
             [
                 'type' => 'filename',
-                'value' => $this->importExportContentInterface->createZipFile($pages, []),
+                'value' => $this->importExportContentInterface->createZipFile($pages, $fileType, $fileName),
                 'rm' => true,
             ],
             DirectoryList::VAR_DIR,
             'application/zip'
         );
+    }
+
+    private function getFileType()
+    {
+        return $this->getRequest()->getParam('type') ?? 'json';
     }
 }
