@@ -66,11 +66,12 @@ interface ContentImportExportInterface
 
     /**
      * Create a zip file and return its name
-     * @param \Magento\Cms\Api\Data\PageInterface[] $pageInterfaces
-     * @param BlockInterface[] $blockInterfaces
+     * @param \Magento\Cms\Api\Data\PageInterface[] | \Magento\Cms\Api\Data\BlockInterface[] $cmsEntities
+     * @param string $type
+     * @param string $fileName
      * @return string
      */
-    public function createZipFile(array $pageInterfaces, array $blockInterfaces): string;
+    public function createZipFile(array $cmsEntities, string $type, string $fileName = null): string;
 
     /**
      * Import a single page from an array and return false on error and true on success
