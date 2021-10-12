@@ -13,10 +13,13 @@ class Converter implements CmsEntityConverterInterface
 {
     const CMS_ENTITY_TYPE = \Magento\Cms\Api\Data\BlockInterface::class;
 
+    const CMS_ENTITY_CODE = 'blocks';
+
     /**
      * @var StoreRepositoryInterface
      */
     private $storeRepositoryInterface;
+
     /**
      * @var BlockRepositoryInterface
      */
@@ -25,17 +28,31 @@ class Converter implements CmsEntityConverterInterface
     public function __construct(
         StoreRepositoryInterface $storeRepositoryInterface,
         BlockRepositoryInterface $blockRepositoryInterface
-    )
-    {
+    ) {
         $this->storeRepositoryInterface = $storeRepositoryInterface;
         $this->blockRepositoryInterface = $blockRepositoryInterface;
     }
 
+    /**
+     * @return string
+     */
     public function getCmsEntityType(): string
     {
         return self::CMS_ENTITY_TYPE;
     }
 
+    /**
+     * @return string
+     */
+    public function getCmsEntityCode(): string
+    {
+        return self::CMS_ENTITY_CODE;
+    }
+
+    /**
+     * @param array $cmsEntities
+     * @return array
+     */
     public function convertToArray(array $cmsEntities): array
     {
         $blocks = [];
@@ -138,7 +155,7 @@ class Converter implements CmsEntityConverterInterface
 
         if (preg_match_all('/{{widget.+?block_id\s*=\s*("|&quot;)(\d+?)("|&quot;).*?}}/', $content, $matches)) {
             foreach ($matches[2] as $blockId) {
-                $block                = $this->blockRepositoryInterface->getById($blockId);
+                $block = $this->blockRepositoryInterface->getById($blockId);
                 $references[$blockId] = $block->getIdentifier();
             }
         }

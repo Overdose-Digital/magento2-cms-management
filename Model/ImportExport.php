@@ -110,15 +110,6 @@ class ImportExport implements ContentImportExportInterface
      */
     public function createZipFile(array $cmsEntities, string $type, string $fileName = null): string
     {
-        $contentArray = $this->cmsEntityConverterManager
-            ->setEntities($cmsEntities)
-            ->getConverter()
-            ->convertToArray($cmsEntities);
-
-        $payload = $this->cmsEntityGeneratorManager
-            ->getGenerator($type)
-            ->generate($contentArray);
-
         $exportPath = $this->filesystem->getExportPath();
 
         $zipFile = $exportPath . '/' . $fileName;
@@ -127,8 +118,21 @@ class ImportExport implements ContentImportExportInterface
         $zipArchive = new \ZipArchive();
         $zipArchive->open($zipFile, \ZipArchive::CREATE);
 
-        // Add pages json
-        $zipArchive->addFromString(self::FILENAME . '.' . $type, $payload);
+        $converter = $this->cmsEntityConverterManager
+            ->setEntities($cmsEntities)
+            ->getConverter();
+        $contentArray = $converter->convertToArray($cmsEntities);
+
+        $cmsEntityCode = $converter->getCmsEntityCode();
+        foreach ($contentArray[$cmsEntityCode] as $key => $content) {
+            $payload = $this->cmsEntityGeneratorManager
+                ->getGenerator($type)
+                ->generate([
+                    $cmsEntityCode => [$key => $content],
+                    'media' => $contentArray['media']
+                ]);
+            $zipArchive->addFromString(sprintf('%s-%s-%s.%s', self::FILENAME, $cmsEntityCode, $key, $type), $payload);
+        }
 
         // Add media files
         foreach ($contentArray['media'] as $mediaFile) {

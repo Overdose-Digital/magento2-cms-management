@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Overdose\CMSContent\Model\Converter;
-
 
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityConverterInterface;
@@ -19,11 +17,14 @@ class CmsEntityConverterManager implements CmsEntityConverterManagerInterface
 
     public function __construct(
         array $converters
-    )
-    {
+    ) {
         $this->converters = $converters;
     }
 
+    /**
+     * @param array $entities
+     * @return $this|CmsEntityConverterManagerInterface
+     */
     public function setEntities(array $entities): CmsEntityConverterManagerInterface
     {
         $this->entities = $entities;
@@ -31,13 +32,17 @@ class CmsEntityConverterManager implements CmsEntityConverterManagerInterface
         return $this;
     }
 
+    /**
+     * @return CmsEntityConverterInterface
+     * @throws LocalizedException
+     */
     public function getConverter(): CmsEntityConverterInterface
     {
-        if(count($this->entities) > 0){
+        if (count($this->entities) > 0) {
             $cmsEntity = $this->entities[0];
-            foreach ($this->converters as $converter){
+            foreach ($this->converters as $converter) {
                 $type = $converter->getCmsEntityType();
-                if($cmsEntity instanceof $type){
+                if ($cmsEntity instanceof $type) {
                     return $converter;
                 }
             }

@@ -17,15 +17,14 @@ class CmsEntityGeneratorManager implements CmsEntityGeneratorManagerInterface
 
     public function __construct(
         array $generators
-    )
-    {
+    ) {
         $this->generators = $generators;
     }
 
     public function getGenerator($type): CmsEntityGeneratorInterface
     {
-        foreach ($this->generators as $generator){
-            if($generator->getType() === $type){
+        foreach ($this->generators as $generator) {
+            if ($generator->getType() === $type) {
                 return $generator;
             }
         }

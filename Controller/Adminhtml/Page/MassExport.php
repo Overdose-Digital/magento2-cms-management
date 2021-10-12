@@ -51,7 +51,7 @@ class MassExport extends Action
 
         $fileType = $this->getFileType();
 
-        $fileName = sprintf('cms_%s.zip', $this->dateTime->date('Ymd_His'));
+        $fileName = sprintf('cms_page_%s.zip', $this->dateTime->date('Ymd_His'));
         return $this->fileFactory->create(
             $fileName,
             [

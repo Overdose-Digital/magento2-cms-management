@@ -75,7 +75,7 @@ class Form extends Generic
             'zipfile',
             'file',
             [
-                'name' => 'zipfile',
+                'name' => 'zipfile[]',
                 'label' => __('ZIP File'),
                 'title' => __('ZIP File'),
                 'required' => true,
