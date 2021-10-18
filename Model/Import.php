@@ -128,9 +128,20 @@ class Import implements ContentImportInterface
                 throw new \Exception($path . ' is missing');
             }
 
-            // Read and import
-            $jsonString = $this->file->read($absolutePath);
-            $cmsData = $this->serializerInterface->unserialize($jsonString);
+            $pathInfo = $this->file->getPathInfo($absolutePath);
+
+            $cmsData = [];
+            if($pathInfo['extension'] === 'xml'){
+                $xmlfile = file_get_contents($absolutePath);
+                $xml = simplexml_load_string($xmlfile);
+                $xml = $this->serializerInterface->serialize($xml);
+                $cmsData = $this->serializerInterface->unserialize($xml);
+            }
+
+            if($pathInfo['extension'] === 'json'){
+                $jsonString = $this->file->read($absolutePath);
+                $cmsData = $this->serializerInterface->unserialize($jsonString);
+            }
 
             $count += $this->importContentFromArray($cmsData, $extractPath);
 
@@ -162,41 +173,47 @@ class Import implements ContentImportInterface
         $count = 0;
 
         // Import pages
-        foreach ($payload['pages'] as $key => $pageData) {
-            if ($this->importPageContentFromArray($pageData)) {
-                $count++;
+        if(isset($payload['pages'])){
+            foreach ($payload['pages'] as $key => $pageData) {
+                if ($this->importPageContentFromArray($pageData)) {
+                    $count++;
+                }
             }
         }
 
-        // Import blocks
-        foreach ($payload['blocks'] as $key => $blockData) {
-            if ($this->importBlockContentFromArray($blockData)) {
-                $count++;
+
+        if(isset($payload['blocks'])){
+            foreach ($payload['blocks'] as $key => $blockData) {
+                if ($this->importBlockContentFromArray($blockData)) {
+                    $count++;
+                }
             }
         }
 
         // Import media
         if ($archivePath && ($count > 0) && ($this->mediaMode != ContentImportInterface::OD_MEDIA_MODE_NONE)) {
-            foreach ($payload['media'] as $mediaFile) {
-                $sourceFile = $archivePath . '/' . self::MEDIA_ARCHIVE_PATH . '/' . $mediaFile;
-                $destFile = $this->fileSystem->getMediaPath($mediaFile);
+            if (isset($payload['media'])) {
+                foreach ($payload['media'] as $mediaFile) {
+                    $sourceFile = $archivePath . '/' . self::MEDIA_ARCHIVE_PATH . '/' . $mediaFile;
+                    $destFile = $this->fileSystem->getMediaPath($mediaFile);
 
-                if ($this->file->fileExists($sourceFile, true)) {
-                    if ($this->file->fileExists($destFile, true) &&
-                        ($this->mediaMode == ContentImportInterface::OD_MEDIA_MODE_SKIP)
-                    ) {
-                        continue;
-                    }
-
-                    if (!$this->file->fileExists(dirname($destFile), false)) {
-                        if (!$this->file->mkdir(dirname($destFile))) {
-                            throw new \Exception('Unable to create folder: ' . dirname($destFile));
+                    if ($this->file->fileExists($sourceFile, true)) {
+                        if ($this->file->fileExists($destFile, true) &&
+                            ($this->mediaMode == ContentImportInterface::OD_MEDIA_MODE_SKIP)
+                        ) {
+                            continue;
                         }
+
+                        if (!$this->file->fileExists(dirname($destFile), false)) {
+                            if (!$this->file->mkdir(dirname($destFile))) {
+                                throw new \Exception('Unable to create folder: ' . dirname($destFile));
+                            }
+                        }
+                        if (!$this->file->cp($sourceFile, $destFile)) {
+                            throw new \Exception('Unable to save image: ' . $mediaFile);
+                        }
+                        $count++;
                     }
-                    if (!$this->file->cp($sourceFile, $destFile)) {
-                        throw new \Exception('Unable to save image: ' . $mediaFile);
-                    }
-                    $count++;
                 }
             }
         }

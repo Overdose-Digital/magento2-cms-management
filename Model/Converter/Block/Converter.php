@@ -85,7 +85,7 @@ class Converter implements CmsEntityConverterInterface
                 CmsBlockInterface::IDENTIFIER => $blockInterface->getIdentifier(),
                 CmsBlockInterface::TITLE => $blockInterface->getTitle(),
                 CmsBlockInterface::CONTENT => $blockInterface->getContent(),
-                CmsBlockInterface::IS_ACTIVE => $blockInterface->isActive(),
+                CmsBlockInterface::IS_ACTIVE => (string)$blockInterface->isActive(),
             ],
             'stores' => $this->getStoreCodes($blockInterface->getStoreId()),
             'media' => $media,
