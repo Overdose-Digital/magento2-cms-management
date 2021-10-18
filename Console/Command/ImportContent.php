@@ -3,7 +3,7 @@
 namespace Overdose\CMSContent\Console\Command;
 
 use Magento\Framework\ObjectManagerInterface;
-use Overdose\CMSContent\Api\ContentImportExportInterface;
+use Overdose\CMSContent\Api\ContentImportInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,7 +44,7 @@ class ImportContent extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $contentImportInterface = $this->objectManager->get(ContentImportExportInterface::class);
+        $contentImportInterface = $this->objectManager->get(ContentImportInterface::class);
 
         $zipFile = $input->getArgument('zipfile');
         if ($contentImportInterface->importContentFromZipFile($zipFile, false) == 0) {
