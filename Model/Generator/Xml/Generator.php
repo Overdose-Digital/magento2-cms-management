@@ -2,7 +2,7 @@
 
 namespace Overdose\CMSContent\Model\Generator\Xml;
 
-use Magento\Framework\Xml\Generator as XmlGenerator;
+use Magento\Framework\Xml\GeneratorFactory as XmlGeneratorFactory;
 use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
 
 class Generator implements CmsEntityGeneratorInterface
@@ -10,14 +10,14 @@ class Generator implements CmsEntityGeneratorInterface
     const TYPE = 'xml';
 
     /**
-     * @var XmlGenerator
+     * @var XmlGeneratorFactory
      */
-    private $xmlGenerator;
+    private $xmlGeneratorFactory;
 
     public function __construct(
-        XmlGenerator $xmlGenerator
+        XmlGeneratorFactory $xmlGeneratorFactory
     ) {
-        $this->xmlGenerator = $xmlGenerator;
+        $this->xmlGeneratorFactory = $xmlGeneratorFactory;
     }
 
     /**
@@ -35,7 +35,8 @@ class Generator implements CmsEntityGeneratorInterface
      */
     public function generate(array $data): string
     {
-        $xml = $this->xmlGenerator->arrayToXml($data);
+        $xmlGenerator = $this->xmlGeneratorFactory->create();
+        $xml = $xmlGenerator->arrayToXml(['config' => $data]);
         return (string)$xml;
     }
 }

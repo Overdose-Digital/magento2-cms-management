@@ -96,7 +96,7 @@ class Converter implements CmsEntityConverterInterface
                 CmsPageInterface::CUSTOM_LAYOUT_UPDATE_XML => $pageInterface->getCustomLayoutUpdateXml(),
                 CmsPageInterface::CUSTOM_THEME_FROM => $pageInterface->getCustomThemeFrom(),
                 CmsPageInterface::CUSTOM_THEME_TO => $pageInterface->getCustomThemeTo(),
-                CmsPageInterface::IS_ACTIVE => $pageInterface->isActive(),
+                CmsPageInterface::IS_ACTIVE => (string)$pageInterface->isActive(),
             ],
             'stores' => $this->getStoreCodes($pageInterface->getStoreId()),
             'media' => $media,

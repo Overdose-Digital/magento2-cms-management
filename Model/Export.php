@@ -66,14 +66,16 @@ class Export implements ContentExportInterface
         $contentArray = $converter->convertToArray($cmsEntities);
 
         $cmsEntityCode = $converter->getCmsEntityCode();
+        $media = [];
         foreach ($contentArray[$cmsEntityCode] as $key => $content) {
             $payload = $this->cmsEntityGeneratorManager
                 ->getGenerator($type)
                 ->generate([
-                    $cmsEntityCode => [$key => $content],
-                    'media' => $contentArray['media']
+                    $cmsEntityCode => [$key => $content]
                 ]);
             $zipArchive->addFromString(sprintf('%s-%s-%s.%s', self::FILENAME, $cmsEntityCode, $key, $type), $payload);
+
+            $media += $contentArray['media'];
         }
 
         // Add media files
