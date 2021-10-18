@@ -4,7 +4,7 @@ namespace Overdose\CMSContent\Block\Adminhtml\Import\Upload;
 
 use Magento\Backend\Block\Widget\Form\Generic;
 use Magento\Store\Api\StoreRepositoryInterface;
-use Overdose\CMSContent\Api\ContentImportExportInterface;
+use Overdose\CMSContent\Api\ContentImportInterface;
 use Overdose\CMSContent\Model\Source\CmsMode;
 use Overdose\CMSContent\Model\Source\MediaMode;
 
@@ -75,7 +75,7 @@ class Form extends Generic
             'zipfile',
             'file',
             [
-                'name' => 'zipfile[]',
+                'name' => 'zipfile',
                 'label' => __('ZIP File'),
                 'title' => __('ZIP File'),
                 'required' => true,
@@ -121,8 +121,8 @@ class Form extends Generic
         }
 
         $values = [
-            'cms_mode' => ContentImportExportInterface::OD_CMS_MODE_UPDATE,
-            'media_mode' => ContentImportExportInterface::OD_MEDIA_MODE_UPDATE,
+            'cms_mode' => ContentImportInterface::OD_CMS_MODE_UPDATE,
+            'media_mode' => ContentImportInterface::OD_MEDIA_MODE_UPDATE,
         ];
         foreach ($stores as $storeInterface) {
             $values['store_map:'.$storeInterface->getCode()] = $storeInterface->getCode();

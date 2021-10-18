@@ -5,7 +5,7 @@ namespace Overdose\CMSContent\Controller\Adminhtml\Import;
 use Magento\Backend\App\Action;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\File\UploaderFactory;
-use Overdose\CMSContent\Api\ContentImportExportInterface;
+use Overdose\CMSContent\Api\ContentImportInterface;
 use Overdose\CMSContent\Model\Filesystem;
 
 class Post extends Action
@@ -21,7 +21,7 @@ class Post extends Action
     public function __construct(
         Action\Context $context,
         UploaderFactory $uploaderFactory,
-        ContentImportExportInterface $importExportInterface,
+        ContentImportInterface $importExportInterface,
         RedirectFactory $redirectFactory,
         Filesystem $filesystem
     ) {

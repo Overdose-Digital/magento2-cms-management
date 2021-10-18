@@ -8,27 +8,27 @@ use Magento\Backend\App\Action;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Overdose\CMSContent\Api\ContentImportExportInterface;
+use Overdose\CMSContent\Api\ContentExportInterface;
 
 class MassExport extends Action
 {
     protected $filter;
     protected $collectionFactory;
-    protected $importExportContentInterface;
+    protected $contentExport;
     protected $fileFactory;
     protected $dateTime;
 
     public function __construct(
         Action\Context $context,
         Filter $filter,
-        ContentImportExportInterface $importExportContentInterface,
+        ContentExportInterface $contentExport,
         CollectionFactory $collectionFactory,
         FileFactory $fileFactory,
         DateTime $dateTime
     ) {
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
-        $this->importExportContentInterface = $importExportContentInterface;
+        $this->contentExport = $contentExport;
         $this->fileFactory = $fileFactory;
         $this->dateTime = $dateTime;
 
@@ -56,7 +56,7 @@ class MassExport extends Action
             $fileName,
             [
                 'type' => 'filename',
-                'value' => $this->importExportContentInterface->createZipFile($pages, $fileType, $fileName),
+                'value' => $this->contentExport->createZipFile($pages, $fileType, $fileName),
                 'rm' => true,
             ],
             DirectoryList::VAR_DIR,
