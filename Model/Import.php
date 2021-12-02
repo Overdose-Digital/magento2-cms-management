@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Overdose\CMSContent\Model;
 
 use Magento\Cms\Api\BlockRepositoryInterface;
@@ -13,66 +12,93 @@ use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as CmsPageCollectionF
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Xml\Parser;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Overdose\CMSContent\Api\ContentImportInterface;
 
 class Import implements ContentImportInterface
 {
-    const MEDIA_ARCHIVE_PATH = 'media';
     /**
      * @var FileSystem
      */
-    private FileSystem $fileSystem;
+    private $fileSystem;
     /**
      * @var File
      */
-    private File $file;
+    private $file;
 
-    protected $cmsMode;
-    protected $mediaMode;
-    protected $storesMap;
+    /**
+     * @var string
+     */
+    private $cmsMode = ContentImportInterface::OD_CMS_MODE_UPDATE;
+
+    /**
+     * @var string
+     */
+    private $mediaMode = ContentImportInterface::OD_MEDIA_MODE_UPDATE;
+
+    /**
+     * @var array
+     */
+    private $storesMap = [];
 
     /**
      * @var CmsPageCollectionFactory
      */
-    private CmsPageCollectionFactory $pageCollectionFactory;
+    private $pageCollectionFactory;
     /**
      * @var CmsBlockCollectionFactory
      */
-    private CmsBlockCollectionFactory $blockCollectionFactory;
+    private $blockCollectionFactory;
     /**
      * @var CmsPageFactory
      */
-    private CmsPageFactory $pageFactory;
+    private $pageFactory;
     /**
      * @var CmsBlockFactory
      */
-    private CmsBlockFactory $blockFactory;
+    private $blockFactory;
 
     /**
      * @var BlockRepositoryInterface
      */
-    private BlockRepositoryInterface $blockRepositoryInterface;
+    private $blockRepositoryInterface;
     /**
      * @var StoreRepositoryInterface
      */
-    private StoreRepositoryInterface $storeRepositoryInterface;
+    private $storeRepositoryInterface;
     /**
      * @var SerializerInterface
      */
-    private SerializerInterface $serializerInterface;
+    private $serializerInterface;
 
+    /**
+     * @var Parser
+     */
+    private $xmlParser;
+
+    /**
+     * @param FileSystem $fileSystem
+     * @param File $file
+     * @param CmsPageFactory $pageFactory
+     * @param CmsBlockFactory $blockFactory
+     * @param CmsBlockCollectionFactory $blockCollectionFactory
+     * @param CmsPageCollectionFactory $pageCollectionFactory
+     * @param BlockRepositoryInterface $blockRepositoryInterface
+     * @param StoreRepositoryInterface $storeRepositoryInterface
+     * @param Parser $xmlParser
+     * @param SerializerInterface $serializerInterface
+     */
     public function __construct(
         FileSystem $fileSystem,
         File $file,
         CmsPageFactory $pageFactory,
         CmsBlockFactory $blockFactory,
-
         CmsBlockCollectionFactory $blockCollectionFactory,
         CmsPageCollectionFactory $pageCollectionFactory,
-
         BlockRepositoryInterface $blockRepositoryInterface,
         StoreRepositoryInterface $storeRepositoryInterface,
+        Parser $xmlParser,
         SerializerInterface $serializerInterface
     ) {
         $this->fileSystem = $fileSystem;
@@ -83,28 +109,20 @@ class Import implements ContentImportInterface
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->blockRepositoryInterface = $blockRepositoryInterface;
         $this->storeRepositoryInterface = $storeRepositoryInterface;
-
-        $this->cmsMode = ContentImportInterface::OD_CMS_MODE_UPDATE;
-        $this->mediaMode = ContentImportInterface::OD_MEDIA_MODE_UPDATE;
-
-        $this->storesMap = [];
-        $stores = $this->storeRepositoryInterface->getList();
-        foreach ($stores as $store) {
-            $this->storesMap[$store->getCode()] = $store->getCode();
-        }
         $this->serializerInterface = $serializerInterface;
+        $this->xmlParser = $xmlParser;
     }
 
     /**
      * Import contents from zip archive and return number of imported records (-1 on error)
      * @param string $fileName
-     * @param bool $rm = true
+     * @param bool $rm
      * @return int
      * @throws \Exception
      */
-    public function importContentFromZipFile($fileName, $rm = false): int
+    public function importContentFromZipFile(string $fileName, bool $rm): int
     {
-        // Unzip archive
+        $this->init();
         $zipArchive = new \ZipArchive();
         $res = $zipArchive->open($fileName);
         if ($res !== true) {
@@ -117,11 +135,10 @@ class Import implements ContentImportInterface
         $zipArchive->extractTo($extractPath);
         $zipArchive->close();
 
-        // Check if pages.json exists
         $count = 0;
         foreach (scandir($extractPath. '/') as $path){
             $absolutePath = $extractPath. '/' . $path;
-            if(in_array($path, ['.', '..'])) {
+            if(in_array($path, ['.', '..']) || is_dir($path)) {
                 continue;
             }
             if (!$this->file->fileExists($absolutePath, true)) {
@@ -130,17 +147,22 @@ class Import implements ContentImportInterface
 
             $pathInfo = $this->file->getPathInfo($absolutePath);
 
-            $cmsData = [];
-            if($pathInfo['extension'] === 'xml'){
-                $xmlfile = file_get_contents($absolutePath);
-                $xml = simplexml_load_string($xmlfile);
-                $xml = $this->serializerInterface->serialize($xml);
-                $cmsData = $this->serializerInterface->unserialize($xml);
+            if (!isset($pathInfo['extension'])) {
+                continue;
             }
+            switch ($pathInfo['extension']) {
+                case 'xml':
+                    $cmsData = $this->xmlParser->load($absolutePath)->xmlToArray();
+                    break;
 
-            if($pathInfo['extension'] === 'json'){
-                $jsonString = $this->file->read($absolutePath);
-                $cmsData = $this->serializerInterface->unserialize($jsonString);
+                case 'json':
+                    $cmsData = $this->serializerInterface->unserialize(
+                        $this->file->read($absolutePath)
+                    );
+                    break;
+
+                default:
+                    $cmsData = [];
             }
 
             $count += $this->importContentFromArray($cmsData, $extractPath);
@@ -157,17 +179,28 @@ class Import implements ContentImportInterface
         return $count;
     }
 
+    protected function init(): void
+    {
+        $stores = $this->storeRepositoryInterface->getList();
+        foreach ($stores as $store) {
+            $this->storesMap[$store->getCode()] = $store->getCode();
+        }
+    }
+
     /**
      * Import contents from array and return number of imported records (-1 on error)
      * @param array $payload
-     * @param string $archivePath = null
+     * @param string|null $archivePath = null
      * @return int
      * @throws \Exception
      */
-    public function importContentFromArray(array $payload, $archivePath = null): int
+    public function importContentFromArray(array $payload, string $archivePath = null): int
     {
+        if (isset($payload['config'])) {
+            $payload = $payload['config'];
+        }
         if (!isset($payload['pages']) && !isset($payload['blocks'])) {
-            throw new \Exception('Invalid json archive');
+            throw new \Exception('Invalid import archive');
         }
 
         $count = 0;
@@ -180,7 +213,6 @@ class Import implements ContentImportInterface
                 }
             }
         }
-
 
         if(isset($payload['blocks'])){
             foreach ($payload['blocks'] as $key => $blockData) {

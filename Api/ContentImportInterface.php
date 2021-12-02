@@ -12,13 +12,16 @@ interface ContentImportInterface
     const OD_MEDIA_MODE_NONE = 'none';
     const OD_MEDIA_MODE_UPDATE = 'update';
     const OD_MEDIA_MODE_SKIP = 'skip';
+
+    const MEDIA_ARCHIVE_PATH = 'media';
+
     /**
      * Import contents from zip archive and return number of imported records (-1 on error)
      * @param string $fileName
-     * @param bool $rm = true
+     * @param bool $rm
      * @return int
      */
-    public function importContentFromZipFile($fileName, $rm = false): int;
+    public function importContentFromZipFile(string $fileName, bool $rm): int;
 
     /**
      * Set CMS mode on import

@@ -31,10 +31,10 @@ class Index extends Action
         $resultPage->setActiveMenu('Overdose_CMSContent::import')
             ->addBreadcrumb(__('CMS'), __('CMS'));
 
-        $resultPage->addBreadcrumb(__('Import CMS'), __('Import CMS by MageSpecialist'));
+        $resultPage->addBreadcrumb(__('Import CMS'), __('Import CMS'));
 
         $resultPage->getConfig()->getTitle()->prepend(__('CMS'));
-        $resultPage->getConfig()->getTitle()->prepend(__('CMS Import by MageSpecialist'));
+        $resultPage->getConfig()->getTitle()->prepend(__('CMS Import'));
 
         return $resultPage;
     }
