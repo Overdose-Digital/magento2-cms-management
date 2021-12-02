@@ -12,11 +12,26 @@ use Overdose\CMSContent\Api\ContentExportInterface;
 
 class MassExport extends Action
 {
-    protected $filter;
-    protected $collectionFactory;
-    protected $contentExport;
-    protected $fileFactory;
-    protected $dateTime;
+    /**
+     * @var Filter
+     */
+    private $filter;
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+    /**
+     * @var ContentExportInterface
+     */
+    private $contentExport;
+    /**
+     * @var FileFactory
+     */
+    private $fileFactory;
+    /**
+     * @var DateTime
+     */
+    private $dateTime;
 
     public function __construct(
         Action\Context $context,
@@ -35,11 +50,17 @@ class MassExport extends Action
         parent::__construct($context);
     }
 
+    /**
+     * @inheridoc
+     */
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('Overdose_CMSContent::export_page');
     }
 
+    /**
+     * @inheridoc
+     */
     public function execute()
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
@@ -49,23 +70,19 @@ class MassExport extends Action
             $pages[] = $page;
         }
 
-        $fileType = $this->getFileType();
-
         $fileName = sprintf('cms_page_%s.zip', $this->dateTime->date('Ymd_His'));
+        $fileType = $this->getRequest()->getParam('type') ?? 'json';
+        $isSplit = $this->getRequest()->getParam('split') ?? false;
+
         return $this->fileFactory->create(
             $fileName,
             [
                 'type' => 'filename',
-                'value' => $this->contentExport->createZipFile($pages, $fileType, $fileName),
+                'value' => $this->contentExport->createZipFile($pages, $fileType, $fileName, $isSplit),
                 'rm' => true,
             ],
             DirectoryList::VAR_DIR,
             'application/zip'
         );
-    }
-
-    private function getFileType()
-    {
-        return $this->getRequest()->getParam('type') ?? 'json';
     }
 }

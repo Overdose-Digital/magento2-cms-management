@@ -5,7 +5,6 @@
     <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface" type="Overdose\CMSContent\Model\ContentVersionRepository"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
-    <preference for="Overdose\CMSContent\Api\ContentImportExportInterface" type="Overdose\CMSContent\Model\ImportExport" />
     <preference for="Overdose\CMSContent\Api\ContentExportInterface" type="Overdose\CMSContent\Model\Export" />
     <preference for="Overdose\CMSContent\Api\ContentImportInterface" type="Overdose\CMSContent\Model\Import" />
     <preference for="Overdose\CMSContent\Api\CmsEntityConverterManagerInterface" type="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager" />

@@ -3,6 +3,7 @@
 namespace Overdose\CMSContent\Controller\Adminhtml\Block;
 
 use Magento\Backend\App\Response\Http\FileFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
 use Magento\Backend\App\Action;
 use Magento\Framework\Stdlib\DateTime\DateTime;
@@ -12,11 +13,26 @@ use Overdose\CMSContent\Api\ContentExportInterface;
 
 class MassExport extends Action
 {
-    protected $filter;
-    protected $collectionFactory;
-    protected $contentExport;
-    protected $fileFactory;
-    protected $dateTime;
+    /**
+     * @var Filter
+     */
+    private $filter;
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+    /**
+     * @var ContentExportInterface
+     */
+    private $contentExport;
+    /**
+     * @var FileFactory
+     */
+    private $fileFactory;
+    /**
+     * @var DateTime
+     */
+    private $dateTime;
 
     public function __construct(
         Action\Context $context,
@@ -35,36 +51,38 @@ class MassExport extends Action
         parent::__construct($context);
     }
 
+    /**
+     * @inheridoc
+     */
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('Overdose_CMSContent::export_block');
     }
 
+    /**
+     * @inheridoc
+     */
     public function execute()
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 
-        $pages = [];
-        foreach ($collection as $page) {
-            $pages[] = $page;
+        $blocks = [];
+        foreach ($collection as $block) {
+            $blocks[] = $block;
         }
 
-        $fileType = $this->getFileType();
+        $fileType = $this->getRequest()->getParam('type') ?? 'json';
+        $isSplit = $this->getRequest()->getParam('split') ?? false;
         $fileName = sprintf('cms_block_%s.zip', $this->dateTime->date('Ymd_His'));
         return $this->fileFactory->create(
             $fileName,
             [
                 'type' => 'filename',
-                'value' => $this->contentExport->createZipFile($pages, $fileType, $fileName),
+                'value' => $this->contentExport->createZipFile($blocks, $fileType, $fileName, $isSplit),
                 'rm' => true,
             ],
             DirectoryList::VAR_DIR,
             'application/zip'
         );
-    }
-
-    private function getFileType()
-    {
-        return $this->getRequest()->getParam('type') ?? 'json';
     }
 }

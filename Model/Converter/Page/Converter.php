@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Overdose\CMSContent\Model\Converter\Page;
-
 
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\Data\PageInterface as CmsPageInterface;

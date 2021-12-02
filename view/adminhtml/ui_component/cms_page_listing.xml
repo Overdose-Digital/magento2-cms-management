@@ -7,7 +7,16 @@
                     <item name="config" xsi:type="array">
                         <item name="type" xsi:type="string">export_json</item>
                         <item name="label" xsi:type="string" translate="true">Export Json</item>
-                        <item name="url" xsi:type="url" path="cmscontent/page/massExport/type/json"/>
+                        <item name="url" xsi:type="url" path="cmscontent/page/massExport"/>
+                    </item>
+                </argument>
+            </action>
+            <action name="export_json_split">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">export_json_split</item>
+                        <item name="label" xsi:type="string" translate="true">Export as split Json files</item>
+                        <item name="url" xsi:type="url" path="cmscontent/page/massExport/split/1"/>
                     </item>
                 </argument>
             </action>
@@ -17,6 +26,15 @@
                         <item name="type" xsi:type="string">export_xml</item>
                         <item name="label" xsi:type="string" translate="true">Export XML</item>
                         <item name="url" xsi:type="url" path="cmscontent/page/massExport/type/xml"/>
+                    </item>
+                </argument>
+            </action>
+            <action name="export_xml_split">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">export_xml_split</item>
+                        <item name="label" xsi:type="string" translate="true">Export as split XML files</item>
+                        <item name="url" xsi:type="url" path="cmscontent/page/massExport/type/xml/split/1"/>
                     </item>
                 </argument>
             </action>

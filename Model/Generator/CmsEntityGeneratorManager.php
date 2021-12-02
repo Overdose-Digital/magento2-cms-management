@@ -3,7 +3,6 @@
 
 namespace Overdose\CMSContent\Model\Generator;
 
-
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
 use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
