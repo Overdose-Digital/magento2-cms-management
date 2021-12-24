@@ -11,14 +11,12 @@
     <preference for="Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface" type="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager" />
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
-            <argument name="fileName" xsi:type="string">cms_page_data.xml</argument>
             <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Converter</argument>
             <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Page\SchemaLocator</argument>
         </arguments>
     </type>
     <type name="Overdose\CMSContent\Model\Config\Block\Reader">
         <arguments>
-            <argument name="fileName" xsi:type="string">cms_block_data.xml</argument>
             <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Block\Converter</argument>
             <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Block\SchemaLocator</argument>
         </arguments>

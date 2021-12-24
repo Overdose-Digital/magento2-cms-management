@@ -2,37 +2,37 @@
 
 namespace Overdose\CMSContent\Model\Config;
 
-use Magento\Framework\Config\FileResolverInterface;
 use Magento\Framework\Config\ConverterInterface;
 use Magento\Framework\Config\SchemaLocatorInterface;
 use Magento\Framework\Config\ValidationStateInterface;
 use Magento\Framework\Config\Reader\Filesystem;
+use Overdose\CMSContent\Model\Config\App\FileResolver;
 
 abstract class ReaderAbstract extends Filesystem
 {
     const SCOPE_GLOBAL = 'global';
     const SCOPE_PRIMARY = 'primary';
+    const FILE_NAME = 'cms_od_data.xml';
+    const OD_CONFIG_DIR_NAME = 'od_cms';
 
     protected $_idAttributes = [];
 
     /**
      * Reader constructor.
      *
-     * @param FileResolverInterface $fileResolver
+     * @param FileResolver $fileResolver
      * @param ConverterInterface $converter
      * @param SchemaLocatorInterface $schemaLocator
      * @param ValidationStateInterface $validationState
-     * @param string $fileName
      * @param array $idAttributes
      * @param string $domDocumentClass
      * @param string $defaultScope
      */
     public function __construct(
-        FileResolverInterface $fileResolver,
+        FileResolver $fileResolver,
         ConverterInterface $converter,
         SchemaLocatorInterface $schemaLocator,
         ValidationStateInterface $validationState,
-        $fileName = null,
         $idAttributes = [],
         $domDocumentClass = \Magento\Framework\Config\Dom::class,
         $defaultScope = 'primary'
@@ -42,7 +42,7 @@ abstract class ReaderAbstract extends Filesystem
             $converter,
             $schemaLocator,
             $validationState,
-            $fileName,
+            static::FILE_NAME,
             $idAttributes,
             $domDocumentClass,
             $defaultScope

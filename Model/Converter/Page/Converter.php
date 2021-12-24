@@ -166,7 +166,7 @@ class Converter implements CmsEntityConverterInterface
         if (preg_match_all('/{{widget.+?block_id\s*=\s*("|&quot;)(\d+?)("|&quot;).*?}}/', $content, $matches)) {
             foreach ($matches[2] as $blockId) {
                 $block = $this->blockRepositoryInterface->getById($blockId);
-                $references[$blockId] = $block->getIdentifier();
+                $references[] = $block->getIdentifier();
             }
         }
 
