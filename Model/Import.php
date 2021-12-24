@@ -385,8 +385,15 @@ class Import implements ContentImportInterface
         if (isset($cmsData['block_references'])) {
             $pairs = [];
             foreach ($cmsData['block_references'] as $blockId => $blockIdent) {
-                $block           = $this->blockRepositoryInterface->getById($blockIdent);
-                $pairs[$blockId] = $block->getId();
+                if (is_array($blockIdent)){
+                    foreach ($blockIdent as $blockIdentItem) {
+                        $block           = $this->blockRepositoryInterface->getById($blockIdentItem);
+                        $pairs[$blockId] = $block->getId();
+                    }
+                } else {
+                    $block           = $this->blockRepositoryInterface->getById($blockIdent);
+                    $pairs[$blockId] = $block->getId();
+                }
             }
 
             $cmsData['cms'][$contentKey] = preg_replace_callback(
