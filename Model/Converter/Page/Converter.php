@@ -11,8 +11,6 @@ class Converter implements CmsEntityConverterInterface
 {
     const CMS_ENTITY_TYPE = \Magento\Cms\Api\Data\PageInterface::class;
 
-    const CMS_ENTITY_CODE = 'pages';
-
     /**
      * @var StoreRepositoryInterface
      */
@@ -44,7 +42,7 @@ class Converter implements CmsEntityConverterInterface
      */
     public function getCmsEntityCode(): string
     {
-        return self::CMS_ENTITY_CODE;
+        return self::PAGE_ENTITY_CODE;
     }
 
     /**
@@ -63,7 +61,7 @@ class Converter implements CmsEntityConverterInterface
         }
 
         return [
-            'pages' => $pages,
+            self::PAGE_ENTITY_CODE => $pages,
             'media' => $media,
         ];
     }
