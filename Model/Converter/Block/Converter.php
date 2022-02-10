@@ -13,8 +13,6 @@ class Converter implements CmsEntityConverterInterface
 {
     const CMS_ENTITY_TYPE = \Magento\Cms\Api\Data\BlockInterface::class;
 
-    const CMS_ENTITY_CODE = 'blocks';
-
     /**
      * @var StoreRepositoryInterface
      */
@@ -46,7 +44,7 @@ class Converter implements CmsEntityConverterInterface
      */
     public function getCmsEntityCode(): string
     {
-        return self::CMS_ENTITY_CODE;
+        return self::BLOCK_ENTITY_CODE;
     }
 
     /**
@@ -65,7 +63,7 @@ class Converter implements CmsEntityConverterInterface
         }
 
         return [
-            'blocks' => $blocks,
+            self::BLOCK_ENTITY_CODE => $blocks,
             'media' => $media,
         ];
     }
