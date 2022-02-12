@@ -6,6 +6,7 @@ use Magento\Framework\Config\ConverterInterface;
 use Magento\Framework\Config\SchemaLocatorInterface;
 use Magento\Framework\Config\ValidationStateInterface;
 use Magento\Framework\Config\Reader\Filesystem;
+use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Model\Config\App\FileResolver;
 
 abstract class ReaderAbstract extends Filesystem
@@ -54,7 +55,7 @@ abstract class ReaderAbstract extends Filesystem
      *
      * @param null $scope
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function read($scope = null)
     {
@@ -64,5 +65,15 @@ abstract class ReaderAbstract extends Filesystem
         $fileListPrimary = count($fileListPrimary) ? $fileListPrimary->toArray() : [];
 
         return $this->_readFiles(array_merge($fileListGlobal, $fileListPrimary));
+    }
+
+    /**
+     * @param string $file
+     * @return array
+     * @throws LocalizedException
+     */
+    public function readFromFile(string $file)
+    {
+        return $this->_readFiles([$file => file_get_contents($file)]);
     }
 }

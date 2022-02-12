@@ -15,6 +15,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Xml\Parser;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Overdose\CMSContent\Api\ContentImportInterface;
+use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 
 class Import implements ContentImportInterface
 {
@@ -73,9 +74,9 @@ class Import implements ContentImportInterface
     private $serializerInterface;
 
     /**
-     * @var Parser
+     * @var ContentVersionManagementInterface
      */
-    private $xmlParser;
+    private $contentVersionManagement;
 
     /**
      * @param FileSystem $fileSystem
@@ -86,7 +87,7 @@ class Import implements ContentImportInterface
      * @param CmsPageCollectionFactory $pageCollectionFactory
      * @param BlockRepositoryInterface $blockRepositoryInterface
      * @param StoreRepositoryInterface $storeRepositoryInterface
-     * @param Parser $xmlParser
+     * @param ContentVersionManagementInterface $contentVersionManagement
      * @param SerializerInterface $serializerInterface
      */
     public function __construct(
@@ -98,7 +99,7 @@ class Import implements ContentImportInterface
         CmsPageCollectionFactory $pageCollectionFactory,
         BlockRepositoryInterface $blockRepositoryInterface,
         StoreRepositoryInterface $storeRepositoryInterface,
-        Parser $xmlParser,
+        ContentVersionManagementInterface $contentVersionManagement,
         SerializerInterface $serializerInterface
     ) {
         $this->fileSystem = $fileSystem;
@@ -110,7 +111,7 @@ class Import implements ContentImportInterface
         $this->blockRepositoryInterface = $blockRepositoryInterface;
         $this->storeRepositoryInterface = $storeRepositoryInterface;
         $this->serializerInterface = $serializerInterface;
-        $this->xmlParser = $xmlParser;
+        $this->contentVersionManagement = $contentVersionManagement;
     }
 
     /**
@@ -152,20 +153,16 @@ class Import implements ContentImportInterface
             }
             switch ($pathInfo['extension']) {
                 case 'xml':
-                    $cmsData = $this->xmlParser->load($absolutePath)->xmlToArray();
+                    $count += $this->contentVersionManagement->processFile($absolutePath);
                     break;
 
                 case 'json':
                     $cmsData = $this->serializerInterface->unserialize(
                         $this->file->read($absolutePath)
                     );
+                    $count += $this->importContentFromArray($cmsData, $extractPath);
                     break;
-
-                default:
-                    $cmsData = [];
             }
-
-            $count += $this->importContentFromArray($cmsData, $extractPath);
 
             // Remove if necessary
             if ($rm) {
