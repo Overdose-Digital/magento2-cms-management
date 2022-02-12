@@ -4,6 +4,9 @@ namespace Overdose\CMSContent\Api;
 
 interface ContentVersionManagementInterface
 {
+    const DEFAULT_VERSION = '1.0.0';
+    const XML_FILE_HEADER_LENGTH = 150;
+
     /**
      * Process update for all changed CMSContent records
      */
@@ -26,6 +29,14 @@ interface ContentVersionManagementInterface
     public function processPages($ids = []);
 
     /**
+     * Process update for all CMSContent records from file
+     *
+     * @param string $filePath
+     * @return int - count of processed entities
+     */
+    public function processFile(string $filePath);
+
+    /**
      * Update data for selected CMSContent record
      *
      * @param $contentVersion
@@ -42,4 +53,22 @@ interface ContentVersionManagementInterface
      * @return $this
      */
     public function createVersion($type, $data);
+
+    /**
+     * Retrieves current version number based on identifier and type (0 - blocks, 1-pages)
+     *
+     * @param int $type
+     * @param string $id
+     * @return string
+     */
+    public function getCurrentVersion(string $id, int $type);
+
+    /**
+     * Delete content version model based on identifier and type (0 - blocks, 1-pages)
+     *
+     * @param int $type
+     * @param string $id
+     * @return bool
+     */
+    public function deleteContentVersion(string $id, int $type);
 }

@@ -7,7 +7,7 @@
 		</constraint>
 		<column name="type" nullable="false" xsi:type="smallint"/>
 		<column length="255" name="identifier" nullable="false" xsi:type="varchar"/>
-		<column default="0.0.0" length="255" name="version" nullable="false" xsi:type="varchar"/>
+		<column default="1.0.0" length="255" name="version" nullable="false" xsi:type="varchar"/>
 		<column default="0" length="255" name="store_ids" nullable="false" xsi:type="varchar"/>
 	</table>
 </schema>

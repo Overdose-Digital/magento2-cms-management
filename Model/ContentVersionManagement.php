@@ -5,12 +5,13 @@ namespace Overdose\CMSContent\Model;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
-use Magento\Framework\Config\ReaderInterface;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Cms\Api\Data\BlockInterfaceFactory;
 use Magento\Cms\Api\Data\PageInterfaceFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Model\Config\ReaderAbstract;
 use Psr\Log\LoggerInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory;
@@ -172,6 +173,38 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
     /**
      * @inheritDoc
      */
+    public function processFile(string $filePath)
+    {
+        $count = 0;
+        switch ($type = $this->defineTypeEntityFromFile($filePath)) {
+            case ContentVersionInterface::TYPE_PAGE:
+                $configItems = $this->getConfigItems($this->pagesConfigReader, [], $filePath);
+                break;
+
+            case ContentVersionInterface::TYPE_BLOCK:
+                $configItems = $this->getConfigItems($this->blockConfigReader, [], $filePath);
+                break;
+
+            default:
+                return 0;
+        }
+
+        $contentVersions = $this->getContentVersions($type);
+        foreach ($configItems as $index => $configItem) {
+            if (isset($contentVersions[$index])) {
+                $this->updateVersion($contentVersions[$index], $configItem);
+            } else {
+                $this->createVersion($type, $configItem);
+            }
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function updateVersion($contentVersion, $configItem)
     {
         if (version_compare($contentVersion->getVersion(), $configItem[ContentVersionInterface::VERSION], '<')) {
@@ -194,7 +227,9 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      */
     public function createVersion($type, $data)
     {
-        $storeIdsData = isset($data['store_ids']) ? $data['store_ids'] : 0;
+        $version = $data[ContentVersionInterface::VERSION]
+            ?? self::DEFAULT_VERSION;
+        $storeIdsData = $data['store_ids'] ?? 0;
         $data['store_ids'] = $this->prepareStoreIds($storeIdsData);
 
         /* Create CMS-block */
@@ -204,11 +239,56 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
         $dataModel = $this->contentVersionFactory->create()
             ->setType($type)
             ->setIdentifier($data[ContentVersionInterface::IDENTIFIER])
-            ->setVersion($data[ContentVersionInterface::VERSION])
+            ->setVersion($version)
             ->setStoreIds($storeIdsData);
         $this->contentVersionRepository->save($dataModel);
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentVersion(string $id, int $type)
+    {
+        $versionResults = $this->getContentVersions($type, [$id]);
+        $versionModel = array_pop($versionResults);
+
+        return ($versionModel instanceof ContentVersionInterface) ?
+            $versionModel->getVersion() : self::DEFAULT_VERSION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteContentVersion(string $id, int $type)
+    {
+        $versionResults = $this->getContentVersions($type, [$id]);
+        $versionModel = array_pop($versionResults);
+
+        return $versionModel instanceof ContentVersionInterface
+            && $this->contentVersionRepository->delete($versionModel);
+    }
+
+    /**
+     * @param string $file
+     * @return int|null
+     */
+    private function defineTypeEntityFromFile(string $file)
+    {
+        if (strpos(
+            file_get_contents($file, false, null, 0, self::XML_FILE_HEADER_LENGTH),
+            CmsEntityGeneratorInterface::PAGE_SCHEMA_NAME)
+        ) {
+            return ContentVersionInterface::TYPE_PAGE;
+        } elseif (strpos(
+            file_get_contents($file, false, null, 0, self::XML_FILE_HEADER_LENGTH),
+            CmsEntityGeneratorInterface::BLOCK_SCHEMA_NAME))
+        {
+            return ContentVersionInterface::TYPE_BLOCK;
+        }
+
+        return null;
     }
 
     /**
@@ -246,7 +326,8 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
 
             $cmsDataModel
                 ->setData('title', $data['title'])
-                ->setData('content', $data['content']);
+                ->setData('content', $data['content'])
+                ->setData('is_active', $data['is_active']);
 
             if (isset($data['content_heading'])) {
                 $cmsDataModel->setData('content_heading', $data['content_heading']);
@@ -266,13 +347,17 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
     /**
      * Retrieves all data from block/page xml config, filtered by provided identifiers
      *
-     * @param ReaderInterface $configReader
+     * @param ReaderAbstract $configReader
      * @param array $filterIds
      * @return array
      */
-    private function getConfigItems(ReaderInterface $configReader, $filterIds = [])
+    private function getConfigItems(ReaderAbstract $configReader, $filterIds = [], $file = null)
     {
-        $config = $configReader->read();
+        if ($file) {
+            $config = $configReader->readFromFile($file);
+        } else {
+            $config = $configReader->read();
+        }
 
         if (empty($filterIds)) {
             return $config;

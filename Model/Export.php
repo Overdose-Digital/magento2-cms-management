@@ -106,7 +106,10 @@ class Export implements ContentExportInterface
                     ->generate([
                         $cmsEntityCode => [$key => $content]
                     ]);
-                $zipArchive->addFromString(sprintf('%s-%s-%s.%s', self::FILENAME, $cmsEntityCode, $key, $type), $payload);
+                $zipArchive->addFromString(
+                    sprintf('%s_%s_%s.%s', self::FILENAME, $this->prepareEntityPartName($cmsEntityCode), $key, $type),
+                    $payload
+                );
             }
         } else {
             $fullContent = [];
@@ -119,9 +122,21 @@ class Export implements ContentExportInterface
             $payload = $this->cmsEntityGeneratorManager
                 ->getGenerator($type)
                 ->generate($fullContent);
-            $zipArchive->addFromString(sprintf('%s-%s.%s', self::FILENAME, $cmsEntityCode, $type), $payload);
+            $zipArchive->addFromString(
+                sprintf('%s_%s.%s', self::FILENAME, $this->prepareEntityPartName($cmsEntityCode), $type),
+                $payload
+            );
         }
 
         return $zipArchive;
+    }
+
+    /**
+     * @param string $cmsEntityCode
+     * @return string
+     */
+    private function prepareEntityPartName(string $cmsEntityCode)
+    {
+        return substr($cmsEntityCode, 0, strlen($cmsEntityCode) - 1) . '_data';
     }
 }

@@ -5,19 +5,12 @@ namespace Overdose\CMSContent\Model\Generator\Xml;
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityConverterInterface;
 use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Api\ContentVersionManagementInterface;
+use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 
 class Generator implements CmsEntityGeneratorInterface
 {
     const TYPE = 'xml';
-
-    const XSD_TYPE_MAP = [
-        CmsEntityConverterInterface::PAGE_ENTITY_CODE => "cms_page_data.xsd",
-        CmsEntityConverterInterface::BLOCK_ENTITY_CODE => "cms_block_data.xsd"
-    ];
-
-    const MAIN_ENTITY_NODE_NAME = 'cms';
-    const STORES_ENTITY_NODE_NAME = 'stores';
-
     /**
      * @var \DOMDocument|null
      */
@@ -28,11 +21,17 @@ class Generator implements CmsEntityGeneratorInterface
      */
     private $currentDom;
 
-    public function __construct()
+    /**
+     * @var ContentVersionManagementInterface
+     */
+    private $contentVersionManagement;
+
+    /**
+     * @param ContentVersionManagementInterface $contentVersionManagement
+     */
+    public function __construct(ContentVersionManagementInterface $contentVersionManagement)
     {
-        $this->dom = new \DOMDocument('1.0');
-        $this->dom->formatOutput = true;
-        $this->currentDom = $this->dom;
+        $this->contentVersionManagement = $contentVersionManagement;
     }
 
     /**
@@ -50,11 +49,18 @@ class Generator implements CmsEntityGeneratorInterface
      */
     public function generate(array $data): string
     {
+        $this->init();
         $this->arrayToXml($data);
 
         return $this->dom->saveXML();
     }
 
+    private function init()
+    {
+        $this->dom = new \DOMDocument('1.0');
+        $this->dom->formatOutput = true;
+        $this->currentDom = $this->dom;
+    }
     /**
      * @param array $content
      * @return $this
@@ -69,8 +75,8 @@ class Generator implements CmsEntityGeneratorInterface
         $this->currentDom->appendChild($node);
         $this->setCurrentDom($node);
 
-        foreach ($content[$root] as $_key => $_item) {
-            $this->createEntityNode($_key, $_item);
+        foreach ($content[$root] as $key => $item) {
+            $this->createEntityNode($key, $item, $root);
             $this->setCurrentDom($node);
         }
 
@@ -102,21 +108,25 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
-     * @param $_key
-     * @param $_item
+     * @param $key
+     * @param $item
+     * @param $root
      * @return void
      * @throws \DOMException
      */
-    private function createEntityNode($_key, $_item)
+    private function createEntityNode(string $key, array $item, string $root)
     {
         $name = $this->currentDom->nodeName;
         $node = $this->dom->createElement(substr($name, 0, -1));
-        $node->setAttribute('identifier', $this->getCmsIdentifier($_key));
+        $identifier = $this->getCmsIdentifier($key);
+        $node->setAttribute('identifier', $identifier);
         $this->currentDom->appendChild($node);
         $this->setCurrentDom($node);
-        $this->createContentNodes($_item);
+        $this->createContentNodes($item);
         $this->setCurrentDom($node);
-        $this->createStoreNodes($_item);
+        $this->createStoreNodes($item);
+        $this->setCurrentDom($node);
+        $this->createVersionNodes($identifier, $root);
         $this->setCurrentDom($node);
     }
 
@@ -160,6 +170,25 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
+     * @param string $identifier
+     * @param string $root
+     * @return void
+     * @throws \DOMException
+     */
+    private function createVersionNodes(string $identifier, string $root)
+    {
+        $type = ($root === CmsEntityConverterInterface::PAGE_ENTITY_CODE) ?
+            ContentVersionInterface::TYPE_PAGE : ContentVersionInterface::TYPE_BLOCK;
+        $node = $this->dom->createElement('attribute');
+        $node->setAttribute('code', 'version');
+        $node->appendChild(
+            $this->dom->createTextNode($this->contentVersionManagement->getCurrentVersion($identifier, $type))
+        );
+        $this->currentDom->appendChild($node);
+        $this->setCurrentDom($node);
+    }
+
+    /**
      * @param string $_key
      * @return string
      */
@@ -187,6 +216,7 @@ class Generator implements CmsEntityGeneratorInterface
     /**
      * @param array $content
      * @return string
+     * @throws LocalizedException
      */
     private function defineRoot(array $content)
     {
@@ -198,4 +228,6 @@ class Generator implements CmsEntityGeneratorInterface
             throw new LocalizedException(__('Incorrect input content for xml generating!'));
         }
     }
+
+
 }
