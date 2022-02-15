@@ -8,9 +8,6 @@ use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
 use Overdose\CMSContent\Api\ContentExportInterface;
 use ZipArchive;
 
-/**
- *
- */
 class Export implements ContentExportInterface
 {
     const FILENAME = 'cms';

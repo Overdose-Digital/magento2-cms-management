@@ -2,6 +2,8 @@
 
 namespace Overdose\CMSContent\Observer;
 
+use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Api\Data\PageInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
@@ -35,7 +37,7 @@ class DeleteContentVersion implements ObserverInterface
 
     /**
      * @param Observer $observer
-     * @return void
+     * @return $this
      */
     public function execute(Observer $observer)
     {
@@ -43,11 +45,12 @@ class DeleteContentVersion implements ObserverInterface
         if (!array_key_exists($eventName, $this->eventsTypeMap)) {
             return $this;
         }
-
+        /** @var PageInterface|BlockInterface $cmsModel */
+        $cmsModel = $observer->getEvent()->getData('data_object');
         $this->contentVersionManagement->deleteContentVersion(
-            $observer->getEvent()->getData('data_object')->getIdentifier(),
+            $cmsModel->getIdentifier(),
             $this->eventsTypeMap[$eventName],
-            $observer->getEvent()->getData('data_object')->getStores()
+            $cmsModel->getStores()
         );
 
         return $this;
