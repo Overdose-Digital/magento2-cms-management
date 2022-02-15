@@ -7,6 +7,7 @@ use Overdose\CMSContent\Api\CmsEntityConverterInterface;
 use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
+use Overdose\CMSContent\Api\StoreManagementInterface;
 
 class Generator implements CmsEntityGeneratorInterface
 {
@@ -27,12 +28,22 @@ class Generator implements CmsEntityGeneratorInterface
     private $contentVersionManagement;
 
     /**
-     * @param ContentVersionManagementInterface $contentVersionManagement
+     * @var StoreManagementInterface
      */
-    public function __construct(ContentVersionManagementInterface $contentVersionManagement)
-    {
+    private $storeManagement;
+
+    /**
+     * @param ContentVersionManagementInterface $contentVersionManagement
+     * @param StoreManagementInterface $storeManagement
+     */
+    public function __construct(
+    ContentVersionManagementInterface $contentVersionManagement,
+    StoreManagementInterface $storeManagement
+    ) {
         $this->contentVersionManagement = $contentVersionManagement;
+        $this->storeManagement = $storeManagement;
     }
+
 
     /**
      * @return string
@@ -124,9 +135,9 @@ class Generator implements CmsEntityGeneratorInterface
         $this->setCurrentDom($node);
         $this->createContentNodes($item);
         $this->setCurrentDom($node);
-        $this->createStoreNodes($item);
+        $stores = $this->createStoreNodes($item);
         $this->setCurrentDom($node);
-        $this->createVersionNodes($identifier, $root);
+        $this->createVersionNodes($identifier, $root, $stores);
         $this->setCurrentDom($node);
     }
 
@@ -150,23 +161,27 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
-     * @param $_item
-     * @return void
+     * @param $item
+     * @return string|null
      * @throws \DOMException
      */
-    private function createStoreNodes($_item)
+    private function createStoreNodes($item)
     {
-        if (is_array($_item) && array_key_exists(self::STORES_ENTITY_NODE_NAME, $_item)) {
-            $stores = $_item[self::STORES_ENTITY_NODE_NAME] ?? [];
+        if (is_array($item) && array_key_exists(self::STORES_ENTITY_NODE_NAME, $item)) {
+            $stores = $item[self::STORES_ENTITY_NODE_NAME] ?? [];
             if ($stores) {
-                $stores = implode(',', array_keys($stores));
+                $stores = implode(',', $this->storeManagement->getStoreIdsByCodes($stores));
                 $node = $this->dom->createElement('attribute');
                 $node->setAttribute('code', 'store_ids');
                 $node->appendChild($this->dom->createTextNode($stores));
                 $this->currentDom->appendChild($node);
                 $this->setCurrentDom($node);
+
+                return $stores;
             }
         }
+
+        return null;
     }
 
     /**
@@ -175,14 +190,16 @@ class Generator implements CmsEntityGeneratorInterface
      * @return void
      * @throws \DOMException
      */
-    private function createVersionNodes(string $identifier, string $root)
+    private function createVersionNodes(string $identifier, string $root, ?string $stores)
     {
         $type = ($root === CmsEntityConverterInterface::PAGE_ENTITY_CODE) ?
             ContentVersionInterface::TYPE_PAGE : ContentVersionInterface::TYPE_BLOCK;
         $node = $this->dom->createElement('attribute');
         $node->setAttribute('code', 'version');
         $node->appendChild(
-            $this->dom->createTextNode($this->contentVersionManagement->getCurrentVersion($identifier, $type))
+            $this->dom->createTextNode(
+                $this->contentVersionManagement->getCurrentVersion($identifier, $type, $stores)
+            )
         );
         $this->currentDom->appendChild($node);
         $this->setCurrentDom($node);

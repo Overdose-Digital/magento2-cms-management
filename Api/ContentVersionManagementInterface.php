@@ -57,11 +57,12 @@ interface ContentVersionManagementInterface
     /**
      * Retrieves current version number based on identifier and type (0 - blocks, 1-pages)
      *
-     * @param int $type
      * @param string $id
+     * @param int $type
+     * @param string|null $storeIds
      * @return string
      */
-    public function getCurrentVersion(string $id, int $type);
+    public function getCurrentVersion(string $id, int $type, ?string $storeIds);
 
     /**
      * Delete content version model based on identifier and type (0 - blocks, 1-pages)
@@ -70,5 +71,5 @@ interface ContentVersionManagementInterface
      * @param string $id
      * @return bool
      */
-    public function deleteContentVersion(string $id, int $type);
+    public function deleteContentVersion(string $id, int $type, array $storeIds);
 }

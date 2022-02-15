@@ -46,7 +46,8 @@ class DeleteContentVersion implements ObserverInterface
 
         $this->contentVersionManagement->deleteContentVersion(
             $observer->getEvent()->getData('data_object')->getIdentifier(),
-            $this->eventsTypeMap[$eventName]
+            $this->eventsTypeMap[$eventName],
+            $observer->getEvent()->getData('data_object')->getStores()
         );
 
         return $this;
