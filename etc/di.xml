@@ -9,6 +9,7 @@
     <preference for="Overdose\CMSContent\Api\ContentImportInterface" type="Overdose\CMSContent\Model\Import" />
     <preference for="Overdose\CMSContent\Api\CmsEntityConverterManagerInterface" type="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager" />
     <preference for="Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface" type="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager" />
+    <preference for="Overdose\CMSContent\Api\StoreManagementInterface" type="Overdose\CMSContent\Model\StoreManagement" />
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
             <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Converter</argument>

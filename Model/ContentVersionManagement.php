@@ -189,10 +189,10 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
                 return 0;
         }
 
-        $contentVersions = $this->getContentVersions($type);
         foreach ($configItems as $index => $configItem) {
-            if (isset($contentVersions[$index])) {
-                $this->updateVersion($contentVersions[$index], $configItem);
+            if ($contentVersion =
+            $this->matchContentVersion($configItem['identifier'], $type, $configItem['store_ids'])) {
+                $this->updateVersion($contentVersion, $configItem);
             } else {
                 $this->createVersion($type, $configItem);
             }
@@ -208,14 +208,16 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
     public function updateVersion($contentVersion, $configItem)
     {
         if (version_compare($contentVersion->getVersion(), $configItem[ContentVersionInterface::VERSION], '<')) {
-            $storeIdsData = isset($configItem['store_ids']) ? $configItem['store_ids'] : 0;
+            $storeIdsData = $configItem['store_ids'] ?? 0;
             $configItem['store_ids'] = $this->prepareStoreIds($storeIdsData);
 
             /* Update cms block/page or create if not exist */
             $this->updateCmsEntity($contentVersion->getType(), $configItem);
 
             /* Update content version */
-            $contentVersion->setVersion($configItem[ContentVersionInterface::VERSION]);
+            $contentVersion
+                ->setVersion($configItem[ContentVersionInterface::VERSION])
+                ->setStoreIds($storeIdsData);
             $this->contentVersionRepository->save($contentVersion);
         }
 
@@ -249,25 +251,23 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
     /**
      * @inheritDoc
      */
-    public function getCurrentVersion(string $id, int $type)
+    public function getCurrentVersion(string $id, int $type, ?string $storeIds)
     {
-        $versionResults = $this->getContentVersions($type, [$id]);
-        $versionModel = array_pop($versionResults);
+        if ($storeIds && $versionModel = $this->matchContentVersion($id, $type, $storeIds)) {
+            return $versionModel->getVersion();
+        }
 
-        return ($versionModel instanceof ContentVersionInterface) ?
-            $versionModel->getVersion() : self::DEFAULT_VERSION;
+        return self::DEFAULT_VERSION;
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteContentVersion(string $id, int $type)
+    public function deleteContentVersion(string $id, int $type, array $storeIds)
     {
-        $versionResults = $this->getContentVersions($type, [$id]);
-        $versionModel = array_pop($versionResults);
+        $versionModel = $this->matchContentVersion($id, $type, implode(',', $storeIds));
 
-        return $versionModel instanceof ContentVersionInterface
-            && $this->contentVersionRepository->delete($versionModel);
+        return $versionModel && $this->contentVersionRepository->delete($versionModel);
     }
 
     /**
@@ -320,14 +320,14 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
             } else { /* Create new block or page */
                 get_class($factory); // FIX: "PHP Fatal error:  Uncaught Error: Call to a member function create() on null"
                 $cmsDataModel = $factory->create()
-                    ->setIdentifier($data['identifier'])
-                    ->setStoreId($data['store_ids']);
+                    ->setIdentifier($data['identifier']);
             }
 
             $cmsDataModel
                 ->setData('title', $data['title'])
                 ->setData('content', $data['content'])
-                ->setData('is_active', $data['is_active']);
+                ->setData('is_active', $data['is_active'])
+                ->setData('stores', $data['store_ids']);
 
             if (isset($data['content_heading'])) {
                 $cmsDataModel->setData('content_heading', $data['content_heading']);
@@ -338,6 +338,7 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
 
             $repository->save($cmsDataModel);
         } catch (\Exception $e) {
+            // todo - revert content update? send msg to import?
             $this->logger->critical(__('Something went wrong during cms_content upgrade'));
         }
 
@@ -520,5 +521,25 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
         } elseif ((int)$strategy === ContentVersionInterface::TYPE_PAGE) {
             return BackupManager::TYPE_CMS_PAGE;
         }
+    }
+
+
+    /**
+     * @param string $identifier
+     * @param int $type
+     * @param string $storeIds
+     * @return ContentVersionInterface|null
+     */
+    private function matchContentVersion(string $identifier, int $type, string $storeIds)
+    {
+        $searchStoreIdsArr = explode(',', $storeIds);
+        $contentVersions = $this->getContentVersions($type, [$identifier]);
+        foreach ($contentVersions as $contentVersion) {
+            if (count(array_intersect(explode(',', $contentVersion->getStoreIds()), $searchStoreIdsArr))) {
+                return $contentVersion;
+            }
+        }
+
+        return null;
     }
 }

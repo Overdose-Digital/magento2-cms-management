@@ -12,10 +12,9 @@ use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as CmsPageCollectionF
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Framework\Xml\Parser;
-use Magento\Store\Api\StoreRepositoryInterface;
 use Overdose\CMSContent\Api\ContentImportInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
+use Overdose\CMSContent\Api\StoreManagementInterface;
 
 class Import implements ContentImportInterface
 {
@@ -39,11 +38,6 @@ class Import implements ContentImportInterface
     private $mediaMode = ContentImportInterface::OD_MEDIA_MODE_UPDATE;
 
     /**
-     * @var array
-     */
-    private $storesMap = [];
-
-    /**
      * @var CmsPageCollectionFactory
      */
     private $pageCollectionFactory;
@@ -65,9 +59,9 @@ class Import implements ContentImportInterface
      */
     private $blockRepositoryInterface;
     /**
-     * @var StoreRepositoryInterface
+     * @var StoreManagementInterface
      */
-    private $storeRepositoryInterface;
+    private $storeManagement;
     /**
      * @var SerializerInterface
      */
@@ -86,7 +80,7 @@ class Import implements ContentImportInterface
      * @param CmsBlockCollectionFactory $blockCollectionFactory
      * @param CmsPageCollectionFactory $pageCollectionFactory
      * @param BlockRepositoryInterface $blockRepositoryInterface
-     * @param StoreRepositoryInterface $storeRepositoryInterface
+     * @param StoreManagementInterface $storeManagement
      * @param ContentVersionManagementInterface $contentVersionManagement
      * @param SerializerInterface $serializerInterface
      */
@@ -98,7 +92,7 @@ class Import implements ContentImportInterface
         CmsBlockCollectionFactory $blockCollectionFactory,
         CmsPageCollectionFactory $pageCollectionFactory,
         BlockRepositoryInterface $blockRepositoryInterface,
-        StoreRepositoryInterface $storeRepositoryInterface,
+        StoreManagementInterface $storeManagement,
         ContentVersionManagementInterface $contentVersionManagement,
         SerializerInterface $serializerInterface
     ) {
@@ -109,7 +103,7 @@ class Import implements ContentImportInterface
         $this->blockCollectionFactory = $blockCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
         $this->blockRepositoryInterface = $blockRepositoryInterface;
-        $this->storeRepositoryInterface = $storeRepositoryInterface;
+        $this->storeManagement = $storeManagement;
         $this->serializerInterface = $serializerInterface;
         $this->contentVersionManagement = $contentVersionManagement;
     }
@@ -123,7 +117,6 @@ class Import implements ContentImportInterface
      */
     public function importContentFromZipFile(string $fileName, bool $rm): int
     {
-        $this->init();
         $zipArchive = new \ZipArchive();
         $res = $zipArchive->open($fileName);
         if ($res !== true) {
@@ -174,14 +167,6 @@ class Import implements ContentImportInterface
         $this->file->rmdir($extractPath, true);
 
         return $count;
-    }
-
-    protected function init(): void
-    {
-        $stores = $this->storeRepositoryInterface->getList();
-        foreach ($stores as $store) {
-            $this->storesMap[$store->getCode()] = $store->getCode();
-        }
     }
 
     /**
@@ -263,7 +248,7 @@ class Import implements ContentImportInterface
 
         // Will not use repositories to save pages because it does not allow stores selection
 
-        $storeIds = $this->getStoreIdsByCodes($this->mapStores($pageData['stores']));
+        $storeIds = $this->storeManagement->getStoreIdsByCodes($pageData['stores']);
 
         $collection = $this->pageCollectionFactory->create();
         $collection
@@ -328,7 +313,7 @@ class Import implements ContentImportInterface
 
         // Will not use repositories to save blocks because it does not allow stores selection
 
-        $storeIds = $this->getStoreIdsByCodes($this->mapStores($blockData['stores']));
+        $storeIds = $this->storeManagement->getStoreIdsByCodes($blockData['stores']);
 
         $collection = $this->blockCollectionFactory->create();
         $collection
@@ -407,47 +392,6 @@ class Import implements ContentImportInterface
         }
 
         return $cmsData;
-    }
-
-    /**
-     * Get store ids by codes
-     * @param array $storeCodes
-     * @return array
-     */
-    public function getStoreIdsByCodes(array $storeCodes): array
-    {
-        $return = [];
-        foreach ($storeCodes as $storeCode) {
-            if ($storeCode == 'admin') {
-                $return[] = 0;
-            } else {
-                $store = $this->storeRepositoryInterface->get($storeCode);
-                if ($store && $store->getId()) {
-                    $return[] = $store->getId();
-                }
-            }
-        }
-
-        return $return;
-    }
-
-    /**
-     * Map stores
-     * @param $storeCodes
-     * @return array
-     */
-    protected function mapStores($storeCodes): array
-    {
-        $return = [];
-        foreach ($storeCodes as $storeCode) {
-            foreach ($this->storesMap as $to => $from) {
-                if ($storeCode == $from) {
-                    $return[] = $to;
-                }
-            }
-        }
-
-        return $return;
     }
 
     /**
