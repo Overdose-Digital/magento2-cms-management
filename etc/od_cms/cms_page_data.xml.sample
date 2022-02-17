@@ -5,6 +5,7 @@
             <attribute code="title">Some title</attribute>
             <attribute code="content"><![CDATA[<div>Content here </div>]]></attribute>
             <attribute code="version">1.0.0</attribute>
+            <attribute code="is_active">1</attribute>
             <attribute code="store_ids"/>
         </cms_page>
         <cms_page identifier="some-identifier-2">
@@ -13,6 +14,7 @@
             <attribute code="content"><![CDATA[<div>Content here 2</div>]]></attribute>
             <attribute code="page_layout">2columns-left</attribute>
             <attribute code="version">1.0.1</attribute>
+            <attribute code="is_active">1</attribute>
             <attribute code="store_ids">1,2,3</attribute>
         </cms_page>
     </cms_pages>
