@@ -36,11 +36,4 @@ interface ContentImportInterface
      * @return ContentImportInterface
      */
     public function setMediaModeOption($mode): ContentImportInterface;
-
-    /**
-     * Set stores mapping on import
-     * @param array $storesMap
-     * @return ContentImportInterface
-     */
-    public function setStoresMapValue(array $storesMap): ContentImportInterface;
 }

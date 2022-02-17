@@ -43,7 +43,6 @@ class Post extends Action
         try {
             $cmsMode = $this->getRequest()->getParam('cms_mode');
             $mediaMode = $this->getRequest()->getParam('media_mode');
-            $storesMap = $this->getRequest()->getParam('store_map');
 
             $destinationPath = $this->filesystem->getUploadPath();
 
@@ -57,8 +56,7 @@ class Post extends Action
 
             $this->importExportInterface
                 ->setCmsModeOption($cmsMode)
-                ->setMediaModeOption($mediaMode)
-                ->setStoresMapValue($storesMap);
+                ->setMediaModeOption($mediaMode);
 
             $count = $this->importExportInterface->importContentFromZipFile($zipFile, true);
 
