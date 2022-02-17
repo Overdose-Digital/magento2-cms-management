@@ -11,6 +11,7 @@ use Magento\Cms\Api\Data\BlockInterfaceFactory;
 use Magento\Cms\Api\Data\PageInterfaceFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Model\Config\ReaderAbstract;
 use Psr\Log\LoggerInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
@@ -19,8 +20,13 @@ use Overdose\CMSContent\Api\ContentVersionRepositoryInterface;
 use Overdose\CMSContent\Model\Config\Block\Reader as BlocksConfigReader;
 use Overdose\CMSContent\Model\Config\Page\Reader as PagesConfigReader;
 
-class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersionManagementInterface
+class ContentVersionManagement implements ContentVersionManagementInterface
 {
+    /**
+     * @var array
+     */
+    private $currentImportItem = [];
+
     /**
      * @var SearchCriteriaBuilder
      */
@@ -62,7 +68,7 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      */
     private $blockInterfaceFactory;
     /**
-     * @var \Overdose\CMSContent\Model\BackupManager
+     * @var BackupManager
      */
     private $backupManager;
     /**
@@ -137,18 +143,7 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      */
     public function processBlocks($ids = [])
     {
-        $configItems = $this->getConfigItems($this->blockConfigReader, $ids);
-        $contentVersions = $this->getContentVersions(ContentVersionInterface::TYPE_BLOCK, $ids);
-
-        foreach ($configItems as $index => $configItem) {
-            if (isset($contentVersions[$index])) {
-                $this->updateVersion($contentVersions[$index], $configItem);
-            } else {
-                $this->createVersion(ContentVersionInterface::TYPE_BLOCK, $configItem);
-            }
-        }
-
-        return $this;
+        $this->processByType(ContentVersionInterface::TYPE_BLOCK, $ids);
     }
 
     /**
@@ -156,18 +151,7 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      */
     public function processPages($ids = [])
     {
-        $configItems = $this->getConfigItems($this->pagesConfigReader, $ids);
-        $contentVersions = $this->getContentVersions(ContentVersionInterface::TYPE_PAGE, $ids);
-
-        foreach ($configItems as $index => $configItem) {
-            if (isset($contentVersions[$index])) {
-                $this->updateVersion($contentVersions[$index], $configItem);
-            } else {
-                $this->createVersion(ContentVersionInterface::TYPE_PAGE, $configItem);
-            }
-        }
-
-        return $this;
+        $this->processByType(ContentVersionInterface::TYPE_PAGE, $ids);
     }
 
     /**
@@ -176,22 +160,62 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
     public function processFile(string $filePath)
     {
         $count = 0;
-        switch ($type = $this->defineTypeEntityFromFile($filePath)) {
-            case ContentVersionInterface::TYPE_PAGE:
-                $configItems = $this->getConfigItems($this->pagesConfigReader, [], $filePath);
-                break;
+        try {
+            switch ($type = $this->defineTypeEntityFromFile($filePath)) {
+                case ContentVersionInterface::TYPE_PAGE:
+                    $configItems = $this->getConfigItems($this->pagesConfigReader, [], $filePath);
+                    break;
 
-            case ContentVersionInterface::TYPE_BLOCK:
-                $configItems = $this->getConfigItems($this->blockConfigReader, [], $filePath);
-                break;
+                case ContentVersionInterface::TYPE_BLOCK:
+                    $configItems = $this->getConfigItems($this->blockConfigReader, [], $filePath);
+                    break;
 
-            default:
-                return 0;
+                default:
+                    return $count;
+            }
+
+            $count = $this->importItems($configItems, $type);
+        } catch (\Exception $e) {
+            $this->handleException($type, $e->getMessage(), true);
         }
 
-        foreach ($configItems as $index => $configItem) {
-            if ($contentVersion =
-            $this->matchContentVersion($configItem['identifier'], $type, $configItem['store_ids'])) {
+        return $count;
+    }
+
+    /**
+     * @param int $cmsType
+     * @param array $ids
+     * @return $this
+     */
+    private function processByType(int $cmsType, array $ids = [])
+    {
+        try {
+            $reader = ($cmsType === ContentVersionInterface::TYPE_BLOCK)
+                ? $this->blockConfigReader : $this->pagesConfigReader;
+            $configItems = $this->getConfigItems($reader, $ids);
+
+            $this->importItems($configItems, $cmsType);
+        } catch (\Exception $e) {
+            $this->handleException($cmsType, $e->getMessage());
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $configItems
+     * @param int $type
+     * @return int
+     */
+    private function importItems(array $configItems, int $type)
+    {
+        $count = 0;
+        foreach ($configItems as $configItem) {
+            $this->currentImportItem = $configItem;
+            if ($contentVersion = $this->matchContentVersion(
+                $configItem[ContentVersionInterface::IDENTIFIER],
+                $type,
+                $configItem[ContentVersionInterface::STORE_IDS])
+            ) {
                 $this->updateVersion($contentVersion, $configItem);
             } else {
                 $this->createVersion($type, $configItem);
@@ -199,7 +223,30 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
             $count++;
         }
 
+        $this->currentImportItem = [];
+
         return $count;
+    }
+
+    /**
+     * @param int $cmsType
+     * @param string $exceptionMsg
+     * @param bool $throwNewException
+     * @return void
+     * @throws LocalizedException
+     */
+    private function handleException(int $cmsType, string $exceptionMsg, bool $throwNewException = false)
+    {
+        $strType = ($cmsType === ContentVersionInterface::TYPE_BLOCK) ? 'Block' : 'Page';
+        $indText = ($this->currentImportItem) ?
+            'with identifier - "' . $this->currentImportItem[ContentVersionInterface::IDENTIFIER] . '"': '';
+        $errorMessage = "{$strType} import {$indText} was failed! \n {$exceptionMsg}";
+
+        if ($throwNewException) {
+            throw new LocalizedException(__($errorMessage));
+        } else {
+            $this->logger->critical($errorMessage);
+        }
     }
 
     /**
@@ -253,7 +300,7 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      */
     public function getCurrentVersion(string $id, int $type, ?string $storeIds)
     {
-        if ($storeIds && $versionModel = $this->matchContentVersion($id, $type, $storeIds)) {
+        if ($storeIds !== null && $versionModel = $this->matchContentVersion($id, $type, $storeIds)) {
             return $versionModel->getVersion();
         }
 
@@ -297,50 +344,46 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      * @param $type
      * @param $data
      * @return $this
-     * @throws LocalizedException
+     * @throws \Exception
      */
     private function updateCmsEntity($type, $data)
     {
         $repository = $this->getCmsRepository($type);
         $factory = $this->getCmsFactory($type);
-
-        try {
-            /* Check if cms-block/-page exists */
-            $searchCriteria = $this->prepareSearchCriteria($data);
-            $items = $repository->getList($searchCriteria)->getItems();
-            /* Block or page exists */
-            if (count($items)) {
-                $cmsDataModel = array_shift($items);
-
-                /* Create backup of cms-block/-page */
-                $this->backupManager->createBackup(
-                    $this->resolveBackupType($type),
-                    $cmsDataModel
-                );
-            } else { /* Create new block or page */
-                get_class($factory); // FIX: "PHP Fatal error:  Uncaught Error: Call to a member function create() on null"
-                $cmsDataModel = $factory->create()
-                    ->setIdentifier($data['identifier']);
-            }
-
-            $cmsDataModel
-                ->setData('title', $data['title'])
-                ->setData('content', $data['content'])
-                ->setData('is_active', $data['is_active'])
-                ->setData('stores', $data['store_ids']);
-
-            if (isset($data['content_heading'])) {
-                $cmsDataModel->setData('content_heading', $data['content_heading']);
-            }
-            if (isset($data['page_layout'])) {
-                $cmsDataModel->setData('page_layout', $data['page_layout']);
-            }
-
-            $repository->save($cmsDataModel);
-        } catch (\Exception $e) {
-            // todo - revert content update? send msg to import?
-            $this->logger->critical(__('Something went wrong during cms_content upgrade'));
+        /* Check if cms-block/-page exists */
+        $searchCriteria = $this->prepareSearchCriteria($data);
+        $items = $repository->getList($searchCriteria)->getItems();
+        /* Block or page exists */
+        if (count($items)) {
+            $cmsDataModel = array_shift($items);
+            /* Create backup of cms-block/-page */
+            $this->backupManager->createBackup(
+                $this->resolveBackupType($type),
+                $cmsDataModel
+            );
+        } else { /* Create new block or page */
+            get_class($factory); // FIX: "PHP Fatal error:  Uncaught Error: Call to a member function create() on null"
+            $cmsDataModel = $factory->create()
+                ->setIdentifier($data['identifier']);
         }
+
+        $cmsDataModel
+            ->setData('title', $data['title'])
+            ->setData('content', $data['content'])
+            ->setData('stores', $data['store_ids']);
+
+        if (isset($data['is_active'])) {
+            $cmsDataModel->setData('is_active', $data['is_active']);
+        }
+
+        if (isset($data['content_heading'])) {
+            $cmsDataModel->setData('content_heading', $data['content_heading']);
+        }
+        if (isset($data['page_layout'])) {
+            $cmsDataModel->setData('page_layout', $data['page_layout']);
+        }
+
+        $repository->save($cmsDataModel);
 
         return $this;
     }
@@ -350,7 +393,9 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
      *
      * @param ReaderAbstract $configReader
      * @param array $filterIds
+     * @param null $file
      * @return array
+     * @throws LocalizedException
      */
     private function getConfigItems(ReaderAbstract $configReader, $filterIds = [], $file = null)
     {
@@ -523,16 +568,15 @@ class ContentVersionManagement implements \Overdose\CMSContent\Api\ContentVersio
         }
     }
 
-
     /**
      * @param string $identifier
      * @param int $type
-     * @param string $storeIds
+     * @param string|null $storeIds
      * @return ContentVersionInterface|null
      */
-    private function matchContentVersion(string $identifier, int $type, string $storeIds)
+    private function matchContentVersion(string $identifier, int $type, ?string $storeIds)
     {
-        $searchStoreIdsArr = explode(',', $storeIds);
+        $searchStoreIdsArr = explode(',', $storeIds = $storeIds ?: '0');
         $contentVersions = $this->getContentVersions($type, [$identifier]);
         foreach ($contentVersions as $contentVersion) {
             if (count(array_intersect(explode(',', $contentVersion->getStoreIds()), $searchStoreIdsArr))) {
