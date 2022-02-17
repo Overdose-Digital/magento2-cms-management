@@ -2,7 +2,11 @@
 
 namespace Overdose\CMSContent\Block\Adminhtml\Import\Upload;
 
+use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Form\Generic;
+use Magento\Framework\Data\FormFactory;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Registry;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Overdose\CMSContent\Api\ContentImportInterface;
 use Overdose\CMSContent\Model\Source\CmsMode;
@@ -10,29 +14,43 @@ use Overdose\CMSContent\Model\Source\MediaMode;
 
 class Form extends Generic
 {
+    /**
+     * @var MediaMode
+     */
     protected $mediaMode;
+    /**
+     * @var CmsMode
+     */
     protected $cmsMode;
-    protected $storeRepositoryInterface;
 
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param FormFactory $formFactory
+     * @param MediaMode $mediaMode
+     * @param CmsMode $cmsMode
+     * @param array $data
+     */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\Data\FormFactory $formFactory,
-        StoreRepositoryInterface $storeRepositoryInterface,
+        Context $context,
+        Registry $registry,
+        FormFactory $formFactory,
         MediaMode $mediaMode,
         CmsMode $cmsMode,
         array $data = []
     ) {
         $this->mediaMode = $mediaMode;
         $this->cmsMode = $cmsMode;
-        $this->storeRepositoryInterface = $storeRepositoryInterface;
 
         parent::__construct($context, $registry, $formFactory, $data);
     }
 
+    /**
+     * @return Form
+     * @throws LocalizedException
+     */
     protected function _prepareForm()
     {
-        /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create(
             [
                 'data' => [
@@ -61,15 +79,6 @@ class Form extends Generic
                 'class' => 'fieldset-wide',
             ]
         );
-
-        $fieldsetStores = $form->addFieldset(
-            'store_fieldset',
-            [
-                'legend' => __('Store mapping'),
-                'class' => 'fieldset-wide',
-            ]
-        );
-
 
         $fieldset->addField(
             'zipfile',
@@ -106,27 +115,10 @@ class Form extends Generic
             ]
         );
 
-        $stores = $this->storeRepositoryInterface->getList();
-        foreach ($stores as $storeInterface) {
-            $fieldsetStores->addField(
-                'store_map:'.$storeInterface->getCode(),
-                'text',
-                [
-                    'name' => 'store_map['.$storeInterface->getCode().']',
-                    'label' => __('Store "%1"', $storeInterface->getCode()),
-                    'title' => __('Store "%1"', $storeInterface->getCode()),
-                    'required' => false,
-                ]
-            );
-        }
-
         $values = [
             'cms_mode' => ContentImportInterface::OD_CMS_MODE_UPDATE,
             'media_mode' => ContentImportInterface::OD_MEDIA_MODE_UPDATE,
         ];
-        foreach ($stores as $storeInterface) {
-            $values['store_map:'.$storeInterface->getCode()] = $storeInterface->getCode();
-        }
 
         // Set defaults
         $form->setValues($values);

@@ -15,11 +15,6 @@ class StoreManagement implements StoreManagementInterface
     private $storeRepositoryInterface;
 
     /**
-     * @var array
-     */
-    private $currentStores = [];
-
-    /**
      * @param StoreRepositoryInterface $storeRepositoryInterface
      */
     public function __construct(StoreRepositoryInterface $storeRepositoryInterface)
@@ -55,31 +50,17 @@ class StoreManagement implements StoreManagementInterface
         return $storeIds;
     }
 
-    private function init(): void
-    {
-        // @todo simplify this
-        $stores = $this->storeRepositoryInterface->getList();
-        foreach ($stores as $store) {
-            $this->currentStores[$store->getCode()] = $store->getCode();
-        }
-    }
-
     /**
      * @param array $storeCodes
      * @return array
      */
     private function filterStores(array $storeCodes): array
     {
-        if (empty($this->currentStores)) {
-            $this->init();
-        }
         $filteredStores = [];
-        // @todo simplify this
+        $allStores = $this->storeRepositoryInterface->getList();
         foreach ($storeCodes as $storeCode) {
-            foreach ($this->currentStores as $to => $from) {
-                if ($storeCode == $from) {
-                    $filteredStores[] = $to;
-                }
+            if (array_key_exists($storeCode, $allStores)) {
+                $filteredStores[] = $storeCode;
             }
         }
 

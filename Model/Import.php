@@ -406,16 +406,6 @@ class Import implements ContentImportInterface
     }
 
     /**
-     * Set stores mapping
-     * @param array $storesMap
-     * @return ContentImportInterface
-     */
-    public function setStoresMapValue(array $storesMap): ContentImportInterface
-    {
-        return $this;
-    }
-
-    /**
      * Set media mode
      * @param $mode
      * @return ContentImportInterface
