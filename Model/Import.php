@@ -5,6 +5,7 @@ namespace Overdose\CMSContent\Model;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\Data\BlockInterface as CmsBlockInterface;
 use Magento\Cms\Api\Data\PageInterface as CmsPageInterface;
+use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Cms\Model\BlockFactory as CmsBlockFactory;
 use Magento\Cms\Model\PageFactory as CmsPageFactory;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory as CmsBlockCollectionFactory;
@@ -21,7 +22,9 @@ class Import implements ContentImportInterface
     /**
      * @var FileSystem
      */
+
     private $fileSystem;
+
     /**
      * @var File
      */
@@ -41,14 +44,17 @@ class Import implements ContentImportInterface
      * @var CmsPageCollectionFactory
      */
     private $pageCollectionFactory;
+
     /**
      * @var CmsBlockCollectionFactory
      */
     private $blockCollectionFactory;
+
     /**
      * @var CmsPageFactory
      */
     private $pageFactory;
+
     /**
      * @var CmsBlockFactory
      */
@@ -57,11 +63,13 @@ class Import implements ContentImportInterface
     /**
      * @var BlockRepositoryInterface
      */
-    private $blockRepositoryInterface;
+    private $blockRepository;
+
     /**
      * @var StoreManagementInterface
      */
     private $storeManagement;
+
     /**
      * @var SerializerInterface
      */
@@ -73,28 +81,35 @@ class Import implements ContentImportInterface
     private $contentVersionManagement;
 
     /**
+     * @var PageRepositoryInterface
+     */
+    private $pageRepository;
+
+    /**
      * @param FileSystem $fileSystem
      * @param File $file
      * @param CmsPageFactory $pageFactory
      * @param CmsBlockFactory $blockFactory
      * @param CmsBlockCollectionFactory $blockCollectionFactory
      * @param CmsPageCollectionFactory $pageCollectionFactory
-     * @param BlockRepositoryInterface $blockRepositoryInterface
+     * @param BlockRepositoryInterface $blockRepository
+     * @param PageRepositoryInterface $pageRepository
      * @param StoreManagementInterface $storeManagement
      * @param ContentVersionManagementInterface $contentVersionManagement
      * @param SerializerInterface $serializerInterface
      */
     public function __construct(
-        FileSystem $fileSystem,
-        File $file,
-        CmsPageFactory $pageFactory,
-        CmsBlockFactory $blockFactory,
-        CmsBlockCollectionFactory $blockCollectionFactory,
-        CmsPageCollectionFactory $pageCollectionFactory,
-        BlockRepositoryInterface $blockRepositoryInterface,
-        StoreManagementInterface $storeManagement,
+        FileSystem                        $fileSystem,
+        File                              $file,
+        CmsPageFactory                    $pageFactory,
+        CmsBlockFactory                   $blockFactory,
+        CmsBlockCollectionFactory         $blockCollectionFactory,
+        CmsPageCollectionFactory          $pageCollectionFactory,
+        BlockRepositoryInterface          $blockRepository,
+        PageRepositoryInterface          $pageRepository,
+        StoreManagementInterface          $storeManagement,
         ContentVersionManagementInterface $contentVersionManagement,
-        SerializerInterface $serializerInterface
+        SerializerInterface               $serializerInterface
     ) {
         $this->fileSystem = $fileSystem;
         $this->file = $file;
@@ -102,7 +117,8 @@ class Import implements ContentImportInterface
         $this->blockFactory = $blockFactory;
         $this->blockCollectionFactory = $blockCollectionFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
-        $this->blockRepositoryInterface = $blockRepositoryInterface;
+        $this->blockRepository = $blockRepository;
+        $this->pageRepository = $pageRepository;
         $this->storeManagement = $storeManagement;
         $this->serializerInterface = $serializerInterface;
         $this->contentVersionManagement = $contentVersionManagement;
@@ -277,25 +293,27 @@ class Import implements ContentImportInterface
 
         $cms = $pageData['cms'];
 
-        $page
-            ->setIdentifier($cms[CmsPageInterface::IDENTIFIER])
-            ->setTitle($cms[CmsPageInterface::TITLE])
-            ->setPageLayout($cms[CmsPageInterface::PAGE_LAYOUT])
-            ->setMetaKeywords($cms[CmsPageInterface::META_KEYWORDS])
-            ->setMetaDescription($cms[CmsPageInterface::META_DESCRIPTION])
-            ->setContentHeading($cms[CmsPageInterface::CONTENT_HEADING])
-            ->setContent($cms[CmsPageInterface::CONTENT])
-            ->setSortOrder($cms[CmsPageInterface::SORT_ORDER])
-            ->setLayoutUpdateXml($cms[CmsPageInterface::LAYOUT_UPDATE_XML])
-            ->setCustomTheme($cms[CmsPageInterface::CUSTOM_THEME])
-            ->setCustomRootTemplate($cms[CmsPageInterface::CUSTOM_ROOT_TEMPLATE])
-            ->setCustomLayoutUpdateXml($cms[CmsPageInterface::CUSTOM_LAYOUT_UPDATE_XML])
-            ->setCustomThemeFrom($cms[CmsPageInterface::CUSTOM_THEME_FROM])
-            ->setCustomThemeTo($cms[CmsPageInterface::CUSTOM_THEME_TO])
-            ->setIsActive($cms[CmsPageInterface::IS_ACTIVE]);
+        foreach ($storeIds as $storeId) {
+            $page
+                ->setIdentifier($cms[CmsPageInterface::IDENTIFIER])
+                ->setTitle($cms[CmsPageInterface::TITLE])
+                ->setPageLayout($cms[CmsPageInterface::PAGE_LAYOUT])
+                ->setMetaKeywords($cms[CmsPageInterface::META_KEYWORDS])
+                ->setMetaDescription($cms[CmsPageInterface::META_DESCRIPTION])
+                ->setContentHeading($cms[CmsPageInterface::CONTENT_HEADING])
+                ->setContent($cms[CmsPageInterface::CONTENT])
+                ->setSortOrder($cms[CmsPageInterface::SORT_ORDER])
+                ->setLayoutUpdateXml($cms[CmsPageInterface::LAYOUT_UPDATE_XML])
+                ->setCustomTheme($cms[CmsPageInterface::CUSTOM_THEME])
+                ->setCustomRootTemplate($cms[CmsPageInterface::CUSTOM_ROOT_TEMPLATE])
+                ->setCustomLayoutUpdateXml($cms[CmsPageInterface::CUSTOM_LAYOUT_UPDATE_XML])
+                ->setCustomThemeFrom($cms[CmsPageInterface::CUSTOM_THEME_FROM])
+                ->setCustomThemeTo($cms[CmsPageInterface::CUSTOM_THEME_TO])
+                ->setIsActive($cms[CmsPageInterface::IS_ACTIVE]);
 
-        $page->setData('stores', $storeIds);
-        $page->save();
+            $page->setData('store_id', $storeId);
+            $this->pageRepository->save($page);
+        }
 
         return true;
     }
@@ -342,14 +360,16 @@ class Import implements ContentImportInterface
 
         $cms = $blockData['cms'];
 
-        $block
-            ->setIdentifier($cms[CmsBlockInterface::IDENTIFIER])
-            ->setTitle($cms[CmsBlockInterface::TITLE])
-            ->setContent($cms[CmsBlockInterface::CONTENT])
-            ->setIsActive($cms[CmsBlockInterface::IS_ACTIVE]);
+        foreach ($storeIds as $storeId) {
+            $block
+                ->setIdentifier($cms[CmsBlockInterface::IDENTIFIER])
+                ->setTitle($cms[CmsBlockInterface::TITLE])
+                ->setContent($cms[CmsBlockInterface::CONTENT])
+                ->setIsActive($cms[CmsBlockInterface::IS_ACTIVE]);
 
-        $block->setData('stores', $storeIds);
-        $block->save();
+            $block->setData('store_id', $storeId);
+            $this->blockRepository->save($block);
+        }
 
         return true;
     }
@@ -369,11 +389,11 @@ class Import implements ContentImportInterface
             foreach ($cmsData['block_references'] as $blockId => $blockIdent) {
                 if (is_array($blockIdent)){
                     foreach ($blockIdent as $blockIdentItem) {
-                        $block           = $this->blockRepositoryInterface->getById($blockIdentItem);
+                        $block           = $this->blockRepository->getById($blockIdentItem);
                         $pairs[$blockId] = $block->getId();
                     }
                 } else {
-                    $block           = $this->blockRepositoryInterface->getById($blockIdent);
+                    $block           = $this->blockRepository->getById($blockIdent);
                     $pairs[$blockId] = $block->getId();
                 }
             }
