@@ -22,7 +22,6 @@ class Import implements ContentImportInterface
     /**
      * @var FileSystem
      */
-
     private $fileSystem;
 
     /**
@@ -328,9 +327,6 @@ class Import implements ContentImportInterface
     {
         // Process block identifiers
         $blockData = $this->loadBlocksByIdent($blockData, CmsBlockInterface::IDENTIFIER);
-
-        // Will not use repositories to save blocks because it does not allow stores selection
-
         $storeIds = $this->storeManagement->getStoreIdsByCodes($blockData['stores']);
 
         $collection = $this->blockCollectionFactory->create();
@@ -377,7 +373,6 @@ class Import implements ContentImportInterface
     /**
      * @param array  $cmsData
      * @param string $contentKey
-     *
      * @return array[]
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -435,5 +430,4 @@ class Import implements ContentImportInterface
         $this->mediaMode = $mode;
         return $this;
     }
-
 }

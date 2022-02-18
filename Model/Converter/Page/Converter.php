@@ -102,7 +102,6 @@ class Converter implements CmsEntityConverterInterface
         return $payload;
     }
 
-
     /**
      * Get media attachments from content
      * @param $content
