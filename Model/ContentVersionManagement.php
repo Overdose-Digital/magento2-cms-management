@@ -2,6 +2,8 @@
 
 namespace Overdose\CMSContent\Model;
 
+use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Api\Data\PageInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
@@ -12,6 +14,7 @@ use Magento\Cms\Api\Data\PageInterfaceFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
+use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
 use Overdose\CMSContent\Model\Config\ReaderAbstract;
 use Psr\Log\LoggerInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
@@ -176,7 +179,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
 
             $count = $this->importItems($configItems, $type);
         } catch (\Exception $e) {
-            $this->handleException($type, $e->getMessage(), true);
+            $this->handleException($type, $e);
         }
 
         return $count;
@@ -185,6 +188,8 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * @param int $cmsType
      * @param array $ids
+     * @throws InvalidXmlImportFilesException
+     * @throws LocalizedException
      * @return $this
      */
     private function processByType(int $cmsType, array $ids = [])
@@ -196,7 +201,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
 
             $this->importItems($configItems, $cmsType);
         } catch (\Exception $e) {
-            $this->handleException($cmsType, $e->getMessage());
+            $this->handleException($cmsType, $e, true);
         }
         return $this;
     }
@@ -230,23 +235,38 @@ class ContentVersionManagement implements ContentVersionManagementInterface
 
     /**
      * @param int $cmsType
-     * @param string $exceptionMsg
-     * @param bool $throwNewException
+     * @param \Exception $exception
+     * @param bool $toLog
      * @return void
+     * @throws InvalidXmlImportFilesException
      * @throws LocalizedException
      */
-    private function handleException(int $cmsType, string $exceptionMsg, bool $throwNewException = false)
+    private function handleException(int $cmsType, \Exception $exception, $toLog = false)
     {
-        $strType = ($cmsType === ContentVersionInterface::TYPE_BLOCK) ? 'Block' : 'Page';
-        $indText = ($this->currentImportItem) ?
-            'with identifier - "' . $this->currentImportItem[ContentVersionInterface::IDENTIFIER] . '"': '';
-        $errorMessage = "{$strType} import {$indText} was failed! \n {$exceptionMsg}";
-
-        if ($throwNewException) {
-            throw new LocalizedException(__($errorMessage));
-        } else {
-            $this->logger->critical($errorMessage);
+        if ($exception instanceof InvalidXmlImportFilesException
+            || empty($this->currentImportItem)) {
+            throw $exception;
         }
+
+        $errorMessage = sprintf(
+            "%s import with identifier - %s for store id - %s was failed! \n %s.",
+            ($cmsType === ContentVersionInterface::TYPE_BLOCK) ? 'Block' : 'Page',
+            $this->currentImportItem[ContentVersionInterface::IDENTIFIER],
+            $this->currentImportItem[ContentVersionInterface::STORE_IDS] ?: '0',
+            $exception->getMessage()
+        );
+
+        if ($toLog) {
+            $this->clearCurrentItemContent($cmsType);
+            $this->logger->critical(
+                sprintf("%s \n Issue with import item: %s",
+                $errorMessage,
+                print_r($this->currentImportItem, true)
+                )
+            );
+        }
+
+        throw new LocalizedException(__($errorMessage));
     }
 
     /**
@@ -367,23 +387,25 @@ class ContentVersionManagement implements ContentVersionManagementInterface
                 ->setIdentifier($data['identifier']);
         }
 
-        $cmsDataModel
-            ->setData('title', $data['title'])
-            ->setData('content', $data['content'])
-            ->setData('stores', $data['store_ids']);
+        foreach ($data['store_ids'] as $storeId) {
+            $cmsDataModel
+                ->setData('title', $data['title'])
+                ->setData('content', $data['content'])
+                ->setData('store_id', $storeId);
 
-        if (isset($data['is_active'])) {
-            $cmsDataModel->setData('is_active', $data['is_active']);
-        }
+            if (isset($data['is_active'])) {
+                $cmsDataModel->setData('is_active', $data['is_active']);
+            }
 
-        if (isset($data['content_heading'])) {
-            $cmsDataModel->setData('content_heading', $data['content_heading']);
-        }
-        if (isset($data['page_layout'])) {
-            $cmsDataModel->setData('page_layout', $data['page_layout']);
-        }
+            if (isset($data['content_heading'])) {
+                $cmsDataModel->setData('content_heading', $data['content_heading']);
+            }
+            if (isset($data['page_layout'])) {
+                $cmsDataModel->setData('page_layout', $data['page_layout']);
+            }
 
-        $repository->save($cmsDataModel);
+            $cmsDataModel->save($cmsDataModel);
+        }
 
         return $this;
     }
@@ -576,7 +598,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      */
     private function matchContentVersion(string $identifier, int $type, ?string $storeIds)
     {
-        $searchStoreIdsArr = explode(',', $storeIds = $storeIds ?: '0');
+        $searchStoreIdsArr = explode(',', $storeIds ?: '0');
         $contentVersions = $this->getContentVersions($type, [$identifier]);
         foreach ($contentVersions as $contentVersion) {
             if (count(array_intersect(explode(',', $contentVersion->getStoreIds()), $searchStoreIdsArr))) {
@@ -585,5 +607,16 @@ class ContentVersionManagement implements ContentVersionManagementInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param int $cmsType
+     * @return void
+     */
+    private function clearCurrentItemContent(int $cmsType)
+    {
+        $contentKey = ($cmsType === ContentVersionInterface::TYPE_BLOCK)
+            ? PageInterface::CONTENT : BlockInterface::CONTENT;
+        unset($this->currentImportItem[$contentKey]);
     }
 }

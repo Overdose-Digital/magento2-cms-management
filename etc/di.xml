@@ -22,6 +22,11 @@
             <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Block\SchemaLocator</argument>
         </arguments>
     </type>
+    <type name="Overdose\CMSContent\Model\Config\ReaderAbstract">
+        <arguments>
+            <argument name="logger" xsi:type="object">CmsImportLogger</argument>
+        </arguments>
+    </type>
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
