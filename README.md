@@ -164,6 +164,33 @@
          `php bin/magento od:cms:upgrade -t page`           -- will update only Pages (`cms_page_data.xml`)
          
          `php bin/magento od:cms:upgrade -t page -i home`   -- will update only page with identifier `home`      
+
+## Delete old files by Cron
+   - For use this possibility we need turn on it in admin panel. **"Delete Backups By Cron"**
+   
+### We have 3 settings:
+
+   - Cron Run Settings:
+   
+         1. Frequency - set cron period when will be run cron (Daily, Weekly, Monthly)
+      
+         2. Start Time - set time, when will be run cron. 
+   
+   - Delete Methods:
+   
+         1. Method:
+      
+            a) By Periods - delete files by periods, exclude files younger than week.
+
+            b) Older Than:
+
+               b-1) Period - set period (Days, Weeks, Months or Years). Files older than it will be delete.
+
+               b-2) Number - set quantity of periods.
+   
+   - Logs:
+   
+      Write logs. Which files were deleted.
     
     
             
