@@ -2,6 +2,9 @@
 
 namespace Overdose\CMSContent\Api;
 
+use Magento\Framework\Exception\LocalizedException;
+use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
+
 interface ContentVersionManagementInterface
 {
     const DEFAULT_VERSION = '1.0.0';
@@ -32,6 +35,8 @@ interface ContentVersionManagementInterface
      * Process update for all CMSContent records from file
      *
      * @param string $filePath
+     * @throws InvalidXmlImportFilesException
+     * @throws LocalizedException
      * @return int - count of processed entities
      */
     public function processFile(string $filePath);
