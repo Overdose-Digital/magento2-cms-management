@@ -6,6 +6,12 @@
 				<enabled>0</enabled>
 				<show_menu>0</show_menu>
 			</general>
+            <delete_backups_by_cron>
+                <cron_enabled>0</cron_enabled>
+                <delete_methods>
+                    <number>5</number>
+                </delete_methods>
+            </delete_backups_by_cron>
 		</cms_content>
 	</default>
 </config>

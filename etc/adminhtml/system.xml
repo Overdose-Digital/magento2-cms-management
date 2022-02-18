@@ -21,6 +21,65 @@
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 				</field>
 			</group>
+            <group id="delete_backups_by_cron" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+                <label>Delete Backups By Cron</label>
+                <field id="cron_enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <comment/>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <group id="cron_run_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Cron Run Settings</label>
+                    <field id="frequency" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Frequency</label>
+                        <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
+                        <backend_model>Overdose\CMSContent\Model\Config\Cron\SaveValue</backend_model>
+                    </field>
+                    <field id="time" translate="label" type="time" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Start Time</label>
+                    </field>
+                    <depends>
+                        <field id="cron_enabled">1</field>
+                    </depends>
+                </group>
+                <group id="delete_methods" translate="label" type="text" sortOrder="30" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Delete Methods</label>
+                    <field id="method" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Method</label>
+                        <source_model>Overdose\CMSContent\Model\Config\Cron\Source\Methods</source_model>
+                        <comment><![CDATA[
+                        <p><b>By Periods</b>: Delete files by periods (weeks, months and years). Files younger than one week, excluded.</p>
+                        <p><b>Older Than</b>: Delete files older than 'Period' and it number.</p>
+                        ]]></comment>
+                    </field>
+                    <field id="period" translate="label" type="select" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Period</label>
+                        <source_model>Overdose\CMSContent\Model\Config\Cron\Source\Periods</source_model>
+                        <depends>
+                            <field id="method">older_than</field>
+                        </depends>
+                    </field>
+                    <field id="number" translate="label" type="text" sortOrder="30" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Number</label>
+                        <depends>
+                            <field id="method">older_than</field>
+                        </depends>
+                    </field>
+                    <depends>
+                        <field id="cron_enabled">1</field>
+                    </depends>
+                </group>
+                <group id="logs" translate="label" type="text" sortOrder="40" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Logs</label>
+                    <field id="logs_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <depends>
+                        <field id="cron_enabled">1</field>
+                    </depends>
+                </group>
+            </group>
 		</section>
 	</system>
 </config>
