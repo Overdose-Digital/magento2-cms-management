@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Overdose\CMSContent\Model\Generator;
 
 use Magento\Framework\Exception\LocalizedException;

@@ -12,6 +12,7 @@ use Overdose\CMSContent\Api\StoreManagementInterface;
 class Generator implements CmsEntityGeneratorInterface
 {
     const TYPE = 'xml';
+
     /**
      * @var \DOMDocument|null
      */
@@ -44,7 +45,6 @@ class Generator implements CmsEntityGeneratorInterface
         $this->storeManagement = $storeManagement;
     }
 
-
     /**
      * @return string
      */
@@ -72,6 +72,7 @@ class Generator implements CmsEntityGeneratorInterface
         $this->dom->formatOutput = true;
         $this->currentDom = $this->dom;
     }
+
     /**
      * @param array $content
      * @return $this
@@ -187,6 +188,7 @@ class Generator implements CmsEntityGeneratorInterface
     /**
      * @param string $identifier
      * @param string $root
+     * @param string|null $stores
      * @return void
      * @throws \DOMException
      */
@@ -245,6 +247,4 @@ class Generator implements CmsEntityGeneratorInterface
             throw new LocalizedException(__('Incorrect input content for xml generating!'));
         }
     }
-
-
 }
