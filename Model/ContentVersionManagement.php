@@ -387,25 +387,23 @@ class ContentVersionManagement implements ContentVersionManagementInterface
                 ->setIdentifier($data['identifier']);
         }
 
-        foreach ($data['store_ids'] as $storeId) {
-            $cmsDataModel
-                ->setData('title', $data['title'])
-                ->setData('content', $data['content'])
-                ->setData('store_id', $storeId);
+        $cmsDataModel
+            ->setData('title', $data['title'])
+            ->setData('content', $data['content'])
+            ->setData('store_id', $data['store_ids']);
 
-            if (isset($data['is_active'])) {
-                $cmsDataModel->setData('is_active', $data['is_active']);
-            }
-
-            if (isset($data['content_heading'])) {
-                $cmsDataModel->setData('content_heading', $data['content_heading']);
-            }
-            if (isset($data['page_layout'])) {
-                $cmsDataModel->setData('page_layout', $data['page_layout']);
-            }
-
-            $cmsDataModel->save($cmsDataModel);
+        if (isset($data['is_active'])) {
+            $cmsDataModel->setData('is_active', $data['is_active']);
         }
+
+        if (isset($data['content_heading'])) {
+            $cmsDataModel->setData('content_heading', $data['content_heading']);
+        }
+        if (isset($data['page_layout'])) {
+            $cmsDataModel->setData('page_layout', $data['page_layout']);
+        }
+
+        $repository->save($cmsDataModel);
 
         return $this;
     }

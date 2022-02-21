@@ -292,27 +292,25 @@ class Import implements ContentImportInterface
 
         $cms = $pageData['cms'];
 
-        foreach ($storeIds as $storeId) {
-            $page
-                ->setIdentifier($cms[CmsPageInterface::IDENTIFIER])
-                ->setTitle($cms[CmsPageInterface::TITLE])
-                ->setPageLayout($cms[CmsPageInterface::PAGE_LAYOUT])
-                ->setMetaKeywords($cms[CmsPageInterface::META_KEYWORDS])
-                ->setMetaDescription($cms[CmsPageInterface::META_DESCRIPTION])
-                ->setContentHeading($cms[CmsPageInterface::CONTENT_HEADING])
-                ->setContent($cms[CmsPageInterface::CONTENT])
-                ->setSortOrder($cms[CmsPageInterface::SORT_ORDER])
-                ->setLayoutUpdateXml($cms[CmsPageInterface::LAYOUT_UPDATE_XML])
-                ->setCustomTheme($cms[CmsPageInterface::CUSTOM_THEME])
-                ->setCustomRootTemplate($cms[CmsPageInterface::CUSTOM_ROOT_TEMPLATE])
-                ->setCustomLayoutUpdateXml($cms[CmsPageInterface::CUSTOM_LAYOUT_UPDATE_XML])
-                ->setCustomThemeFrom($cms[CmsPageInterface::CUSTOM_THEME_FROM])
-                ->setCustomThemeTo($cms[CmsPageInterface::CUSTOM_THEME_TO])
-                ->setIsActive($cms[CmsPageInterface::IS_ACTIVE]);
+        $page
+            ->setIdentifier($cms[CmsPageInterface::IDENTIFIER])
+            ->setTitle($cms[CmsPageInterface::TITLE])
+            ->setPageLayout($cms[CmsPageInterface::PAGE_LAYOUT])
+            ->setMetaKeywords($cms[CmsPageInterface::META_KEYWORDS])
+            ->setMetaDescription($cms[CmsPageInterface::META_DESCRIPTION])
+            ->setContentHeading($cms[CmsPageInterface::CONTENT_HEADING])
+            ->setContent($cms[CmsPageInterface::CONTENT])
+            ->setSortOrder($cms[CmsPageInterface::SORT_ORDER])
+            ->setLayoutUpdateXml($cms[CmsPageInterface::LAYOUT_UPDATE_XML])
+            ->setCustomTheme($cms[CmsPageInterface::CUSTOM_THEME])
+            ->setCustomRootTemplate($cms[CmsPageInterface::CUSTOM_ROOT_TEMPLATE])
+            ->setCustomLayoutUpdateXml($cms[CmsPageInterface::CUSTOM_LAYOUT_UPDATE_XML])
+            ->setCustomThemeFrom($cms[CmsPageInterface::CUSTOM_THEME_FROM])
+            ->setCustomThemeTo($cms[CmsPageInterface::CUSTOM_THEME_TO])
+            ->setIsActive($cms[CmsPageInterface::IS_ACTIVE])
+            ->setData('store_id', $storeIds);
 
-            $page->setData('store_id', $storeId);
-            $this->pageRepository->save($page);
-        }
+        $this->pageRepository->save($page);
 
         return true;
     }
@@ -356,16 +354,14 @@ class Import implements ContentImportInterface
 
         $cms = $blockData['cms'];
 
-        foreach ($storeIds as $storeId) {
-            $block
-                ->setIdentifier($cms[CmsBlockInterface::IDENTIFIER])
-                ->setTitle($cms[CmsBlockInterface::TITLE])
-                ->setContent($cms[CmsBlockInterface::CONTENT])
-                ->setIsActive($cms[CmsBlockInterface::IS_ACTIVE]);
+        $block
+            ->setIdentifier($cms[CmsBlockInterface::IDENTIFIER])
+            ->setTitle($cms[CmsBlockInterface::TITLE])
+            ->setContent($cms[CmsBlockInterface::CONTENT])
+            ->setIsActive($cms[CmsBlockInterface::IS_ACTIVE])
+            ->setData('store_id', $storeIds);
 
-            $block->setData('store_id', $storeId);
-            $this->blockRepository->save($block);
-        }
+        $this->blockRepository->save($block);
 
         return true;
     }
