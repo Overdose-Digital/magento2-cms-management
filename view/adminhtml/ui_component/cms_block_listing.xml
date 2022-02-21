@@ -6,7 +6,7 @@
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="type" xsi:type="string">json_export</item>
-                        <item name="label" xsi:type="string" translate="true">Export Json</item>
+                        <item name="label" xsi:type="string" translate="true">Export JSON</item>
                         <item name="url" xsi:type="url" path="cmscontent/block/massExport"/>
                     </item>
                 </argument>
@@ -15,7 +15,7 @@
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="type" xsi:type="string">json_split_export</item>
-                        <item name="label" xsi:type="string" translate="true">Export as split Json files</item>
+                        <item name="label" xsi:type="string" translate="true">Export as split JSON files</item>
                         <item name="url" xsi:type="url" path="cmscontent/block/massExport/split/1"/>
                     </item>
                 </argument>
