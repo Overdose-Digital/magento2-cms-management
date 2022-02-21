@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cms_page_data.xsd">
+  <cms_pages>
+    <cms_page identifier="no-route">
+      <attribute code="identifier">no-route</attribute>
+      <attribute code="title">404 Not Found</attribute>
+      <attribute code="page_layout">2columns-right</attribute>
+      <attribute code="meta_keywords">Page keywords</attribute>
+      <attribute code="meta_description">Page description</attribute>
+      <attribute code="content_heading">Whoops, our bad...</attribute>
+      <attribute code="content"><![CDATA[<dl>
+<dt>The page you requested was not found, and we have a fine guess why.</dt>
+<dd>
+<ul class="disc">
+<li>If you typed the URL directly, please make sure the spelling is correct.</li>
+<li>If you clicked on a link to get here, the link is outdated.</li>
+</ul></dd>
+</dl>
+<dl>
+<dt>What can you do?</dt>
+<dd>Have no fear, help is near! There are many ways you can get back on track with Magento Store.</dd>
+<dd>
+<ul class="disc">
+<li><a href="#" onclick="history.go(-1); return false;">Go back</a> to the previous page.</li>
+<li>Use the search bar at the top of the page to search for your products.</li>
+<li>Follow these links to get you back on track!<br /><a href="{{store url=""}}">Store Home</a> <span class="separator">|</span> <a href="{{store url="customer/account"}}">My Account</a></li></ul></dd></dl>
+]]></attribute>
+      <attribute code="sort_order">0</attribute>
+      <attribute code="layout_update_xml"></attribute>
+      <attribute code="custom_theme"></attribute>
+      <attribute code="custom_root_template"></attribute>
+      <attribute code="custom_layout_update_xml"></attribute>
+      <attribute code="custom_theme_from"></attribute>
+      <attribute code="custom_theme_to"></attribute>
+      <attribute code="is_active">1</attribute>
+      <attribute code="store_ids">0</attribute>
+      <attribute code="version">1.0.1</attribute>
+    </cms_page>
+  </cms_pages>
+</config>
