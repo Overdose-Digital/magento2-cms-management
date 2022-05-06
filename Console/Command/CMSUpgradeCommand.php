@@ -76,7 +76,6 @@ class CMSUpgradeCommand extends Command
         }
 
         $cmsType = $input->getOption(self::OPTION_CMS_TYPE);
-
         if (empty($cmsType) && !empty($cmsIdentifier)) {
             throw new \InvalidArgumentException('CMS Entity type OPTION [--type] missed');
         }

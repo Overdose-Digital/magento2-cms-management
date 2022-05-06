@@ -68,7 +68,7 @@
         - Options:
            - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
            - -i, --identifier=IDENTIFIER  > Comma-separated Identifiers of Block/Page to upgrade
-    
+    - od:cms:history-clear > Will delete old history files, by default will be used: Period option
  - Custom configuration files
      - cms_block_data.xml > Create or update cms-blocks
      - cms_page_data.xml > Create or update cms-pages

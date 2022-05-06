@@ -29,7 +29,7 @@ class ImportContent extends Command
 
     protected function configure()
     {
-        $this->setName('cms:import');
+        $this->setName('od:cms:import');
         $this->setDescription('Import CMS zip file');
         $this->addArgument('zipfile', InputArgument::REQUIRED, __('Zip file containing CMS information'));
 

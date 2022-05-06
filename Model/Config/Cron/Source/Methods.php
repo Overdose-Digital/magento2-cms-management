@@ -1,29 +1,28 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model\Config\Cron\Source;
 
-use Overdose\CMSContent\Model\Config\Cron\CronConfig;
+use Magento\Framework\Data\OptionSourceInterface;
+use Overdose\CMSContent\Model\Config;
 
-class Methods implements \Magento\Framework\Data\OptionSourceInterface
+class Methods implements OptionSourceInterface
 {
-
-    /**
-     * @var null|array
-     */
-    private ?array $options = null;
-
     /**
      * @return array
      */
     public function toOptionArray(): array
     {
-        if (!$this->options) {
-            $this->options = [
-                ['label' => __('By Periods'), 'value' => CronConfig::PERIOD],
-                ['label' => __('Older Than'), 'value' => CronConfig::OLDER_THAN],
-            ];
-        }
-        return $this->options;
+        return [
+            [
+                'label' => __('By Periods'),
+                'value' => Config::PERIOD
+            ],
+            [
+                'label' => __('Older Than'),
+                'value' => Config::OLDER_THAN
+            ]
+        ];
     }
 }
