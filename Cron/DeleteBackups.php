@@ -12,12 +12,12 @@ class DeleteBackups
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var ClearCMSHistory
      */
-    private ClearCMSHistory $clearCMSHistory;
+    private $clearCMSHistory;
 
     /**
      * @param ClearCMSHistory $clearCMSHistory
@@ -41,6 +41,7 @@ class DeleteBackups
         if ($this->config->isCronEnabled()) {
             return;
         }
-        $this->clearCMSHistory->execute();
+        $this->clearCMSHistory->execute(Config::TYPE_BLOCK);
+        $this->clearCMSHistory->execute(Config::TYPE_PAGE);
     }
 }

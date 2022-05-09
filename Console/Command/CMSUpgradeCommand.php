@@ -19,6 +19,7 @@ class CMSUpgradeCommand extends Command
      * Identifier option
      */
     const OPTION_CMS_IDENTIFIER = 'identifier';
+
     /**
      * @var ContentVersionManagementInterface
      */

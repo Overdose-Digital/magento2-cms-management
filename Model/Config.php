@@ -10,6 +10,13 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    /**#@+
+     * CMSContent Objects Types
+     */
+    public const TYPE_PAGE = 'pages';
+    public const TYPE_BLOCK = 'blocks';
+    /**#@-*/
+
     public const CMS_DIR = 'cms';
     public const HISTORY_DIR = 'history';
 
@@ -34,12 +41,12 @@ class Config
     /**
      * @var ScopeConfigInterface
      */
-    private ScopeConfigInterface $scopeConfig;
+    private $scopeConfig;
 
     /**
      * @var DirectoryList
      */
-    private DirectoryList $directoryList;
+    private $directoryList;
 
     /**
      * @param ScopeConfigInterface $scopeConfig

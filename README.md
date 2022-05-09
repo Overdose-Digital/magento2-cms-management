@@ -152,7 +152,7 @@
 
 ## Console commands usage
         
-   od:cms:upgrade [options]
+1. **od:cms:upgrade** [options]
    
    - Used to create/update cms-blocks/pages bases on data in `cms_block_data.xml` and `cms_page_data.xml`
    Alternative way: run `php bin/magento setup:upgrade`
@@ -164,6 +164,16 @@
          `php bin/magento od:cms:upgrade -t page`           -- will update only Pages (`cms_page_data.xml`)
          
          `php bin/magento od:cms:upgrade -t page -i home`   -- will update only page with identifier `home`      
+
+2. **od:cms:history-clear** [options]
+
+- Used to manually clear old cms-blocks/pages which are located in var/cms/history folder
+- Examples:
+
+      `php bin/magento od:cms:history-clear -t block`          -- will delete only history Blocks
+      
+      `php bin/magento od:cms:history-clear -t page`           -- will delete only history Pages
+
 
 ## Delete old files by Cron
    - For use this possibility we need turn on it in admin panel. **"Delete Backups By Cron"**

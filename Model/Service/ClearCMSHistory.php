@@ -17,22 +17,22 @@ class ClearCMSHistory
     /**
      * @var DateTime
      */
-    private DateTime $dateTime;
+    private $dateTime;
 
     /**
      * @var Config
      */
-    private Config $config;
+    private $config;
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var File
      */
-    private File $fileManger;
+    private $fileManger;
 
     /**
      * @param DateTime $dateTime
@@ -55,17 +55,19 @@ class ClearCMSHistory
     /**
      * Get module version
      *
+     * @param string $type
+     *
      * @return int
      */
-    public function execute(): int
+    public function execute(string $type): int
     {
         $count = 0;
         switch ($this->config->getMethodType()) {
             case Config::PERIOD:
-                $count = $this->clearByPeriod();
+                $count = $this->clearByPeriod($type);
                 break;
             case Config::OLDER_THAN:
-                $count = $this->clearOlderThan();
+                $count = $this->clearOlderThan($type);
                 break;
         }
         return $count;
@@ -74,27 +76,37 @@ class ClearCMSHistory
     /**
      * Delete files by periods
      *
+     * @param string $type
+     *
      * @return int
      */
-    private function clearByPeriod(): int
+    private function clearByPeriod(string $type): int
     {
-        $filesByPeriods = $this->formFilesByPeriods();
-        if (count($filesByPeriods)) {
-            return $this->deleteFiles($filesByPeriods, Config::PERIOD);
+        $count = 0;
+        foreach ($this->getItemsByType($type) as $item) {
+            $filesByPeriods = $this->formFilesByPeriods($item);
+            if (count($filesByPeriods)) {
+                $count += $this->deleteFiles($filesByPeriods, Config::PERIOD);
+            }
         }
-        return 0;
+        return $count;
     }
 
     /**
      * Delete files older than some period
      *
+     * @param string $type
+     *
      * @return int
      */
-    private function clearOlderThan(): int
+    private function clearOlderThan(string $type): int
     {
-        $filesOlderThan = $this->findFilesOlderThan();
-        if (count($filesOlderThan)) {
-            return $this->deleteFiles($filesOlderThan, Config::OLDER_THAN);
+        $count = 0;
+        foreach ($this->getItemsByType($type) as $item) {
+            $filesOlderThan = $this->findFilesOlderThan($item);
+            if (count($filesOlderThan)) {
+                $count += $this->deleteFiles($filesOlderThan, Config::OLDER_THAN);
+            }
         }
         return 0;
     }
@@ -102,29 +114,36 @@ class ClearCMSHistory
     /**
      * Form list of files by periods
      *
+     * @param string $item
+     *
      * @return array
      */
-    private function formFilesByPeriods(): array
+    private function formFilesByPeriods(string $item): array
     {
         $now = $this->dateTime->gmtTimestamp();
-
         $filesByPeriod = $filesToDelete = [];
-        foreach ($this->getFilesList() as $file) {
+
+        foreach ($this->getFilesList($item) as $file) {
             if ($now - filemtime($file) >= Config::WEEK && $now - filemtime($file) < Config::MONTH) {
-                $filesByPeriod[Config::WEEK][] = $file;
+                $week = date('W', filemtime($file));
+                $filesByPeriod[$week][] = $file;
             }
 
             if ($now - filemtime($file) >= Config::MONTH && $now - filemtime($file) < Config::YEAR) {
-                $filesByPeriod[Config::MONTH][] = $file;
+                $month = date('Y-m', filemtime($file));
+                $filesByPeriod[$month][] = $file;
             }
 
             if ($now - filemtime($file) >= Config::YEAR) {
-                $filesByPeriod[Config::YEAR][] = $file;
+                $year = date('Y', filemtime($file));
+                $filesByPeriod[$year][] = $file;
             }
         }
 
         foreach ($filesByPeriod as $files) {
-            usort($files, static fn ($a, $b) => filemtime($b) - filemtime($a));
+            usort($files, function ($a, $b) {
+                return filemtime($a) < filemtime($b);
+            });
             array_shift($files);
             array_push($filesToDelete, ...$files);
         }
@@ -134,15 +153,17 @@ class ClearCMSHistory
     /**
      * Fina files which are older than
      *
+     * @param string $item
+     *
      * @return array
      */
-    private function findFilesOlderThan(): array
+    private function findFilesOlderThan(string $item): array
     {
         $now = $this->dateTime->gmtTimestamp();
         $period = $this->config->getPeriodType() * $this->config->getPeriodNumber();
 
         $files = [];
-        foreach ($this->getFilesList() as $file) {
+        foreach ($this->getFilesList($item) as $file) {
             if ($now - filemtime($file) >= $period) {
                 $files[] = $file;
             }
@@ -185,16 +206,38 @@ class ClearCMSHistory
     /**
      * Get files list
      *
+     * @param string $itemDir
+     *
      * @return array
      */
-    private function getFilesList(): array
+    private function getFilesList(string $itemDir): array
     {
         $result = [];
         try {
-            $result = $this->fileManger->readDirectoryRecursively($this->config->getBackupsDir());
-            $result = array_filter(
-                $result,
-                fn($file) => (!$this->fileManger->isDirectory($file) && strpos($file, Config::HISTORY_DIR))
+            $result = $this->fileManger->readDirectoryRecursively($itemDir);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
+        return $result;
+    }
+
+    /**
+     * Get list of items by type ( blocks, pages )
+     *
+     * @param string $type
+     *
+     * @return array
+     */
+    private function getItemsByType(string $type): array
+    {
+        $result = [];
+        try {
+            $result = $this->fileManger->readDirectory(
+                $this->config->getBackupsDir()
+                . DIRECTORY_SEPARATOR
+                . $type
+                . DIRECTORY_SEPARATOR
+                . Config::HISTORY_DIR
             );
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
