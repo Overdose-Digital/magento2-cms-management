@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model;
 
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Magento\Framework\Exception\FileSystemException;
+use Overdose\CMSContent\Model\Config;
 use Psr\Log\LoggerInterface;
 use Overdose\CMSContent\File\FileInterface;
 
@@ -13,45 +15,43 @@ class BackupManager
     const TYPE_CMS_BLOCK = 'cms_block';
     const TYPE_CMS_PAGE = 'cms_page';
 
-    private $directoryPathMap = [
-        self::TYPE_CMS_BLOCK    => '/cms/blocks/history/',
-        self::TYPE_CMS_PAGE     => '/cms/pages/history/',
-    ];
-
     private $cmsObject = null;
 
     /**
      * @var FileInterface
      */
     private $file;
-    /**
-     * @var DirectoryList
-     */
-    private $directoryList;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var FileDriver
      */
     private $fileDriver;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * BackupManager constructor.
      *
-     * @param DirectoryList $directoryList
      * @param FileDriver $fileDriver
      * @param FileInterface $file
+     * @param Config $config
      * @param LoggerInterface $logger
      */
     public function __construct(
-        DirectoryList $directoryList,
         FileDriver  $fileDriver,
         FileInterface $file,
+        Config $config,
         LoggerInterface $logger
     ) {
-        $this->directoryList = $directoryList;
+        $this->config = $config;
         $this->file = $file;
         $this->logger = $logger;
         $this->fileDriver = $fileDriver;
@@ -92,22 +92,35 @@ class BackupManager
     /**
      * Generates path to backup file
      *
-     * @param $type
-     * @return bool|string
+     * @param string $type
+     * @param string $identifier
+     *
+     * @return null|string
      */
-    public function getBackupPath($type, $identifier = '')
+    public function getBackupPath(string $type, string $identifier = ''): ?string
     {
         try {
-            $varPath = $this->directoryList->getPath(DirectoryList::VAR_DIR);
+            $cmsDir = $this->config->getBackupsDir() . DIRECTORY_SEPARATOR;
             $identifier = $identifier ?: $this->cmsObject->getIdentifier();
-            $backupPath = $this->directoryPathMap[$type] . $identifier;
+
+            switch ($type) {
+                case self::TYPE_CMS_BLOCK:
+                    $backupPath = $cmsDir . Config::TYPE_BLOCK . DIRECTORY_SEPARATOR;
+                    break;
+                case self::TYPE_CMS_PAGE:
+                    $backupPath = $cmsDir . Config::TYPE_PAGE . DIRECTORY_SEPARATOR;
+                    break;
+                default:
+                    $backupPath = $cmsDir;
+                    break;
+            }
+
+            return $backupPath . 'history' . DIRECTORY_SEPARATOR . $identifier;
         } catch (\Exception $e) {
             $this->logger->critical(__('Something went wrong while retrieving filepath'));
 
-            return false;
+            return null;
         }
-
-        return $varPath . $backupPath;
     }
 
     /**
@@ -158,9 +171,11 @@ class BackupManager
      *  Setter for $cmsObject
      *
      * @param $cmsObject
+     *
      * @return $this
      */
-    public function setCmsObject($cmsObject) {
+    public function setCmsObject($cmsObject)
+    {
         $this->cmsObject = $cmsObject;
 
         return $this;
