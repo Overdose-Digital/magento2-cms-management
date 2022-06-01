@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Generator\Json;
 
 use Magento\Framework\Serialize\SerializerInterface;
-use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Model\Generator\CmsEntityGeneratorInterface;
 
 class Generator implements CmsEntityGeneratorInterface
 {
-    const TYPE = 'json';
-
     /**
      * @var SerializerInterface
      */
     private $serializerInterface;
 
+    /**
+     * @param SerializerInterface $serializerInterface
+     */
     public function __construct(
         SerializerInterface $serializerInterface
     ) {
@@ -21,15 +24,8 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return self::TYPE;
-    }
-
-    /**
      * @param array $data
+     *
      * @return string
      */
     public function generate(array $data): string

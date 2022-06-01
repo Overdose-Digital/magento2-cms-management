@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Converter;
 
 use Magento\Framework\Exception\LocalizedException;
-use Overdose\CMSContent\Api\CmsEntityConverterInterface;
 use Overdose\CMSContent\Api\CmsEntityConverterManagerInterface;
 
 class CmsEntityConverterManager implements CmsEntityConverterManagerInterface
 {
-    private $entities = [];
-
     /**
      * @var CmsEntityConverterInterface[]
      */
     private $converters = [];
 
+    /**
+     * @param array $converters
+     */
     public function __construct(
         array $converters
     ) {
@@ -22,32 +24,13 @@ class CmsEntityConverterManager implements CmsEntityConverterManagerInterface
     }
 
     /**
-     * @param array $entities
-     * @return $this|CmsEntityConverterManagerInterface
+     * @inheritdoc
      */
-    public function setEntities(array $entities): CmsEntityConverterManagerInterface
+    public function getConverter(string $type): CmsEntityConverterInterface
     {
-        $this->entities = $entities;
-
-        return $this;
-    }
-
-    /**
-     * @return CmsEntityConverterInterface
-     * @throws LocalizedException
-     */
-    public function getConverter(): CmsEntityConverterInterface
-    {
-        if (count($this->entities) > 0) {
-            $cmsEntity = $this->entities[0];
-            foreach ($this->converters as $converter) {
-                $type = $converter->getCmsEntityType();
-                if ($cmsEntity instanceof $type) {
-                    return $converter;
-                }
-            }
+        if (isset($this->converters[$type])) {
+            return $this->converters[$type];
         }
-
         throw new LocalizedException(__("Can't find converter"));
     }
 }

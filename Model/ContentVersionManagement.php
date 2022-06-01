@@ -2,26 +2,26 @@
 
 namespace Overdose\CMSContent\Model;
 
+use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Api\Data\BlockInterfaceFactory;
 use Magento\Cms\Api\Data\PageInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Cms\Api\Data\PageInterfaceFactory;
+use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
-use Magento\Cms\Api\BlockRepositoryInterface;
-use Magento\Cms\Api\PageRepositoryInterface;
-use Magento\Cms\Api\Data\BlockInterfaceFactory;
-use Magento\Cms\Api\Data\PageInterfaceFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
-use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
-use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
-use Overdose\CMSContent\Model\Config\ReaderAbstract;
-use Psr\Log\LoggerInterface;
+use Overdose\CMSContent\Api\ContentVersionRepositoryInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory;
-use Overdose\CMSContent\Api\ContentVersionRepositoryInterface;
+use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
 use Overdose\CMSContent\Model\Config\Block\Reader as BlocksConfigReader;
 use Overdose\CMSContent\Model\Config\Page\Reader as PagesConfigReader;
+use Overdose\CMSContent\Model\Config\ReaderAbstract;
+use Overdose\CMSContent\Model\Generator\CmsEntityGeneratorInterface;
+use Psr\Log\LoggerInterface;
 
 class ContentVersionManagement implements ContentVersionManagementInterface
 {

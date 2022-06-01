@@ -1,17 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Api;
+
+use Magento\Framework\Exception\LocalizedException;
+use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
 
 interface CmsEntityConverterManagerInterface
 {
-    /**
-     * @param array $entities
-     * @return $this
+    /**#@+
+     * Entity Types
      */
-    public function setEntities(array $entities): self;
+    const PAGE_ENTITY_CODE = 'pages';
+    const BLOCK_ENTITY_CODE = 'blocks';
+    /**#@-*/
 
     /**
+     * Get converter by Entity
+     *
+     * @param string $type
+     *
      * @return CmsEntityConverterInterface
+     * @throws LocalizedException
      */
-    public function getConverter(): CmsEntityConverterInterface;
+    public function getConverter(string $type): CmsEntityConverterInterface;
 }

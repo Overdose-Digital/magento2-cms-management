@@ -1,27 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Api\Data;
 
-interface ContentVersionSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
+use Magento\Framework\Api\SearchResultsInterface;
+
+interface ContentVersionSearchResultsInterface extends SearchResultsInterface
 {
 
     /**
      * Get content_version list.
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface[]
+     *
+     * @return ContentVersionInterface[]
      */
-    public function getItems();
+    public function getItems(): array;
 
     /**
      * Get content_version list as array with identifiers as keys
      *
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface[]
+     * @return ContentVersionInterface[]
      */
-    public function getItemsArray();
+    public function getItemsArray(): array;
 
     /**
      * Set id list.
-     * @param \Overdose\CMSContent\Api\Data\ContentVersionInterface[] $items
+     *
+     * @param ContentVersionInterface[] $items
+     *
      * @return $this
      */
-    public function setItems(array $items);
+    public function setItems(array $items): ContentVersionSearchResultsInterface;
 }

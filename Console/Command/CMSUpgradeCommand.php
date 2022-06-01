@@ -19,6 +19,7 @@ class CMSUpgradeCommand extends Command
      * Identifier option
      */
     const OPTION_CMS_IDENTIFIER = 'identifier';
+
     /**
      * @var ContentVersionManagementInterface
      */
@@ -98,10 +99,5 @@ class CMSUpgradeCommand extends Command
             $result = $this->contentVersionManagement->processAll();
         }
         $output->writeln('<info>Upgrade Completed!</info>');
-//        $output->writeln('<info>Upgrade Completed! ' . count($result). ' items processed</info>');
-//        foreach ($result as $item) {
-//            $message = $item['type']  . ': ' . $item['identifier'] . ' ' . $item['old_version'] . ' --> ' . $item['new_version'];
-//            $output->writeln('<comment>' . $message . '</comment>');
-//        }
     }
 }

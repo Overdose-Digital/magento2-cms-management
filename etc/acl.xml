@@ -1,18 +1,19 @@
 <?xml version="1.0" ?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
-	<acl>
-		<resources>
-			<resource id="Magento_Backend::admin">
-				<resource id="Magento_Backend::stores">
-					<resource id="Magento_Backend::stores_settings">
-						<resource id="Magento_Config::config">
-							<resource id="Overdose_CMSContent::config_overdose_cmscontent" title="cms_content"/>
-						</resource>
-					</resource>
-					<resource id="Overdose_CMSContent::cmscontent" sortOrder="10" title="cmscontent">
-						<resource id="Overdose_CMSContent::history_view" sortOrder="10" title="history view"/>
-					</resource>
-				</resource>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Overdose_CMSContent::config_overdose_cmscontent" title="cms_content"/>
+                        </resource>
+                    </resource>
+                    <resource id="Overdose_CMSContent::cmscontent" sortOrder="10" title="cmscontent">
+                        <resource id="Overdose_CMSContent::history_view" sortOrder="10" title="history view"/>
+                    </resource>
+                </resource>
                 <resource id="Magento_Backend::content">
                     <resource id="Magento_Backend::content_elements">
                         <resource id="Magento_Cms::page" title="Pages" sortOrder="10">
@@ -24,7 +25,7 @@
                         <resource id="Overdose_CMSContent::import" title="Import" sortOrder="30" />
                     </resource>
                 </resource>
-			</resource>
-		</resources>
-	</acl>
+            </resource>
+        </resources>
+    </acl>
 </config>

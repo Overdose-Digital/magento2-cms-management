@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\Io\File;
-use Overdose\CMSContent\Api\CmsEntityConverterManagerInterface;
 use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
 use Overdose\CMSContent\Api\ContentExportInterface;
 use ZipArchive;
 
-class Export implements ContentExportInterface
+class ContentExport implements ContentExportInterface
 {
     const FILENAME = 'cms';
     const MEDIA_ARCHIVE_PATH = 'media';
@@ -17,26 +19,27 @@ class Export implements ContentExportInterface
      * @var Filesystem
      */
     private $filesystem;
-    /**
-     * @var CmsEntityConverterManagerInterface
-     */
-    private $cmsEntityConverterManager;
+
     /**
      * @var CmsEntityGeneratorManagerInterface
      */
     private $cmsEntityGeneratorManager;
+
     /**
      * @var File
      */
     private $file;
 
+    /**
+     * @param CmsEntityGeneratorManagerInterface $cmsEntityGeneratorManager
+     * @param Filesystem $filesystem
+     * @param File $file
+     */
     public function __construct(
-        CmsEntityConverterManagerInterface $cmsEntityConverterManager,
         CmsEntityGeneratorManagerInterface $cmsEntityGeneratorManager,
         Filesystem $filesystem,
         File $file
     ) {
-        $this->cmsEntityConverterManager = $cmsEntityConverterManager;
         $this->cmsEntityGeneratorManager = $cmsEntityGeneratorManager;
         $this->filesystem = $filesystem;
         $this->file = $file;
@@ -45,24 +48,26 @@ class Export implements ContentExportInterface
     /**
      * @inheridoc
      */
-    public function createZipFile(array $cmsEntities, string $type, string $fileName, bool $split): string
-    {
+    public function createZipFile(
+        array $convertedEntities,
+        string $entityType,
+        string $type,
+        string $fileName,
+        bool $split
+    ): string {
         $exportPath = $this->filesystem->getExportPath();
         $relativeZipFile = Filesystem::EXPORT_PATH . '/' . $fileName;
-        $converter = $this->cmsEntityConverterManager
-            ->setEntities($cmsEntities)
-            ->getConverter();
-        $contentArray = $converter->convertToArray($cmsEntities);
+
         $zipArchive = $this->putContentToZip(
-            $contentArray,
-            $converter->getCmsEntityCode(),
+            $convertedEntities,
+            $entityType,
             $exportPath . '/' . $fileName,
             $type,
             $split
         );
 
         // Add media files
-        foreach ($contentArray['media'] as $mediaFile) {
+        foreach ($convertedEntities['media'] as $mediaFile) {
             //Strip Quotes if any
             $mediaFile = str_replace(['"',"&quot;","'"], '', $mediaFile);
             $absMediaPath = $this->filesystem->getMediaPath($mediaFile);
@@ -86,23 +91,26 @@ class Export implements ContentExportInterface
      * @param string $type
      * @param bool $split
      * @return ZipArchive
+     * @throws LocalizedException
      */
     private function putContentToZip(
         array $contentArray,
         string $cmsEntityCode,
         string $zipFileName,
         string $type,
-        bool $split)
-    : ZipArchive {
+        bool $split
+    ): ZipArchive {
         $zipArchive = new ZipArchive();
         $zipArchive->open($zipFileName, ZipArchive::CREATE);
+        $generator = $this->cmsEntityGeneratorManager->getGenerator($type);
+
         if ($split) {
             foreach ($contentArray[$cmsEntityCode] as $key => $content) {
-                $payload = $this->cmsEntityGeneratorManager
-                    ->getGenerator($type)
-                    ->generate([
+                $payload = $generator->generate(
+                    [
                         $cmsEntityCode => [$key => $content]
-                    ]);
+                    ]
+                );
                 $zipArchive->addFromString(
                     sprintf('%s_%s_%s.%s', self::FILENAME, $this->prepareEntityPartName($cmsEntityCode), $key, $type),
                     $payload
@@ -116,9 +124,7 @@ class Export implements ContentExportInterface
                 ];
                 $fullContent = array_merge_recursive($fullContent, $entityContent);
             }
-            $payload = $this->cmsEntityGeneratorManager
-                ->getGenerator($type)
-                ->generate($fullContent);
+            $payload = $generator->generate($fullContent);
             $zipArchive->addFromString(
                 sprintf('%s_%s.%s', self::FILENAME, $this->prepareEntityPartName($cmsEntityCode), $type),
                 $payload
@@ -129,10 +135,13 @@ class Export implements ContentExportInterface
     }
 
     /**
+     * Prepare entity part name
+     *
      * @param string $cmsEntityCode
+     *
      * @return string
      */
-    private function prepareEntityPartName(string $cmsEntityCode)
+    private function prepareEntityPartName(string $cmsEntityCode): string
     {
         return substr($cmsEntityCode, 0, strlen($cmsEntityCode) - 1) . '_data';
     }

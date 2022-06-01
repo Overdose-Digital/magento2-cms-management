@@ -93,9 +93,9 @@ class BackupManager
      * Generates path to backup file
      *
      * @param $type
-     * @return bool|string
+     * @return null|string
      */
-    public function getBackupPath($type, $identifier = '')
+    public function getBackupPath($type, $identifier = ''): ?string
     {
         try {
             $varPath = $this->directoryList->getPath(DirectoryList::VAR_DIR);
@@ -104,7 +104,7 @@ class BackupManager
         } catch (\Exception $e) {
             $this->logger->critical(__('Something went wrong while retrieving filepath'));
 
-            return false;
+            return null;
         }
 
         return $varPath . $backupPath;
