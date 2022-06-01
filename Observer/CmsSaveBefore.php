@@ -2,9 +2,10 @@
 
 namespace Overdose\CMSContent\Observer;
 
+use Magento\Framework\Event\ObserverInterface;
 use Overdose\CMSContent\Model\BackupManager;
 
-class CmsSaveBefore implements \Magento\Framework\Event\ObserverInterface
+class CmsSaveBefore implements ObserverInterface
 {
     /**
      * Events map to process

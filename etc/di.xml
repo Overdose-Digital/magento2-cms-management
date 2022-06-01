@@ -5,10 +5,14 @@
     <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface" type="Overdose\CMSContent\Model\ContentVersionRepository"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
-    <preference for="Overdose\CMSContent\Api\ContentExportInterface" type="Overdose\CMSContent\Model\Export" />
-    <preference for="Overdose\CMSContent\Api\ContentImportInterface" type="Overdose\CMSContent\Model\Import" />
-    <preference for="Overdose\CMSContent\Api\CmsEntityConverterManagerInterface" type="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager" />
-    <preference for="Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface" type="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager" />
+    <preference for="Overdose\CMSContent\Api\ContentExportInterface"
+                type="Overdose\CMSContent\Model\ContentExport" />
+    <preference for="Overdose\CMSContent\Api\ContentImportInterface"
+                type="Overdose\CMSContent\Model\Import" />
+    <preference for="Overdose\CMSContent\Api\CmsEntityConverterManagerInterface"
+                type="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager" />
+    <preference for="Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface"
+                type="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager" />
     <preference for="Overdose\CMSContent\Api\StoreManagementInterface" type="Overdose\CMSContent\Model\StoreManagement" />
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
@@ -73,16 +77,16 @@
     <type name="Overdose\CMSContent\Model\Converter\CmsEntityConverterManager">
         <arguments>
             <argument name="converters" xsi:type="array">
-                <item name="pageConverter" xsi:type="object">Overdose\CMSContent\Model\Converter\Page\Converter</item>
-                <item name="blockConverter" xsi:type="object">Overdose\CMSContent\Model\Converter\Block\Converter</item>
+                <item name="pages" xsi:type="object">Overdose\CMSContent\Model\Converter\Page\Converter\Proxy</item>
+                <item name="blocks" xsi:type="object">Overdose\CMSContent\Model\Converter\Block\Converter\Proxy</item>
             </argument>
         </arguments>
     </type>
     <type name="Overdose\CMSContent\Model\Generator\CmsEntityGeneratorManager">
         <arguments>
             <argument name="generators" xsi:type="array">
-                <item name="jsonGenerator" xsi:type="object">Overdose\CMSContent\Model\Generator\Json\Generator</item>
-                <item name="xmlGenerator" xsi:type="object">Overdose\CMSContent\Model\Generator\Xml\Generator</item>
+                <item name="json" xsi:type="object">Overdose\CMSContent\Model\Generator\Json\Generator\Proxy</item>
+                <item name="xml" xsi:type="object">Overdose\CMSContent\Model\Generator\Xml\Generator\Proxy</item>
             </argument>
         </arguments>
     </type>

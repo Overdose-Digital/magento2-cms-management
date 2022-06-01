@@ -1,8 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\ResourceModel\ContentVersion;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Overdose\CMSContent\Model\ContentVersion;
+use Overdose\CMSContent\Model\ResourceModel\ContentVersion as ResourceContentVersion;
+
+class Collection extends AbstractCollection
 {
     /**
      * Define resource model
@@ -11,9 +17,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init(
-            \Overdose\CMSContent\Model\ContentVersion::class,
-            \Overdose\CMSContent\Model\ResourceModel\ContentVersion::class
-        );
+        $this->_init(ContentVersion::class, ResourceContentVersion::class);
     }
 }

@@ -1,6 +1,10 @@
 <?php
 
-namespace Overdose\CMSContent\Api;
+declare(strict_types=1);
+
+namespace Overdose\CMSContent\Model\Generator;
+
+use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
 
 interface CmsEntityGeneratorInterface
 {
@@ -16,13 +20,11 @@ interface CmsEntityGeneratorInterface
     const STORES_ENTITY_NODE_NAME = 'stores';
 
     /**
-     * @return string
-     */
-    public function getType(): string;
-
-    /**
+     * Call generate action
+     *
      * @param array $data
-     * @return string | array
+     *
+     * @return string
      */
     public function generate(array $data): string;
 }

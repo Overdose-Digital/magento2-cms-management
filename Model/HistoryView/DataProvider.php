@@ -2,6 +2,7 @@
 
 namespace Overdose\CMSContent\Model\HistoryView;
 
+use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Overdose\CMSContent\Model\BackupManager;
@@ -13,10 +14,12 @@ class DataProvider extends AbstractDataProvider
      * @var BackupManager
      */
     private $backupManager;
+
     /**
      * @var FileInterface
      */
     private $file;
+
     /**
      * @var RequestInterface
      */
@@ -61,7 +64,7 @@ class DataProvider extends AbstractDataProvider
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $data = [];
         if ($backupItemIdentifier = $this->request->getParam('bc_identifier')) {
@@ -91,7 +94,7 @@ class DataProvider extends AbstractDataProvider
     /**
      * @inheritDoc
      */
-    public function addFilter(\Magento\Framework\Api\Filter $filter)
+    public function addFilter(Filter $filter)
     {
         return $this;
     }

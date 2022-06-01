@@ -1,36 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Controller\Adminhtml\History;
 
-class View extends \Magento\Backend\App\Action
-{
-    /**
-     * Constructor
-     *
-     * @param \Magento\Backend\App\Action\Context  $context
-     */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context
-    ) {
-        parent::__construct($context);
-    }
+use Magento\Backend\App\Action;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Result\Page;
 
+class View extends Action implements HttpGetActionInterface
+{
     /**
      * Execute view action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface|Page
      */
     public function execute()
     {
-        try {
-            $this->_view->loadLayout();
-            $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Backup Preview'));
-            $this->_view->renderLayout();
-        } catch (\Exception $e) {
-            $this->messageManager->addErrorMessage(
-                __('An error occurred. The backup can not be opened for preview.')
-            );
-            $this->_redirect('adminhtml/*/');
-        }
+        $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+
+        $resultPage->getConfig()->getTitle()->prepend(__('Backup Preview'));
+
+        return $resultPage;
     }
 }

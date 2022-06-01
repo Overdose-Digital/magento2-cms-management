@@ -1,6 +1,8 @@
 <?php
 
-namespace Overdose\CMSContent\Api;
+declare(strict_types=1);
+
+namespace Overdose\CMSContent\Model\Converter;
 
 interface CmsEntityConverterInterface
 {
@@ -9,17 +11,8 @@ interface CmsEntityConverterInterface
     const BLOCK_ENTITY_CODE = 'blocks';
 
     /**
-     * @return string
-     */
-    public function getCmsEntityType(): string;
-
-    /**
-     * @return string
-     */
-    public function getCmsEntityCode(): string;
-
-    /**
      * @param array $cmsEntities
+     *
      * @return array
      */
     public function convertToArray(array $cmsEntities): array;

@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Converter\Page;
 
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\Data\PageInterface as CmsPageInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
-use Overdose\CMSContent\Api\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
 
 class Converter implements CmsEntityConverterInterface
 {
-    const CMS_ENTITY_TYPE = \Magento\Cms\Api\Data\PageInterface::class;
-
     /**
      * @var StoreRepositoryInterface
      */
@@ -27,22 +27,6 @@ class Converter implements CmsEntityConverterInterface
     ) {
         $this->storeRepositoryInterface = $storeRepositoryInterface;
         $this->blockRepositoryInterface = $blockRepositoryInterface;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCmsEntityType(): string
-    {
-        return self::CMS_ENTITY_TYPE;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCmsEntityCode(): string
-    {
-        return self::PAGE_ENTITY_CODE;
     }
 
     /**

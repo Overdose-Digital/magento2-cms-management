@@ -8,6 +8,14 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action
 {
+    /**
+     * Authorization level of a basic admin session
+     *
+     * @see _isAllowed()
+     */
+    const ADMIN_RESOURCE = 'Overdose_CMSContent::import';
+
+
     protected $pageFactory;
 
     public function __construct(
@@ -17,11 +25,6 @@ class Index extends Action
         $this->pageFactory = $pageFactory;
 
         parent::__construct($context);
-    }
-
-    protected function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Overdose_CMSContent::import');
     }
 
     public function execute()

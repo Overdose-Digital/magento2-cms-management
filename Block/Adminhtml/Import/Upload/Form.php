@@ -18,6 +18,7 @@ class Form extends Generic
      * @var MediaMode
      */
     protected $mediaMode;
+
     /**
      * @var CmsMode
      */

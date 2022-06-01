@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Api\Data;
 
-interface ContentVersionInterface extends \Magento\Framework\Api\ExtensibleDataInterface
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface ContentVersionInterface extends ExtensibleDataInterface
 {
     const IDENTIFIER = 'identifier';
     const STORE_IDS = 'store_ids';

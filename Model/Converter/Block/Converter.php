@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model\Converter\Block;
 
-
 use Magento\Cms\Api\BlockRepositoryInterface;
-use Magento\Cms\Api\Data\BlockInterface as CmsBlockInterface;
+use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Api\StoreRepositoryInterface;
-use Overdose\CMSContent\Api\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
 
 class Converter implements CmsEntityConverterInterface
 {
-    const CMS_ENTITY_TYPE = \Magento\Cms\Api\Data\BlockInterface::class;
-
     /**
      * @var StoreRepositoryInterface
      */
@@ -32,33 +31,16 @@ class Converter implements CmsEntityConverterInterface
     }
 
     /**
-     * @return string
-     */
-    public function getCmsEntityType(): string
-    {
-        return self::CMS_ENTITY_TYPE;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCmsEntityCode(): string
-    {
-        return self::BLOCK_ENTITY_CODE;
-    }
-
-    /**
-     * @param array $cmsEntities
-     * @return array
+     * @inheritdoc
      */
     public function convertToArray(array $cmsEntities): array
     {
         $blocks = [];
-        $media = [];
+        $media  = [];
 
         foreach ($cmsEntities as $cmsEntity) {
             $blockInfo = $this->convertBlockToArray($cmsEntity);
-            $blocks[$this->_getBlockKey($cmsEntity)] = $blockInfo;
+            $blocks[$this->getBlockKey($cmsEntity)] = $blockInfo;
             $media = array_merge($media, $blockInfo['media']);
         }
 
@@ -70,20 +52,20 @@ class Converter implements CmsEntityConverterInterface
 
     /**
      * Return CMS block to array
-     * @param \Magento\Cms\Api\Data\BlockInterface $blockInterface
+     * @param BlockInterface $blockInterface
      * @return array
      */
-    private function convertBlockToArray(CmsBlockInterface $blockInterface): array
+    private function convertBlockToArray(BlockInterface $blockInterface): array
     {
         // Extract attachments
         $media = $this->getMediaAttachments($blockInterface->getContent());
 
         $payload = [
             'cms' => [
-                CmsBlockInterface::IDENTIFIER => $blockInterface->getIdentifier(),
-                CmsBlockInterface::TITLE => $blockInterface->getTitle(),
-                CmsBlockInterface::CONTENT => $blockInterface->getContent(),
-                CmsBlockInterface::IS_ACTIVE => (string)$blockInterface->isActive(),
+                BlockInterface::IDENTIFIER => $blockInterface->getIdentifier(),
+                BlockInterface::TITLE => $blockInterface->getTitle(),
+                BlockInterface::CONTENT => $blockInterface->getContent(),
+                BlockInterface::IS_ACTIVE => (string)$blockInterface->isActive(),
             ],
             'stores' => $this->getStoreCodes($blockInterface->getStoreId()),
             'media' => $media,
@@ -114,10 +96,12 @@ class Converter implements CmsEntityConverterInterface
 
     /**
      * Get block unique key
-     * @param CmsBlockInterface $blockInterface
+     *
+     * @param BlockInterface $blockInterface
+     *
      * @return string
      */
-    private function _getBlockKey(CmsBlockInterface $blockInterface): string
+    private function getBlockKey(BlockInterface $blockInterface): string
     {
         $keys = $this->getStoreCodes($blockInterface->getStoreId());
         $keys[] = $blockInterface->getIdentifier();
@@ -145,13 +129,15 @@ class Converter implements CmsEntityConverterInterface
      * @param string $content
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     private function saveBlockByIdent(string $content)
     {
         $references = [];
 
-        if (preg_match_all('/{{widget.+?block_id\s*=\s*("|&quot;)(\d+?)("|&quot;).*?}}/', $content, $matches)) {
+        $pattern = '/{{widget.+?block_id\s*=\s*("|&quot;)(\d+?)("|&quot;).*?}}/';
+
+        if (preg_match_all($pattern, $content, $matches)) {
             foreach ($matches[2] as $blockId) {
                 $block = $this->blockRepositoryInterface->getById($blockId);
                 $references[$blockId] = $block->getIdentifier();

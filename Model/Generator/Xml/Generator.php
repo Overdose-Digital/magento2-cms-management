@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Generator\Xml;
 
 use Magento\Framework\Exception\LocalizedException;
-use Overdose\CMSContent\Api\CmsEntityConverterInterface;
-use Overdose\CMSContent\Api\CmsEntityGeneratorInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Overdose\CMSContent\Api\StoreManagementInterface;
+use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Generator\CmsEntityGeneratorInterface;
 
 class Generator implements CmsEntityGeneratorInterface
 {
-    const TYPE = 'xml';
-
     /**
      * @var \DOMDocument|null
      */
@@ -43,14 +43,6 @@ class Generator implements CmsEntityGeneratorInterface
     ) {
         $this->contentVersionManagement = $contentVersionManagement;
         $this->storeManagement = $storeManagement;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return self::TYPE;
     }
 
     /**
