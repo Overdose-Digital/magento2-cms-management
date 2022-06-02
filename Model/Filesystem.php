@@ -2,6 +2,7 @@
 
 namespace Overdose\CMSContent\Model;
 
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem\DriverInterface;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -25,7 +26,9 @@ class Filesystem
 
     /**
      * Get upload path
+     *
      * @return string
+     * @throws FileSystemException
      */
     public function getUploadPath()
     {

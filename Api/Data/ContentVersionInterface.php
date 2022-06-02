@@ -8,90 +8,118 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface ContentVersionInterface extends ExtensibleDataInterface
 {
+    /**#@+
+     * Entity Fields
+     */
     const IDENTIFIER = 'identifier';
     const STORE_IDS = 'store_ids';
     const ID = 'id';
     const VERSION = 'version';
     const TYPE = 'type';
+    /**#@-*/
+
+    /**#@+
+     * Types
+     */
     const TYPE_BLOCK = 0;
     const TYPE_PAGE = 1;
+    /**#@-*/
+
     /**
      * Get id
+     *
      * @return string|null
      */
     public function getId();
 
     /**
      * Set id
+     *
      * @param string $id
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     *
+     * @return ContentVersionInterface
      */
-    public function setId($id);
+    public function setId(string $id): ContentVersionInterface;
 
     /**
      * Retrieve existing extension attributes object or create a new one.
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface|null
+     *
+     * @return ContentVersionExtensionInterface|null
      */
-    public function getExtensionAttributes();
+    public function getExtensionAttributes(): ?ContentVersionExtensionInterface;
 
     /**
      * Set an extension attributes object.
-     * @param \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
+     *
+     * @param ContentVersionExtensionInterface $extensionAttributes
+     *
      * @return $this
      */
     public function setExtensionAttributes(
-        \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
-    );
+        ContentVersionExtensionInterface $extensionAttributes
+    ): ContentVersionInterface;
 
     /**
      * Get type
+     *
      * @return string|null
      */
-    public function getType();
+    public function getType(): ?string;
 
     /**
      * Set type
+     *
      * @param string $type
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     *
+     * @return ContentVersionInterface
      */
-    public function setType($type);
+    public function setType(string $type): ContentVersionInterface;
 
     /**
      * Get identifier
+     *
      * @return string|null
      */
-    public function getIdentifier();
+    public function getIdentifier(): ?string;
 
     /**
      * Set identifier
+     *
      * @param string $identifier
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     *
+     * @return ContentVersionInterface
      */
-    public function setIdentifier($identifier);
+    public function setIdentifier(string $identifier): ContentVersionInterface;
 
     /**
      * Get version
+     *
      * @return string|null
      */
-    public function getVersion();
+    public function getVersion(): ?string;
 
     /**
      * Set version
+     *
      * @param string $version
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     *
+     * @return ContentVersionInterface
      */
-    public function setVersion($version);
+    public function setVersion(string $version): ContentVersionInterface;
 
     /**
      * Get store_ids
+     *
      * @return string|null
      */
-    public function getStoreIds();
+    public function getStoreIds(): ?string;
 
     /**
      * Set store_ids
+     *
      * @param string $storeIds
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     *
+     * @return ContentVersionInterface
      */
-    public function setStoreIds($storeIds);
+    public function setStoreIds(string $storeIds): ContentVersionInterface;
 }

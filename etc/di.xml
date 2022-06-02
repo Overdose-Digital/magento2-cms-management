@@ -53,7 +53,7 @@
             <argument name="blockInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\BlockInterfaceFactory\Proxy</argument>
             <argument name="blockRepository" xsi:type="object">Magento\Cms\Api\BlockRepositoryInterface\Proxy</argument>
             <argument name="contentVersionFactory" xsi:type="object">Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory\Proxy</argument>
-            <argument name="contentVersionRepository" xsi:type="object">\Overdose\CMSContent\Api\ContentVersionRepositoryInterface\Proxy</argument>
+            <argument name="contentVersionRepository" xsi:type="object">Overdose\CMSContent\Api\ContentVersionRepositoryInterface\Proxy</argument>
             <argument name="filterBuilder" xsi:type="object">\Magento\Framework\Api\FilterBuilder\Proxy</argument>
             <argument name="filterGroupBuilder" xsi:type="object">\Magento\Framework\Api\Search\FilterGroupBuilder\Proxy</argument>
             <argument name="logger" xsi:type="object">CmsImportLogger</argument>

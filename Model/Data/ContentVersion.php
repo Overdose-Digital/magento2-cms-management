@@ -1,122 +1,108 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Data;
 
+use Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
+use Magento\Framework\Model\AbstractExtensibleModel;
 
-class ContentVersion extends \Magento\Framework\Api\AbstractExtensibleObject implements ContentVersionInterface
+class ContentVersion extends AbstractExtensibleModel implements ContentVersionInterface
 {
     /**
-     * Get id
-     * @return string|null
+     * @inheritdoc
      */
     public function getId()
     {
-        return $this->_get(self::ID);
+        return $this->getData(self::ID);
     }
 
     /**
-     * Set id
-     * @param string $id
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     * @inheritdoc
      */
-    public function setId($id)
+    public function setId(string $id): ContentVersionInterface
     {
         return $this->setData(self::ID, $id);
     }
 
     /**
-     * Retrieve existing extension attributes object or create a new one.
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface|null
+     * @inheritdoc
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?ContentVersionExtensionInterface
     {
         return $this->_getExtensionAttributes();
     }
 
     /**
-     * Set an extension attributes object.
-     * @param \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
-     * @return $this
+     * @inheritdoc
      */
     public function setExtensionAttributes(
-        \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
-    ) {
+        ContentVersionExtensionInterface $extensionAttributes
+    ): ContentVersionInterface {
         return $this->_setExtensionAttributes($extensionAttributes);
     }
 
     /**
-     * Get type
-     * @return string|null
+     * @inheritdoc
      */
-    public function getType()
+    public function getType(): ?string
     {
-        return $this->_get(self::TYPE);
+        return $this->getData(self::TYPE);
     }
 
     /**
-     * Set type
-     * @param string $type
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     * @inheritdoc
      */
-    public function setType($type)
+    public function setType(string $type): ContentVersionInterface
     {
         return $this->setData(self::TYPE, $type);
     }
 
     /**
-     * Get identifier
-     * @return string|null
+     * @inheritdoc
      */
-    public function getIdentifier()
+    public function getIdentifier(): ?string
     {
-        return $this->_get(self::IDENTIFIER);
+        return $this->getData(self::IDENTIFIER);
     }
 
     /**
-     * Set identifier
-     * @param string $identifier
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     * @inheritdoc
      */
-    public function setIdentifier($identifier)
+    public function setIdentifier(string $identifier): ContentVersionInterface
     {
         return $this->setData(self::IDENTIFIER, $identifier);
     }
 
     /**
-     * Get version
-     * @return string|null
+     * @inheritdoc
      */
-    public function getVersion()
+    public function getVersion(): ?string
     {
-        return $this->_get(self::VERSION);
+        return $this->getData(self::VERSION);
     }
 
     /**
-     * Set version
-     * @param string $version
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     * @inheritdoc
      */
-    public function setVersion($version)
+    public function setVersion(string $version): ContentVersionInterface
     {
         return $this->setData(self::VERSION, $version);
     }
 
     /**
-     * Get store_ids
-     * @return string|null
+     * @inheritdoc
      */
-    public function getStoreIds()
+    public function getStoreIds(): ?string
     {
-        return $this->_get(self::STORE_IDS);
+        return $this->getData(self::STORE_IDS);
     }
 
     /**
-     * Set store_ids
-     * @param string $storeIds
-     * @return \Overdose\CMSContent\Api\Data\ContentVersionInterface
+     * @inheritdoc
      */
-    public function setStoreIds($storeIds)
+    public function setStoreIds(string $storeIds): ContentVersionInterface
     {
         return $this->setData(self::STORE_IDS, $storeIds);
     }

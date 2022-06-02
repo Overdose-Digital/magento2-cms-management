@@ -12,11 +12,11 @@ use Magento\Ui\Component\MassAction\Filter;
 use Magento\Backend\App\Action;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory;
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Overdose\CMSContent\Api\ContentExportInterface;
 use Overdose\CMSContent\Api\CmsEntityConverterManagerInterface;
+use Overdose\CMSContent\Controller\Adminhtml\AbstractMassExport;
 
-class MassExport extends Action implements HttpPostActionInterface
+class MassExport extends AbstractMassExport implements HttpPostActionInterface
 {
     /**
      * Authorization level of a basic admin session
@@ -26,34 +26,9 @@ class MassExport extends Action implements HttpPostActionInterface
     const ADMIN_RESOURCE = 'Overdose_CMSContent::export_page';
 
     /**
-     * @var Filter
-     */
-    private $filter;
-
-    /**
      * @var CollectionFactory
      */
     private $collectionFactory;
-
-    /**
-     * @var ContentExportInterface
-     */
-    private $contentExport;
-
-    /**
-     * @var FileFactory
-     */
-    private $fileFactory;
-
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
-
-    /**
-     * @var CmsEntityConverterManagerInterface
-     */
-    private $cmsEntityConverterManager;
 
     /**
      * @param Action\Context $context
@@ -99,21 +74,10 @@ class MassExport extends Action implements HttpPostActionInterface
             ->getConverter(CmsEntityConverterManagerInterface::PAGE_ENTITY_CODE)
             ->convertToArray($pages);
 
-        return $this->fileFactory->create(
+        return $this->formFile(
             $fileName,
-            [
-                'type' => 'filename',
-                'value' => $this->contentExport->createZipFile(
-                    $convertedPages,
-                    CmsEntityConverterManagerInterface::PAGE_ENTITY_CODE,
-                    $this->getRequest()->getParam('type', 'json'),
-                    $fileName,
-                    $this->getRequest()->getParam('split', false)
-                ),
-                'rm' => true,
-            ],
-            DirectoryList::VAR_DIR,
-            'application/zip'
+            $convertedPages,
+            CmsEntityConverterManagerInterface::PAGE_ENTITY_CODE
         );
     }
 }
