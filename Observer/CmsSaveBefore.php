@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Overdose\CMSContent\Model\BackupManager;
 
@@ -48,12 +51,12 @@ class CmsSaveBefore implements ObserverInterface
     /**
      * Execute observer
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
+     *
      * @return void
      */
-    public function execute(
-        \Magento\Framework\Event\Observer $observer
-    ) {
+    public function execute(Observer $observer)
+    {
         $eventName = $observer->getEvent()->getName();
 
         if (empty($this->eventsTypeMap[$eventName])) {
@@ -71,16 +74,16 @@ class CmsSaveBefore implements ObserverInterface
      * Check if cms object was changed
      *
      * @param $cmsObject
+     *
      * @return bool
      */
-    private function hasImportantDataChanges($cmsObject)
+    private function hasImportantDataChanges($cmsObject): bool
     {
         foreach ($this->keysToCheck as $key) {
             if ($cmsObject->getData($key) !== $cmsObject->getOrigData($key)) {
                 return true;
             }
         }
-
         return false;
     }
 }

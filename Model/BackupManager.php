@@ -160,19 +160,19 @@ class BackupManager
      * @param $cmsObject
      * @return $this
      */
-    public function setCmsObject($cmsObject) {
+    public function setCmsObject($cmsObject)
+    {
         $this->cmsObject = $cmsObject;
 
         return $this;
     }
 
     /**
-     *  Prepare store ids array
+     * Prepare store ids array
      *
-     * @param mixed $storeIds
      * @return array
      */
-    public function prepareStoreIds()
+    public function prepareStoreIds(): array
     {
         $storeIds = $this->cmsObject->getStoreId();
         //Fix for import wth  Overdose_CMSContent
@@ -184,7 +184,6 @@ class BackupManager
         if (empty($storeIds) || in_array(0, $storeIds)) {
             $storeIds = [0];
         }
-
         return $storeIds;
     }
 }

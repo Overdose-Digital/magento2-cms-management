@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model;
 
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Overdose\CMSContent\Api\Data\ContentVersionInterface;
+use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterfaceFactory;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -74,24 +79,22 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function save(
-        \Overdose\CMSContent\Api\Data\ContentVersionInterface $contentVersion
-    ) {
+    public function save(ContentVersionInterface $contentVersion): ContentVersionInterface {
         /* if (empty($contentVersion->getStoreId())) {
             $storeId = $this->storeManager->getStore()->getId();
             $contentVersion->setStoreId($storeId);
         } */
-        
+
         $contentVersionData = $this->extensibleDataObjectConverter->toNestedArray(
             $contentVersion,
             [],
-            \Overdose\CMSContent\Api\Data\ContentVersionInterface::class
+            ContentVersionInterface::class
         );
-        
+
         $contentVersionModel = $this->contentVersionFactory->create()->setData($contentVersionData);
-        
+
         try {
             $this->resource->save($contentVersionModel);
         } catch (\Exception $exception) {
@@ -104,9 +107,9 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function get($id)
+    public function get(string $id): ContentVersionInterface
     {
         $contentVersion = $this->contentVersionFactory->create();
         $this->resource->load($contentVersion, $id);
@@ -117,39 +120,37 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getList(
-        \Magento\Framework\Api\SearchCriteriaInterface $criteria
-    ) {
+    public function getList(SearchCriteriaInterface $searchCriteria): ContentVersionSearchResultsInterface
+    {
         $collection = $this->contentVersionCollectionFactory->create();
-        
+
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            \Overdose\CMSContent\Api\Data\ContentVersionInterface::class
+            ContentVersionInterface::class
         );
-        
-        $this->collectionProcessor->process($criteria, $collection);
-        
+
+        $this->collectionProcessor->process($searchCriteria, $collection);
+
         $searchResults = $this->searchResultsFactory->create();
-        $searchResults->setSearchCriteria($criteria);
-        
+        $searchResults->setSearchCriteria($searchCriteria);
+
         $items = [];
         foreach ($collection as $model) {
             $items[] = $model->getDataModel();
         }
-        
+
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
         return $searchResults;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function delete(
-        \Overdose\CMSContent\Api\Data\ContentVersionInterface $contentVersion
-    ) {
+    public function delete(ContentVersionInterface $contentVersion): bool
+    {
         try {
             $contentVersionModel = $this->contentVersionFactory->create();
             $this->resource->load($contentVersionModel, $contentVersion->getId());
@@ -164,9 +165,9 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function deleteById($id)
+    public function deleteById($id): bool
     {
         return $this->delete($this->get($id));
     }

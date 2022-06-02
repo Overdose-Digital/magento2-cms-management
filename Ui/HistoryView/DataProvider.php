@@ -1,12 +1,12 @@
 <?php
 
-namespace Overdose\CMSContent\Model\HistoryView;
+namespace Overdose\CMSContent\Ui\HistoryView;
 
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Overdose\CMSContent\Model\BackupManager;
 use Overdose\CMSContent\File\FileInterface;
+use Overdose\CMSContent\Model\BackupManager;
 
 class DataProvider extends AbstractDataProvider
 {
