@@ -36,6 +36,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="od_cms_upgrade_command" xsi:type="object">Overdose\CMSContent\Console\Command\CMSUpgradeCommand</item>
                 <item name="import_page" xsi:type="object">Overdose\CMSContent\Console\Command\ImportContent</item>
+                <item name="od_cms_delete_command" xsi:type="object">Overdose\CMSContent\Console\Command\ClearCMSHistoryCommand</item>
             </argument>
         </arguments>
     </type>

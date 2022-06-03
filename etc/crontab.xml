@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="cms_content_delete_backups" instance="Overdose\CMSContent\Cron\DeleteBackups" method="execute">
+            <config_path>crontab/default/jobs/cms_content_delete_backups/schedule/cron_expr</config_path>
+        </job>
+    </group>
+</config>
