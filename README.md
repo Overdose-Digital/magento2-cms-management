@@ -70,7 +70,7 @@
         - Options:
            - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
            - -i, --identifier=IDENTIFIER  > Comma-separated Identifiers of Block/Page to upgrade
-    
+    - od:cms:history-clear > Will delete old history files, by default will be used: Period option
  - Custom configuration files
      - cms_block_data*.xml > Create or update cms-blocks
      - cms_page_data*.xml > Create or update cms-pages
@@ -166,7 +166,7 @@
 
 ## Console commands usage
         
-   od:cms:upgrade [options]
+1. **od:cms:upgrade** [options]
    
    - Used to create/update cms-blocks/pages bases on data in `cms_block_data.xml` and `cms_page_data.xml`
    Alternative way: run `php bin/magento setup:upgrade`
@@ -177,5 +177,41 @@
          
          `php bin/magento od:cms:upgrade -t page`           -- will update only Pages (`cms_page_data.xml`)
          
-         `php bin/magento od:cms:upgrade -t page -i home`   -- will update only page with identifier `home`      
+         `php bin/magento od:cms:upgrade -t page -i home`   -- will update only page with identifier `home`
+
+2. **od:cms:history-clear** [options]
+
+- Used to manually clear old cms-blocks/pages which are located in var/cms/history folder
+- Examples:
+
+      `php bin/magento od:cms:history-clear -t block`          -- will delete only history Blocks
+      
+      `php bin/magento od:cms:history-clear -t page`           -- will delete only history Pages
+
+
+## Delete old files by Cron
+   - For use this possibility we need turn on it in admin panel. **"Delete Backups By Cron"**
    
+### We have 3 settings:
+
+   - Cron Run Settings:
+   
+         1. Frequency - set cron period when will be run cron (Daily, Weekly, Monthly)
+      
+         2. Start Time - set time, when will be run cron. 
+   
+   - Delete Methods:
+   
+         1. Method:
+      
+            a) By Periods - delete files by periods, exclude files younger than week.
+
+            b) Older Than:
+
+               b-1) Period - set period (Days, Weeks, Months or Years). Files older than it will be delete.
+
+               b-2) Number - set quantity of periods.
+   
+   - Logs:
+   
+      Write logs. Which files were deleted.
