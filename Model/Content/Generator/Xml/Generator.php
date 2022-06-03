@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Generator\Xml;
+namespace Overdose\CMSContent\Model\Content\Generator\Xml;
 
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Overdose\CMSContent\Api\StoreManagementInterface;
-use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
-use Overdose\CMSContent\Model\Generator\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorInterface;
+use function Overdose\CMSContent\Model\Generator\Xml\__;
 
 class Generator implements CmsEntityGeneratorInterface
 {
@@ -38,8 +39,8 @@ class Generator implements CmsEntityGeneratorInterface
      * @param StoreManagementInterface $storeManagement
      */
     public function __construct(
-    ContentVersionManagementInterface $contentVersionManagement,
-    StoreManagementInterface $storeManagement
+        ContentVersionManagementInterface $contentVersionManagement,
+        StoreManagementInterface $storeManagement
     ) {
         $this->contentVersionManagement = $contentVersionManagement;
         $this->storeManagement = $storeManagement;
@@ -47,6 +48,7 @@ class Generator implements CmsEntityGeneratorInterface
 
     /**
      * @param array $data
+     *
      * @return string
      * @throws \DOMException
      */
@@ -98,7 +100,8 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
-     * @param string $root_key
+     * @param string $root
+     *
      * @return void
      * @throws \DOMException
      */
@@ -112,9 +115,10 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
-     * @param $key
-     * @param $item
-     * @param $root
+     * @param string $key
+     * @param array $item
+     * @param string $root
+     *
      * @return void
      * @throws \DOMException
      */
@@ -136,6 +140,7 @@ class Generator implements CmsEntityGeneratorInterface
 
     /**
      * @param $_item
+     *
      * @return void
      * @throws \DOMException
      */
@@ -226,10 +231,11 @@ class Generator implements CmsEntityGeneratorInterface
 
     /**
      * @param array $content
+     *
      * @return string
      * @throws LocalizedException
      */
-    private function defineRoot(array $content)
+    private function defineRoot(array $content): string
     {
         if (array_key_exists(CmsEntityConverterInterface::PAGE_ENTITY_CODE, $content)) {
             return CmsEntityConverterInterface::PAGE_ENTITY_CODE;

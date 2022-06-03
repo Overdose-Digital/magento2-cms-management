@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model;
 
-use Magento\Framework\Filesystem\Driver\File as FileDriver;
+use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Exception\FileSystemException;
-use Overdose\CMSContent\Model\Config;
+use Magento\Store\Model\Store;
 use Psr\Log\LoggerInterface;
-use Overdose\CMSContent\File\FileInterface;
+use Overdose\CMSContent\File\FileManagerInterface;
 
 class BackupManager
 {
@@ -18,7 +18,7 @@ class BackupManager
     private $cmsObject = null;
 
     /**
-     * @var FileInterface
+     * @var FileManagerInterface
      */
     private $file;
 
@@ -28,7 +28,7 @@ class BackupManager
     private $logger;
 
     /**
-     * @var FileDriver
+     * @var File
      */
     private $fileDriver;
 
@@ -40,14 +40,14 @@ class BackupManager
     /**
      * BackupManager constructor.
      *
-     * @param FileDriver $fileDriver
-     * @param FileInterface $file
+     * @param File $fileDriver
+     * @param FileManagerInterface $file
      * @param Config $config
      * @param LoggerInterface $logger
      */
     public function __construct(
-        FileDriver  $fileDriver,
-        FileInterface $file,
+        File $fileDriver,
+        FileManagerInterface $file,
         Config $config,
         LoggerInterface $logger
     ) {
@@ -62,31 +62,33 @@ class BackupManager
      *
      * @param $type
      * @param $cmsObject
+     *
      * @return $this
      */
     public function createBackup($type, $cmsObject)
     {
         $this->setCmsObject($cmsObject);
-        $this->file->writeData(
-            $this->getBackupPath($type),
-            $this->generateBackupName(),
-            $this->prepareBackupContent()
-        );
+        foreach ($this->prepareStoreIds() as $storeId) {
+            $this->file->writeData(
+                $this->getBackupPath($type, $this->cmsObject->getIdentifier(), $storeId),
+                $this->generateBackupName((int)$storeId),
+                $this->prepareBackupContent()
+            );
+        }
 
         return $this;
     }
 
     /**
-     * Generates backup filename
+     * Generates backup filename in format: Y_m_d_h_i_s_store_id
+     *
+     * @param int $storeId
      *
      * @return string
      */
-    public function generateBackupName()
+    public function generateBackupName(int $storeId): string
     {
-        $datePart = date('Y_m_d_h_i_s', time());
-        $storePart = '_store_' . implode('_' , $this->prepareStoreIds());
-
-        return  $datePart . $storePart;
+        return sprintf('%s_store_%s', date('Y_m_d_h_i_s', time()), $storeId);
     }
 
     /**
@@ -94,11 +96,15 @@ class BackupManager
      *
      * @param string $type
      * @param string $identifier
+     * @param int $storeId
      *
      * @return null|string
      */
-    public function getBackupPath(string $type, string $identifier = ''): ?string
-    {
+    public function getBackupPath(
+        string $type,
+        string $identifier = '',
+        int $storeId = Store::DEFAULT_STORE_ID
+    ): ?string {
         try {
             $cmsDir = $this->config->getBackupsDir() . DIRECTORY_SEPARATOR;
             $identifier = $identifier ?: $this->cmsObject->getIdentifier();
@@ -115,7 +121,12 @@ class BackupManager
                     break;
             }
 
-            return $backupPath . 'history' . DIRECTORY_SEPARATOR . $identifier;
+            return $backupPath . 'history'
+                . DIRECTORY_SEPARATOR
+                . $storeId
+                . DIRECTORY_SEPARATOR
+                . $identifier
+                . DIRECTORY_SEPARATOR;
         } catch (\Exception $e) {
             $this->logger->critical(__('Something went wrong while retrieving filepath'));
 
@@ -138,10 +149,11 @@ class BackupManager
      *
      * @param $type
      * @param $cmsObject
+     *
      * @return array
      * @throws FileSystemException
      */
-    public function getBackupsByCmsEntity($type, $cmsObject)
+    public function getBackupsByCmsEntity($type, $cmsObject): array
     {
         if (!$cmsObject) {
             return [];
@@ -149,32 +161,35 @@ class BackupManager
 
         $this->setCmsObject($cmsObject);
         $result = [];
-        $backupsDir = $this->getBackupPath($type);
-        try {
-            if ($this->fileDriver->isDirectory($backupsDir)) {
-                $backups = $this->fileDriver->readDirectory($backupsDir);
-                foreach ($backups as $backup) {
-                    $result[] =  [
-                        'name' => basename($backup),
-                        'identifier' => $this->cmsObject->getIdentifier(),
-                    ];
+        foreach ($cmsObject->getStores() as $storeId) {
+            $backupsDir = $this->getBackupPath($type, $cmsObject->getIdentifier(), (int)$storeId);
+            try {
+                if ($this->fileDriver->isDirectory($backupsDir)) {
+                    $backups = $this->fileDriver->readDirectory($backupsDir);
+                    foreach ($backups as $backup) {
+                        $result[] = [
+                            'name' => basename($backup),
+                            'label' => 'store_' . $storeId . '/' . basename($backup),
+                            'identifier' => $this->cmsObject->getIdentifier(),
+                            'store_id' => $storeId
+                        ];
+                    }
                 }
+            } catch (FileSystemException $e) {
+                $this->logger->critical(__('Something went wrong while reading backups'));
             }
-        } catch (FileSystemException $e) {
-            $this->logger->critical(__('Something went wrong while reading backups'));
         }
-
         return $result;
     }
 
     /**
-     *  Setter for $cmsObject
+     * Setter for $cmsObject
      *
      * @param $cmsObject
      *
      * @return $this
      */
-    public function setCmsObject($cmsObject)
+    public function setCmsObject($cmsObject): BackupManager
     {
         $this->cmsObject = $cmsObject;
 
@@ -188,15 +203,9 @@ class BackupManager
      */
     public function prepareStoreIds(): array
     {
-        $storeIds = $this->cmsObject->getStoreId();
-        //Fix for import wth  Overdose_CMSContent
-        if (null === $storeIds) {
-            $storeIds = $this->cmsObject->getStores();
-        }
-
-        $storeIds = (array)$storeIds;
-        if (empty($storeIds) || in_array(0, $storeIds)) {
-            $storeIds = [0];
+        $storeIds = $this->cmsObject->getStores();
+        if (!count($storeIds) || in_array(Store::DEFAULT_STORE_ID, $storeIds)) {
+            $storeIds = [Store::DEFAULT_STORE_ID];
         }
         return $storeIds;
     }

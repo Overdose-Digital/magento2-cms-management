@@ -4,45 +4,11 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model\Data;
 
-use Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Magento\Framework\Model\AbstractExtensibleModel;
 
 class ContentVersion extends AbstractExtensibleModel implements ContentVersionInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->getData(self::ID);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setId(string $id): ContentVersionInterface
-    {
-        return $this->setData(self::ID, $id);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getExtensionAttributes(): ?ContentVersionExtensionInterface
-    {
-        return $this->_getExtensionAttributes();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setExtensionAttributes(
-        ContentVersionExtensionInterface $extensionAttributes
-    ): ContentVersionInterface {
-        return $this->_setExtensionAttributes($extensionAttributes);
-    }
-
     /**
      * @inheritdoc
      */
@@ -105,5 +71,22 @@ class ContentVersion extends AbstractExtensibleModel implements ContentVersionIn
     public function setStoreIds(string $storeIds): ContentVersionInterface
     {
         return $this->setData(self::STORE_IDS, $storeIds);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getExtensionAttributes()
+    {
+        return $this->_getExtensionAttributes();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setExtensionAttributes(
+        \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
+    ): ContentVersionInterface {
+        return $this->_setExtensionAttributes($extensionAttributes);
     }
 }

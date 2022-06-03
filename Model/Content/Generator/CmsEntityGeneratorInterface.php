@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Generator;
+namespace Overdose\CMSContent\Model\Content\Generator;
 
-use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterInterface;
 
 interface CmsEntityGeneratorInterface
 {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Block\Adminhtml\Cms;
 
+use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Api\Data\PageInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Cms\Api\BlockRepositoryInterface;
@@ -89,6 +91,7 @@ class CmsAbstract extends Template
                 'bc_type' => $this->bcType,
                 'bc_identifier' => $backup['identifier'],
                 'item' => $backup['name'],
+                'store_id' => $backup['store_id']
             ]
         );
     }
@@ -97,7 +100,8 @@ class CmsAbstract extends Template
      * Retrieve cms block or cms page by identifier
      *
      * @param $id
-     * @return \Magento\Cms\Api\Data\BlockInterface|\Magento\Cms\Api\Data\PageInterface|null
+     *
+     * @return BlockInterface|PageInterface|null
      */
     public function getCmsObject($id)
     {

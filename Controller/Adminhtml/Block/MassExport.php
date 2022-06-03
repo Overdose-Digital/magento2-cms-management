@@ -48,7 +48,12 @@ class MassExport extends AbstractMassExport implements HttpPostActionInterface
         DateTime $dateTime,
         CmsEntityConverterManagerInterface $cmsEntityConverterManager
     ) {
+        $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
+        $this->contentExport = $contentExport;
+        $this->fileFactory = $fileFactory;
+        $this->dateTime = $dateTime;
+        $this->cmsEntityConverterManager = $cmsEntityConverterManager;
 
         parent::__construct($context);
     }

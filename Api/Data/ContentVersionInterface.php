@@ -26,40 +26,6 @@ interface ContentVersionInterface extends ExtensibleDataInterface
     /**#@-*/
 
     /**
-     * Get id
-     *
-     * @return string|null
-     */
-    public function getId();
-
-    /**
-     * Set id
-     *
-     * @param string $id
-     *
-     * @return ContentVersionInterface
-     */
-    public function setId(string $id): ContentVersionInterface;
-
-    /**
-     * Retrieve existing extension attributes object or create a new one.
-     *
-     * @return ContentVersionExtensionInterface|null
-     */
-    public function getExtensionAttributes(): ?ContentVersionExtensionInterface;
-
-    /**
-     * Set an extension attributes object.
-     *
-     * @param ContentVersionExtensionInterface $extensionAttributes
-     *
-     * @return $this
-     */
-    public function setExtensionAttributes(
-        ContentVersionExtensionInterface $extensionAttributes
-    ): ContentVersionInterface;
-
-    /**
      * Get type
      *
      * @return string|null
@@ -122,4 +88,23 @@ interface ContentVersionInterface extends ExtensibleDataInterface
      * @return ContentVersionInterface
      */
     public function setStoreIds(string $storeIds): ContentVersionInterface;
+
+    /**
+     * Retrieve existing extension attributes object or create a new one.
+     *
+     * @return Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface|null
+     */
+    public function getExtensionAttributes();
+
+    /**
+     * Set an extension attributes object.
+     *
+     * @param \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
+     *
+     * @return ContentVersionInterface
+     */
+    public function setExtensionAttributes(
+        \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
+    ): ContentVersionInterface;
+
 }

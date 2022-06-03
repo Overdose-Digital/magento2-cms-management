@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Converter;
+namespace Overdose\CMSContent\Model\Content\Converter;
 
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityConverterManagerInterface;
+use function Overdose\CMSContent\Model\Converter\__;
 
 class CmsEntityConverterManager implements CmsEntityConverterManagerInterface
 {

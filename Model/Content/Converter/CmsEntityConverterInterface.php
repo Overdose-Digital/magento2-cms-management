@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Converter;
+namespace Overdose\CMSContent\Model\Content\Converter;
 
 use Magento\Framework\Exception\LocalizedException;
 

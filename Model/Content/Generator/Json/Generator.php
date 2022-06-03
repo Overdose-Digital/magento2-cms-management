@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Generator\Json;
+namespace Overdose\CMSContent\Model\Content\Generator\Json;
 
 use Magento\Framework\Serialize\SerializerInterface;
-use Overdose\CMSContent\Model\Generator\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorInterface;
 
 class Generator implements CmsEntityGeneratorInterface
 {

@@ -17,6 +17,14 @@ class Config
     public const TYPE_BLOCK = 'blocks';
     /**#@-*/
 
+    /**#@+
+     * Export folders
+     */
+    const EXPORT_PATH = 'export/export';
+    const EXTRACT_PATH = 'export/extract';
+    const UPLOAD_PATH = 'export/extract';
+    /**#@-*/
+
     public const CMS_DIR = 'cms';
     public const HISTORY_DIR = 'history';
 
@@ -131,6 +139,60 @@ class Config
     {
         try {
             return $this->directoryList->getPath(DirectoryList::VAR_DIR) . DIRECTORY_SEPARATOR . self::CMS_DIR;
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Form export path
+     *
+     * @return string
+     */
+    public function getExportPath(): string
+    {
+        try {
+            return $this->directoryList->getPath(DirectoryList::VAR_DIR)
+                . DIRECTORY_SEPARATOR
+                . self::CMS_DIR
+                . DIRECTORY_SEPARATOR
+                . self::EXPORT_PATH;
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Form Upload path
+     *
+     * @return string
+     */
+    public function getUploadPath(): string
+    {
+        try {
+            return $this->directoryList->getPath(DirectoryList::VAR_DIR)
+                . DIRECTORY_SEPARATOR
+                . self::CMS_DIR
+                . DIRECTORY_SEPARATOR
+                . self::UPLOAD_PATH;
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Get Extract Path
+     *
+     * @return string
+     */
+    public function getExtractPath(): string
+    {
+        try {
+            return $this->directoryList->getPath(DirectoryList::VAR_DIR)
+                . DIRECTORY_SEPARATOR
+                . self::CMS_DIR
+                . DIRECTORY_SEPARATOR
+                . self::EXTRACT_PATH;
         } catch (\Exception $e) {
             return '';
         }

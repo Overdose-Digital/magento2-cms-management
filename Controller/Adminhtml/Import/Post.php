@@ -3,31 +3,32 @@
 namespace Overdose\CMSContent\Controller\Adminhtml\Import;
 
 use Magento\Backend\App\Action;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\File\UploaderFactory;
 use Overdose\CMSContent\Api\ContentImportInterface;
-use Overdose\CMSContent\Model\Filesystem;
+use Overdose\CMSContent\Model\Config;
 
-class Post extends Action
+class Post extends Action implements HttpPostActionInterface
 {
     protected $uploaderFactory;
 
     protected $importExportInterface;
 
-    protected $filesystem;
-
     protected $redirectFactory;
+
+    private $config;
 
     public function __construct(
         Action\Context $context,
+        Config $config,
         UploaderFactory $uploaderFactory,
         ContentImportInterface $importExportInterface,
-        RedirectFactory $redirectFactory,
-        Filesystem $filesystem
+        RedirectFactory $redirectFactory
     ) {
         $this->uploaderFactory = $uploaderFactory;
+        $this->config = $config;
         $this->importExportInterface = $importExportInterface;
-        $this->filesystem = $filesystem;
         $this->redirectFactory = $redirectFactory;
 
         parent::__construct($context);
@@ -44,7 +45,7 @@ class Post extends Action
             $cmsMode = $this->getRequest()->getParam('cms_mode');
             $mediaMode = $this->getRequest()->getParam('media_mode');
 
-            $destinationPath = $this->filesystem->getUploadPath();
+            $destinationPath = $this->config->getUploadPath();
 
             $uploader = $this->uploaderFactory->create(['fileId' => 'zipfile']);
             $uploader->setAllowRenameFiles(true);
