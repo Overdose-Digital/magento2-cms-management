@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Generator;
+namespace Overdose\CMSContent\Model\Content\Generator;
 
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
+use function Overdose\CMSContent\Model\Generator\__;
 
 class CmsEntityGeneratorManager implements CmsEntityGeneratorManagerInterface
 {

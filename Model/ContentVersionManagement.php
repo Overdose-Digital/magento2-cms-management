@@ -20,7 +20,7 @@ use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
 use Overdose\CMSContent\Model\Config\Block\Reader as BlocksConfigReader;
 use Overdose\CMSContent\Model\Config\Page\Reader as PagesConfigReader;
 use Overdose\CMSContent\Model\Config\ReaderAbstract;
-use Overdose\CMSContent\Model\Generator\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorInterface;
 use Psr\Log\LoggerInterface;
 
 class ContentVersionManagement implements ContentVersionManagementInterface

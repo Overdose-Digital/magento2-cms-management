@@ -12,7 +12,9 @@
     </div>
 <?php else: ?>
     <?php foreach ($backups as $backup) : ?>
-        <a href="#" onclick="popWin('<?= $block->getBackupUrl($backup) ?>','backupHistory','width=930,height=760,resizable=yes,scrollbars=yes')" style="display: block"><?= $backup['name']; ?></a>
+        <a href="#" onclick="popWin('<?= $block->getBackupUrl($backup) ?>','backupHistory','width=930,height=760,resizable=yes,scrollbars=yes')" style="display: block">
+            <?= $backup['label']; ?>
+        </a>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>

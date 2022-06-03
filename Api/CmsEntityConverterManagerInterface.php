@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Overdose\CMSContent\Api;
 
 use Magento\Framework\Exception\LocalizedException;
-use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterInterface;
 
 interface CmsEntityConverterManagerInterface
 {

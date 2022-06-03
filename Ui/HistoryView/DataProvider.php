@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Ui\HistoryView;
 
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Overdose\CMSContent\File\FileInterface;
+use Overdose\CMSContent\File\FileManagerInterface;
 use Overdose\CMSContent\Model\BackupManager;
 
 class DataProvider extends AbstractDataProvider
@@ -16,7 +18,7 @@ class DataProvider extends AbstractDataProvider
     private $backupManager;
 
     /**
-     * @var FileInterface
+     * @var FileManagerInterface
      */
     private $file;
 
@@ -33,7 +35,7 @@ class DataProvider extends AbstractDataProvider
      * @param string $requestFieldName
      * @param RequestInterface $request
      * @param BackupManager $backupManager
-     * @param FileInterface $file
+     * @param FileManagerInterface $file
      * @param array $meta
      * @param array $data
      */
@@ -43,7 +45,7 @@ class DataProvider extends AbstractDataProvider
         $requestFieldName,
         RequestInterface $request,
         BackupManager $backupManager,
-        FileInterface $file,
+        FileManagerInterface $file,
         array $meta = [],
         array $data = []
     ) {
@@ -81,11 +83,12 @@ class DataProvider extends AbstractDataProvider
      */
     public function getBackupContent()
     {
-        $backupItemIdentifier   = $this->request->getParam('bc_identifier');
-        $backupItemName         = $this->request->getParam('item');
-        $backupItemType         = $this->request->getParam('bc_type');
+        $backupItemIdentifier = $this->request->getParam('bc_identifier');
+        $backupItemName       = $this->request->getParam('item');
+        $backupItemType       = $this->request->getParam('bc_type');
+        $backupStoreId        = $this->request->getParam('store_id');
 
-        $path = $this->backupManager->getBackupPath($backupItemType, $backupItemIdentifier)
+        $path = $this->backupManager->getBackupPath($backupItemType, $backupItemIdentifier, $backupStoreId)
             . DIRECTORY_SEPARATOR . $backupItemName;
 
         return $this->file->readData($path);

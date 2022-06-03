@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Converter\Block;
+namespace Overdose\CMSContent\Model\Content\Converter\Block;
 
 use Magento\Cms\Api\Data\BlockInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Overdose\CMSContent\Model\Converter\AbstractConverter;
-use Overdose\CMSContent\Model\Converter\CmsEntityConverterInterface;
+use Overdose\CMSContent\Model\Content\Converter\AbstractConverter;
+use Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterInterface;
 
 class Converter extends AbstractConverter implements CmsEntityConverterInterface
 {

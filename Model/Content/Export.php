@@ -2,23 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model;
+namespace Overdose\CMSContent\Model\Content;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\Io\File;
 use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
 use Overdose\CMSContent\Api\ContentExportInterface;
+use Overdose\CMSContent\File\FileManagerInterface;
 use ZipArchive;
 
-class ContentExport implements ContentExportInterface
+class Export implements ContentExportInterface
 {
     const FILENAME = 'cms';
     const MEDIA_ARCHIVE_PATH = 'media';
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
 
     /**
      * @var CmsEntityGeneratorManagerInterface
@@ -31,18 +27,31 @@ class ContentExport implements ContentExportInterface
     private $file;
 
     /**
+     * @var FileManagerInterface
+     */
+    private $fileManager;
+
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param CmsEntityGeneratorManagerInterface $cmsEntityGeneratorManager
-     * @param Filesystem $filesystem
+     * @param Config $config
+     * @param FileManagerInterface $fileManager
      * @param File $file
      */
     public function __construct(
         CmsEntityGeneratorManagerInterface $cmsEntityGeneratorManager,
-        Filesystem $filesystem,
+        Config $config,
+        FileManagerInterface $fileManager,
         File $file
     ) {
         $this->cmsEntityGeneratorManager = $cmsEntityGeneratorManager;
-        $this->filesystem = $filesystem;
+        $this->config = $config;
         $this->file = $file;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -55,8 +64,11 @@ class ContentExport implements ContentExportInterface
         string $fileName,
         bool $split
     ): string {
-        $exportPath = $this->filesystem->getExportPath();
-        $relativeZipFile = Filesystem::EXPORT_PATH . '/' . $fileName;
+        $exportPath = $this->fileManager->getFolder($this->config->getExportPath());
+
+        $relativeZipFile = Config::CMS_DIR . DIRECTORY_SEPARATOR
+            . Config::EXPORT_PATH . DIRECTORY_SEPARATOR
+            . $fileName;
 
         $zipArchive = $this->putContentToZip(
             $convertedEntities,
@@ -70,7 +82,7 @@ class ContentExport implements ContentExportInterface
         foreach ($convertedEntities['media'] as $mediaFile) {
             //Strip Quotes if any
             $mediaFile = str_replace(['"',"&quot;","'"], '', $mediaFile);
-            $absMediaPath = $this->filesystem->getMediaPath($mediaFile);
+            $absMediaPath = $this->fileManager->getMediaPath($mediaFile);
             if ($this->file->fileExists($absMediaPath, true)) {
                 $zipArchive->addFile($absMediaPath, self::MEDIA_ARCHIVE_PATH . '/' . $mediaFile);
             }
@@ -79,7 +91,7 @@ class ContentExport implements ContentExportInterface
         $zipArchive->close();
 
         // Clear export path
-        $this->file->rm($exportPath);
+        $this->file->rm($relativeZipFile);
 
         return $relativeZipFile;
     }
@@ -111,8 +123,15 @@ class ContentExport implements ContentExportInterface
                         $cmsEntityCode => [$key => $content]
                     ]
                 );
+
                 $zipArchive->addFromString(
-                    sprintf('%s_%s_%s.%s', self::FILENAME, $this->prepareEntityPartName($cmsEntityCode), $key, $type),
+                    sprintf(
+                        '%s_%s_%s.%s',
+                        self::FILENAME,
+                        $this->prepareEntityPartName($cmsEntityCode),
+                        $key,
+                        $type
+                    ),
                     $payload
                 );
             }

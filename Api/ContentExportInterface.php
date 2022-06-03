@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Api;
 
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\LocalizedException;
+
 interface ContentExportInterface
 {
     /**
@@ -16,6 +19,7 @@ interface ContentExportInterface
      * @param bool $split
      *
      * @return string
+     * @throws FileSystemException|LocalizedException
      */
     public function createZipFile(
         array $convertedEntities,

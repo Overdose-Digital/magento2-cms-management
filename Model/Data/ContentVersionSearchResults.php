@@ -1,14 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Data;
 
-class ContentVersionSearchResults extends \Magento\Framework\Api\SearchResults
-    implements \Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface
+use Magento\Framework\Api\SearchResults;
+use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface;
+
+class ContentVersionSearchResults extends SearchResults implements ContentVersionSearchResultsInterface
 {
     /**
      * @inheritDoc
      */
-    public function getItemsArray()
+    public function getItems(): array
+    {
+        return $this->_get(self::KEY_ITEMS) === null ? [] : $this->_get(self::KEY_ITEMS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setItems(array $items): ContentVersionSearchResultsInterface
+    {
+        return $this->setData(self::KEY_ITEMS, $items);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getItemsArray(): array
     {
         $result = [];
         $items = $this->getItems();

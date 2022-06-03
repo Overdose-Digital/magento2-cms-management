@@ -1,6 +1,6 @@
 <?php
 
-namespace Overdose\CMSContent\Model;
+namespace Overdose\CMSContent\Model\Content;
 
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\Data\BlockInterface as CmsBlockInterface;
@@ -16,13 +16,19 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Overdose\CMSContent\Api\ContentImportInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\StoreManagementInterface;
+use Overdose\CMSContent\File\FileManagerInterface;
 
 class Import implements ContentImportInterface
 {
     /**
-     * @var FileSystem
+     * @var Config
      */
-    private $fileSystem;
+    private $config;
+
+    /**
+     * @var FileManagerInterface
+     */
+    private $fileManager;
 
     /**
      * @var File
@@ -85,7 +91,8 @@ class Import implements ContentImportInterface
     private $pageRepository;
 
     /**
-     * @param FileSystem $fileSystem
+     * @param FileManagerInterface $fileManager
+     * @param Config $config
      * @param File $file
      * @param CmsPageFactory $pageFactory
      * @param CmsBlockFactory $blockFactory
@@ -98,7 +105,8 @@ class Import implements ContentImportInterface
      * @param SerializerInterface $serializerInterface
      */
     public function __construct(
-        FileSystem                        $fileSystem,
+        FileManagerInterface              $fileManager,
+        Config                            $config,
         File                              $file,
         CmsPageFactory                    $pageFactory,
         CmsBlockFactory                   $blockFactory,
@@ -110,7 +118,8 @@ class Import implements ContentImportInterface
         ContentVersionManagementInterface $contentVersionManagement,
         SerializerInterface               $serializerInterface
     ) {
-        $this->fileSystem = $fileSystem;
+        $this->fileManager = $fileManager;
+        $this->config = $config;
         $this->file = $file;
         $this->pageFactory = $pageFactory;
         $this->blockFactory = $blockFactory;
@@ -139,7 +148,7 @@ class Import implements ContentImportInterface
         }
 
         $subPath = md5(date(DATE_RFC2822));
-        $extractPath = $this->fileSystem->getExtractPath($subPath);
+        $extractPath = $this->fileManager->getFolder($this->config->getExtractPath() . DIRECTORY_SEPARATOR . $subPath);
 
         $zipArchive->extractTo($extractPath);
         $zipArchive->close();
@@ -224,7 +233,7 @@ class Import implements ContentImportInterface
             if (isset($payload['media'])) {
                 foreach ($payload['media'] as $mediaFile) {
                     $sourceFile = $archivePath . '/' . self::MEDIA_ARCHIVE_PATH . '/' . $mediaFile;
-                    $destFile = $this->fileSystem->getMediaPath($mediaFile);
+                    $destFile = $this->fileManager->getMediaPath($mediaFile);
 
                     if ($this->file->fileExists($sourceFile, true)) {
                         if ($this->file->fileExists($destFile, true) &&
