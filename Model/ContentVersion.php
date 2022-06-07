@@ -2,53 +2,72 @@
 
 namespace Overdose\CMSContent\Model;
 
-use Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory;
+use Magento\Framework\Model\AbstractModel;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
-use Magento\Framework\Api\DataObjectHelper;
 
-class ContentVersion extends \Magento\Framework\Model\AbstractModel
+class ContentVersion extends AbstractModel implements ContentVersionInterface
 {
-    protected $dataObjectHelper;
-    protected $content_versionDataFactory;
-    protected $_eventPrefix = 'od_cmscontent_version';
-
     /**
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param ContentVersionInterfaceFactory $content_versionDataFactory
-     * @param DataObjectHelper $dataObjectHelper
-     * @param \Overdose\CMSContent\Model\ResourceModel\ContentVersion $resource
-     * @param \Overdose\CMSContent\Model\ResourceModel\ContentVersion\Collection $resourceCollection
-     * @param array $data
+     * @inheritdoc
      */
-    public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        ContentVersionInterfaceFactory $content_versionDataFactory,
-        DataObjectHelper $dataObjectHelper,
-        \Overdose\CMSContent\Model\ResourceModel\ContentVersion $resource,
-        \Overdose\CMSContent\Model\ResourceModel\ContentVersion\Collection $resourceCollection,
-        array $data = []
-    ) {
-        $this->content_versionDataFactory = $content_versionDataFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    public function getType(): ?string
+    {
+        return $this->getData(self::TYPE);
     }
 
     /**
-     * Retrieve content_version model with content_version data
-     * @return ContentVersionInterface
+     * @inheritdoc
      */
-    public function getDataModel()
+    public function setType(string $type): ContentVersionInterface
     {
-        $content_versionData = $this->getData();
-        $content_versionDataObject = $this->content_versionDataFactory->create();
-        $this->dataObjectHelper->populateWithArray(
-            $content_versionDataObject,
-            $content_versionData,
-            ContentVersionInterface::class
-        );
-        
-        return $content_versionDataObject;
+        return $this->setData(self::TYPE, $type);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifier(): ?string
+    {
+        return $this->getData(self::IDENTIFIER);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setIdentifier(string $identifier): ContentVersionInterface
+    {
+        return $this->setData(self::IDENTIFIER, $identifier);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getVersion(): ?string
+    {
+        return $this->getData(self::VERSION);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setVersion(string $version): ContentVersionInterface
+    {
+        return $this->setData(self::VERSION, $version);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStoreIds(): ?string
+    {
+        return $this->getData(self::STORE_IDS);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStoreIds(string $storeIds): ContentVersionInterface
+    {
+        return $this->setData(self::STORE_IDS, $storeIds);
     }
 }

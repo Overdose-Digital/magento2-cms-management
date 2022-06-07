@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Api\Data;
 
-use Magento\Framework\Api\ExtensibleDataInterface;
-
-interface ContentVersionInterface extends ExtensibleDataInterface
+interface ContentVersionInterface
 {
     /**#@+
      * Entity Fields
@@ -88,23 +86,4 @@ interface ContentVersionInterface extends ExtensibleDataInterface
      * @return ContentVersionInterface
      */
     public function setStoreIds(string $storeIds): ContentVersionInterface;
-
-    /**
-     * Retrieve existing extension attributes object or create a new one.
-     *
-     * @return Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface|null
-     */
-    public function getExtensionAttributes();
-
-    /**
-     * Set an extension attributes object.
-     *
-     * @param \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
-     *
-     * @return ContentVersionInterface
-     */
-    public function setExtensionAttributes(
-        \Overdose\CMSContent\Api\Data\ContentVersionExtensionInterface $extensionAttributes
-    ): ContentVersionInterface;
-
 }

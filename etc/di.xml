@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Overdose\CMSContent\File\FileManagerInterface"
                 type="Overdose\CMSContent\File\FileManager" />
-    <preference for="Overdose\CMSContent\Api\ContentVersionManagementInterface" type="Overdose\CMSContent\Model\ContentVersionManagement"/>
-    <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface" type="Overdose\CMSContent\Model\ContentVersionRepository"/>
-    <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
-    <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
+    <preference for="Overdose\CMSContent\Api\ContentVersionManagementInterface"
+                type="Overdose\CMSContent\Model\ContentVersionManagement"/>
+    <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface"
+                type="Overdose\CMSContent\Model\ContentVersionRepository"/>
+    <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface"
+                type="Overdose\CMSContent\Model\ContentVersion"/>
+    <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface"
+                type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
     <preference for="Overdose\CMSContent\Api\ContentExportInterface"
                 type="Overdose\CMSContent\Model\Content\Export" />
     <preference for="Overdose\CMSContent\Api\ContentImportInterface"
@@ -16,6 +21,7 @@
                 type="Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorManager" />
     <preference for="Overdose\CMSContent\Api\StoreManagementInterface"
                 type="Overdose\CMSContent\Model\StoreManagement" />
+
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
             <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Converter</argument>

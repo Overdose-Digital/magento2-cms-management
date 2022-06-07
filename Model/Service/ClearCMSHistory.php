@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model\Service;
 
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Overdose\CMSContent\Model\Config;
@@ -58,16 +59,44 @@ class ClearCMSHistory
      * @param string $type
      *
      * @return int
+     * @throws FileSystemException
      */
     public function execute(string $type): int
     {
         $count = 0;
+        foreach ($this->getItemsByType($type) as $folder) {
+            $items = $this->getFilesList($folder);
+            if (!count($items)) {
+                continue;
+            }
+
+            if ($this->fileManger->isFile($items[0])) {
+                $count = $this->clear($folder, $count);
+            } else {
+                foreach ($items as $item) {
+                    $count = $this->clear($item, $count);
+                }
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Clear folders
+     *
+     * @param string $folder
+     * @param int $count
+     *
+     * @return int
+     */
+    private function clear(string $folder, int $count): int
+    {
         switch ($this->config->getMethodType()) {
             case Config::PERIOD:
-                $count = $this->clearByPeriod($type);
+                $count += $this->clearByPeriod($folder, $count);
                 break;
             case Config::OLDER_THAN:
-                $count = $this->clearOlderThan($type);
+                $count += $this->clearOlderThan($folder, $count);
                 break;
         }
         return $count;
@@ -76,18 +105,16 @@ class ClearCMSHistory
     /**
      * Delete files by periods
      *
-     * @param string $type
+     * @param string $folder
+     * @param int $count
      *
      * @return int
      */
-    private function clearByPeriod(string $type): int
+    private function clearByPeriod(string $folder, int $count): int
     {
-        $count = 0;
-        foreach ($this->getItemsByType($type) as $item) {
-            $filesByPeriods = $this->formFilesByPeriods($item);
-            if (count($filesByPeriods)) {
-                $count += $this->deleteFiles($filesByPeriods, Config::PERIOD);
-            }
+        $filesByPeriods = $this->formFilesByPeriods($folder);
+        if (count($filesByPeriods)) {
+            $count = $this->deleteFiles($filesByPeriods, Config::PERIOD);
         }
         return $count;
     }
@@ -95,20 +122,18 @@ class ClearCMSHistory
     /**
      * Delete files older than some period
      *
-     * @param string $type
+     * @param string $folder
+     * @param int $count
      *
      * @return int
      */
-    private function clearOlderThan(string $type): int
+    private function clearOlderThan(string $folder, int $count): int
     {
-        $count = 0;
-        foreach ($this->getItemsByType($type) as $item) {
-            $filesOlderThan = $this->findFilesOlderThan($item);
-            if (count($filesOlderThan)) {
-                $count += $this->deleteFiles($filesOlderThan, Config::OLDER_THAN);
-            }
+        $filesOlderThan = $this->findFilesOlderThan($folder);
+        if (count($filesOlderThan)) {
+            $count = $this->deleteFiles($filesOlderThan, Config::OLDER_THAN);
         }
-        return 0;
+        return $count;
     }
 
     /**
@@ -214,7 +239,7 @@ class ClearCMSHistory
     {
         $result = [];
         try {
-            $result = $this->fileManger->readDirectoryRecursively($itemDir);
+            $result = $this->fileManger->readDirectory($itemDir);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }

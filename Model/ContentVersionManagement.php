@@ -293,6 +293,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
 
     /**
      * @inheritDoc
+     * @throws LocalizedException
      */
     public function createVersion($type, $data)
     {

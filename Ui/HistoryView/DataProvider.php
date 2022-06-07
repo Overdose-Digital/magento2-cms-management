@@ -83,13 +83,18 @@ class DataProvider extends AbstractDataProvider
      */
     public function getBackupContent()
     {
-        $backupItemIdentifier = $this->request->getParam('bc_identifier');
-        $backupItemName       = $this->request->getParam('item');
-        $backupItemType       = $this->request->getParam('bc_type');
-        $backupStoreId        = $this->request->getParam('store_id');
+        $itemIdentifier = $this->request->getParam('bc_identifier');
+        $itemName       = $this->request->getParam('item');
+        $itemType       = $this->request->getParam('bc_type');
+        $storeId        = $this->request->getParam('store_id');
 
-        $path = $this->backupManager->getBackupPath($backupItemType, $backupItemIdentifier, $backupStoreId)
-            . DIRECTORY_SEPARATOR . $backupItemName;
+        if (!is_null($storeId)) {
+            $path = $this->backupManager->getBackupPathByStoreId($itemType, $itemIdentifier, (int)$storeId)
+                . DIRECTORY_SEPARATOR . $itemName;
+        } else {
+            $path = $this->backupManager->getBackupPath($itemType, $itemIdentifier)
+                . DIRECTORY_SEPARATOR . $itemName;
+        }
 
         return $this->file->readData($path);
     }

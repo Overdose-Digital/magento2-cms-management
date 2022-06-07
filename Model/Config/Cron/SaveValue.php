@@ -20,7 +20,7 @@ class SaveValue extends Value
     /**
      * @var ConfigInterface
      */
-    private ConfigInterface $configInterface;
+    private $configInterface;
 
     /**
      * @param Context $context
