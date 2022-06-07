@@ -13,6 +13,7 @@ abstract class ConverterAbstract implements ConverterInterface
      * Converting data to array type
      *
      * @param mixed $source
+     *
      * @return array
      * @throws \InvalidArgumentException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -37,7 +38,9 @@ abstract class ConverterAbstract implements ConverterInterface
             foreach ($children as $child) {
                 $childData = [];
                 if (!$identifier = $child->getAttribute('identifier')) {
-                    throw new \InvalidArgumentException(__('Attribute "identifier" of "%1" does not exist', $this->childNode));
+                    throw new \InvalidArgumentException(
+                        __('Attribute "identifier" of "%1" does not exist', $this->childNode)
+                    );
                 }
 
                 $childData['identifier'] = $identifier;

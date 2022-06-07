@@ -6,6 +6,7 @@ namespace Overdose\CMSContent\Model\Data;
 
 use Magento\Framework\Api\SearchResults;
 use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface;
+use Overdose\CMSContent\Model\ContentVersion;
 
 class ContentVersionSearchResults extends SearchResults implements ContentVersionSearchResultsInterface
 {

@@ -3,43 +3,47 @@
 namespace Overdose\CMSContent\Model\Config\App;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Config\FileIteratorFactory;
+use Magento\Framework\Config\FileResolverInterface;
+use Magento\Framework\Filesystem;
+use Overdose\CMSContent\Model\Dir\Reader;
 
-class FileResolver implements \Magento\Framework\Config\FileResolverInterface
+class FileResolver implements FileResolverInterface
 {
     /**
      * Module configuration file reader
      *
-     * @var \Overdose\CMSContent\Model\Dir\Reader
+     * @var Reader
      */
-    protected $_moduleReader;
+    protected $moduleReader;
 
     /**
      * File iterator factory
      *
-     * @var \Magento\Framework\Config\FileIteratorFactory
+     * @var FileIteratorFactory
      */
     protected $iteratorFactory;
 
     /**
      * Filesystem
      *
-     * @var \Magento\Framework\Filesystem
+     * @var Filesystem
      */
     protected $filesystem;
 
     /**
-     * @param \Overdose\CMSContent\Model\Dir\Reader $moduleReader
-     * @param \Magento\Framework\Filesystem $filesystem
-     * @param \Magento\Framework\Config\FileIteratorFactory $iteratorFactory
+     * @param Reader $moduleReader
+     * @param Filesystem $filesystem
+     * @param FileIteratorFactory $iteratorFactory
      */
     public function __construct(
-        \Overdose\CMSContent\Model\Dir\Reader $moduleReader,
-        \Magento\Framework\Filesystem $filesystem,
-        \Magento\Framework\Config\FileIteratorFactory $iteratorFactory
+        Reader $moduleReader,
+        Filesystem $filesystem,
+        FileIteratorFactory $iteratorFactory
     ) {
         $this->iteratorFactory = $iteratorFactory;
         $this->filesystem = $filesystem;
-        $this->_moduleReader = $moduleReader;
+        $this->moduleReader = $moduleReader;
     }
 
     /**
@@ -57,10 +61,10 @@ class FileResolver implements \Magento\Framework\Config\FileResolverInterface
                 $iterator = $this->iteratorFactory->create($absolutePaths);
                 break;
             case 'global':
-                $iterator = $this->_moduleReader->getConfigurationFiles($filename);
+                $iterator = $this->moduleReader->getConfigurationFiles($filename);
                 break;
             default:
-                $iterator = $this->_moduleReader->getConfigurationFiles($scope . '/' . $filename);
+                $iterator = $this->moduleReader->getConfigurationFiles($scope . '/' . $filename);
                 break;
         }
         return $iterator;

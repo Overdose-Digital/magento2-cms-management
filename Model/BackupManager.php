@@ -63,14 +63,14 @@ class BackupManager
      * @param $type
      * @param $cmsObject
      *
-     * @return $this
+     * @return BackupManager
      */
-    public function createBackup($type, $cmsObject)
+    public function createBackup($type, $cmsObject): BackupManager
     {
         $this->setCmsObject($cmsObject);
         foreach ($this->prepareStoreIds() as $storeId) {
             $this->file->writeData(
-                $this->getBackupPath($type, $this->cmsObject->getIdentifier(), $storeId),
+                $this->getBackupPathByStoreId($type, $this->cmsObject->getIdentifier(), $storeId),
                 $this->generateBackupName((int)$storeId),
                 $this->prepareBackupContent()
             );
@@ -100,33 +100,39 @@ class BackupManager
      *
      * @return null|string
      */
-    public function getBackupPath(
+    public function getBackupPathByStoreId(
         string $type,
         string $identifier = '',
         int $storeId = Store::DEFAULT_STORE_ID
     ): ?string {
         try {
-            $cmsDir = $this->config->getBackupsDir() . DIRECTORY_SEPARATOR;
             $identifier = $identifier ?: $this->cmsObject->getIdentifier();
 
-            switch ($type) {
-                case self::TYPE_CMS_BLOCK:
-                    $backupPath = $cmsDir . Config::TYPE_BLOCK . DIRECTORY_SEPARATOR;
-                    break;
-                case self::TYPE_CMS_PAGE:
-                    $backupPath = $cmsDir . Config::TYPE_PAGE . DIRECTORY_SEPARATOR;
-                    break;
-                default:
-                    $backupPath = $cmsDir;
-                    break;
-            }
+            return $this->getBaseBackupPath($type) . 'history'
+                . DIRECTORY_SEPARATOR . $storeId . DIRECTORY_SEPARATOR . $identifier . DIRECTORY_SEPARATOR;
+        } catch (\Exception $e) {
+            $this->logger->critical(__('Something went wrong while retrieving filepath'));
 
-            return $backupPath . 'history'
-                . DIRECTORY_SEPARATOR
-                . $storeId
-                . DIRECTORY_SEPARATOR
-                . $identifier
-                . DIRECTORY_SEPARATOR;
+            return null;
+        }
+    }
+
+    /**
+     * Get backup path
+     * This function is for backward compatibility with previous code
+     *
+     * @param string $type
+     * @param string $identifier
+     *
+     * @return string|null
+     */
+    public function getBackupPath(string $type, string $identifier = ''): ?string
+    {
+        try {
+            $identifier = $identifier ?: $this->cmsObject->getIdentifier();
+
+            return $this->getBaseBackupPath($type) . 'history'
+                . DIRECTORY_SEPARATOR . $identifier . DIRECTORY_SEPARATOR;
         } catch (\Exception $e) {
             $this->logger->critical(__('Something went wrong while retrieving filepath'));
 
@@ -161,25 +167,14 @@ class BackupManager
 
         $this->setCmsObject($cmsObject);
         $result = [];
+
         foreach ($cmsObject->getStores() as $storeId) {
-            $backupsDir = $this->getBackupPath($type, $cmsObject->getIdentifier(), (int)$storeId);
-            try {
-                if ($this->fileDriver->isDirectory($backupsDir)) {
-                    $backups = $this->fileDriver->readDirectory($backupsDir);
-                    foreach ($backups as $backup) {
-                        $result[] = [
-                            'name' => basename($backup),
-                            'label' => 'store_' . $storeId . '/' . basename($backup),
-                            'identifier' => $this->cmsObject->getIdentifier(),
-                            'store_id' => $storeId
-                        ];
-                    }
-                }
-            } catch (FileSystemException $e) {
-                $this->logger->critical(__('Something went wrong while reading backups'));
-            }
+            $backupsDir = $this->getBackupPathByStoreId($type, $cmsObject->getIdentifier(), (int)$storeId);
+            $result = $this->getItemsByStore($result, $backupsDir, (int)$storeId);
         }
-        return $result;
+
+        $backupsDir = $this->getBackupPath($type, $cmsObject->getIdentifier());
+        return $this->getItemsByStore($result, $backupsDir, null);
     }
 
     /**
@@ -208,5 +203,60 @@ class BackupManager
             $storeIds = [Store::DEFAULT_STORE_ID];
         }
         return $storeIds;
+    }
+
+    /**
+     * Get items by store
+     *
+     * @param array $result
+     * @param string $backupsDir
+     * @param null|int $storeId
+     *
+     * @return array
+     */
+    private function getItemsByStore(array $result, string $backupsDir, ?int $storeId): array
+    {
+        try {
+            if (!$this->fileDriver->isDirectory($backupsDir)) {
+                return $result;
+            }
+            $backups = $this->fileDriver->readDirectory($backupsDir);
+            foreach ($backups as $backup) {
+                $result[] = [
+                    'name'       => basename($backup),
+                    'label'      => (!is_null($storeId))
+                        ? 'store_' . $storeId . '/' . basename($backup) : basename($backup),
+                    'identifier' => $this->cmsObject->getIdentifier(),
+                    'store_id'   => $storeId
+                ];
+            }
+        } catch (FileSystemException $e) {
+            $this->logger->critical(__('Something went wrong while reading backups'));
+        }
+        return $result;
+    }
+
+    /**
+     * Get base backup path
+     *
+     * @param string $type
+     *
+     * @return string
+     */
+    private function getBaseBackupPath(string $type): string
+    {
+        $cmsDir = $this->config->getBackupsDir() . DIRECTORY_SEPARATOR;
+        switch ($type) {
+            case self::TYPE_CMS_BLOCK:
+                $backupPath = $cmsDir . Config::TYPE_BLOCK . DIRECTORY_SEPARATOR;
+                break;
+            case self::TYPE_CMS_PAGE:
+                $backupPath = $cmsDir . Config::TYPE_PAGE . DIRECTORY_SEPARATOR;
+                break;
+            default:
+                $backupPath = $cmsDir;
+                break;
+        }
+        return $backupPath;
     }
 }
