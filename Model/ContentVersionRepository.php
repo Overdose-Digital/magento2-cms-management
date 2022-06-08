@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Overdose\CMSContent\Model;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Api\SearchResultsInterfaceFactory;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
-use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface;
-use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterfaceFactory;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Overdose\CMSContent\Model\ResourceModel\ContentVersion\CollectionFactory as ContentVersionCollectionFactory;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
@@ -19,7 +19,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 class ContentVersionRepository implements ContentVersionRepositoryInterface
 {
     /**
-     * @var ContentVersionSearchResultsInterfaceFactory
+     * @var SearchResultsInterfaceFactory
      */
     private $searchResultsFactory;
 
@@ -49,14 +49,14 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
      * @param ResourceContentVersion $resource
      * @param ContentVersionFactory $contentVersionFactory
      * @param ContentVersionCollectionFactory $contentVersionCollectionFactory
-     * @param ContentVersionSearchResultsInterfaceFactory $searchResultsFactory
+     * @param SearchResultsInterfaceFactory $searchResultsFactory
      * @param CollectionProcessorInterface $collectionProcessor
      */
     public function __construct(
         ResourceContentVersion $resource,
         ContentVersionFactory $contentVersionFactory,
         ContentVersionCollectionFactory $contentVersionCollectionFactory,
-        ContentVersionSearchResultsInterfaceFactory $searchResultsFactory,
+        SearchResultsInterfaceFactory $searchResultsFactory,
         CollectionProcessorInterface $collectionProcessor
     ) {
         $this->resource = $resource;
@@ -76,10 +76,9 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
 
             return $this->get($contentVersion->getId());
         } catch (\Exception $exception) {
-            throw new CouldNotSaveException(__(
-                'Could not save the contentVersion: %1',
-                $exception->getMessage()
-            ));
+            throw new CouldNotSaveException(
+                __('Could not save the contentVersion: %1', $exception->getMessage())
+            );
         }
     }
 
@@ -93,13 +92,13 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
         if (!$contentVersion->getId()) {
             throw new NoSuchEntityException(__('content_version with id "%1" does not exist.', $id));
         }
-        return $contentVersion->getDataModel();
+        return $contentVersion;
     }
 
     /**
      * @inheritdoc
      */
-    public function getList(SearchCriteriaInterface $searchCriteria): ContentVersionSearchResultsInterface
+    public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface
     {
         $collection = $this->contentVersionCollectionFactory->create();
 
@@ -109,6 +108,7 @@ class ContentVersionRepository implements ContentVersionRepositoryInterface
         $searchResult->setItems($collection->getItems());
         $searchResult->setTotalCount($collection->getSize());
         $searchResult->setSearchCriteria($searchCriteria);
+
         return $searchResult;
     }
 

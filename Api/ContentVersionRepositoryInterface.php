@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Overdose\CMSContent\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
-use Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface;
 
 interface ContentVersionRepositoryInterface
 {
@@ -37,10 +37,10 @@ interface ContentVersionRepositoryInterface
      *
      * @param SearchCriteriaInterface $searchCriteria
      *
-     * @return ContentVersionSearchResultsInterface
+     * @return SearchResultsInterface
      * @throws LocalizedException
      */
-    public function getList(SearchCriteriaInterface $searchCriteria): ContentVersionSearchResultsInterface;
+    public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface;
 
     /**
      * Delete content_version

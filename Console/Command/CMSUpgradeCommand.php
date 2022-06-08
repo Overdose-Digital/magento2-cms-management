@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -40,7 +42,7 @@ class CMSUpgradeCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function configure()
     {
@@ -66,7 +68,7 @@ class CMSUpgradeCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -85,17 +87,17 @@ class CMSUpgradeCommand extends Command
             switch ($cmsType) {
                 case 'block':
                 case 'blocks':
-                    $result = $this->contentVersionManagement->processBlocks($identifiers);
+                    $this->contentVersionManagement->processBlocks($identifiers);
                     break;
                 case 'page':
                 case 'pages':
-                    $result = $this->contentVersionManagement->processPages($identifiers);
+                     $this->contentVersionManagement->processPages($identifiers);
                     break;
                 default:
                     throw new \InvalidArgumentException($cmsType . ' is incorrect CMS entity type');
             }
         } else {
-            $result = $this->contentVersionManagement->processAll();
+            $this->contentVersionManagement->processAll();
         }
         $output->writeln('<info>Upgrade Completed!</info>');
     }

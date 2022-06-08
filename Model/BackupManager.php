@@ -70,12 +70,11 @@ class BackupManager
         $this->setCmsObject($cmsObject);
         foreach ($this->prepareStoreIds() as $storeId) {
             $this->file->writeData(
-                $this->getBackupPathByStoreId($type, $this->cmsObject->getIdentifier(), $storeId),
+                $this->getBackupPathByStoreId($type, $this->cmsObject->getIdentifier(), (int)$storeId),
                 $this->generateBackupName((int)$storeId),
                 $this->prepareBackupContent()
             );
         }
-
         return $this;
     }
 

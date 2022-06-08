@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Config\Page;
 
-class Reader extends \Overdose\CMSContent\Model\Config\ReaderAbstract
+use Overdose\CMSContent\Model\Config\ReaderAbstract;
+
+class Reader extends ReaderAbstract
 {
     const FILE_NAME = 'cms_page_data.xml';
+
     /**
      * @inheridoc
      */

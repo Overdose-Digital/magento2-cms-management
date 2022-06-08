@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Api;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -12,52 +14,59 @@ interface ContentVersionManagementInterface
 
     /**
      * Process update for all changed CMSContent records
+     *
+     * @return void
      */
-    public function processAll();
+    public function processAll(): void;
 
     /**
      * Update blocks CMSContent records
      *
      * @param array $ids
-     * @return $this
+     *
+     * @return void
      */
-    public function processBlocks($ids = []);
+    public function processBlocks(array $ids = []): void;
 
     /**
      * Update pages CMSContent records
      *
      * @param array $ids
-     * @return $this
+     *
+     * @return void
      */
-    public function processPages($ids = []);
+    public function processPages(array $ids = []): void;
 
     /**
      * Process update for all CMSContent records from file
      *
      * @param string $filePath
+     *
      * @throws InvalidXmlImportFilesException
      * @throws LocalizedException
      * @return int - count of processed entities
      */
-    public function processFile(string $filePath);
+    public function processFile(string $filePath): int;
 
     /**
      * Update data for selected CMSContent record
      *
      * @param $contentVersion
      * @param $configItem
-     * @return $this
+     *
+     * @return ContentVersionManagementInterface
      */
-    public function updateVersion($contentVersion, $configItem);
+    public function updateVersion($contentVersion, $configItem): ContentVersionManagementInterface;
 
     /**
      * Create CMSContent record
      *
-     * @param $type
-     * @param $data
-     * @return $this
+     * @param int $type
+     * @param array $data
+     *
+     * @return ContentVersionManagementInterface
      */
-    public function createVersion($type, $data);
+    public function createVersion(int $type, array $data): ContentVersionManagementInterface;
 
     /**
      * Retrieves current version number based on identifier and type (0 - blocks, 1-pages)
@@ -65,16 +74,19 @@ interface ContentVersionManagementInterface
      * @param string $id
      * @param int $type
      * @param string|null $storeIds
+     *
      * @return string
      */
-    public function getCurrentVersion(string $id, int $type, ?string $storeIds);
+    public function getCurrentVersion(string $id, int $type, ?string $storeIds): string;
 
     /**
      * Delete content version model based on identifier and type (0 - blocks, 1-pages)
      *
-     * @param int $type
      * @param string $id
-     * @return bool
+     * @param int $type
+     * @param array $storeIds
+     *
+     * @return mixed
      */
     public function deleteContentVersion(string $id, int $type, array $storeIds);
 }

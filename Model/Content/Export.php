@@ -9,6 +9,7 @@ use Magento\Framework\Filesystem\Io\File;
 use Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface;
 use Overdose\CMSContent\Api\ContentExportInterface;
 use Overdose\CMSContent\File\FileManagerInterface;
+use Overdose\CMSContent\Model\Config;
 use ZipArchive;
 
 class Export implements ContentExportInterface

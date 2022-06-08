@@ -54,7 +54,7 @@ class ClearCMSHistory
     }
 
     /**
-     * Get module version
+     * Delete old backups
      *
      * @param string $type
      *

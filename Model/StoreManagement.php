@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model;
@@ -29,7 +30,7 @@ class StoreManagement implements StoreManagementInterface
      */
     public function getStoreIdsByCodes(array $storeCodes): array
     {
-        $storeCodes = $this->filterStores($storeCodes);
+        $storeCodes = $this->filterStoresByStoreCodes($storeCodes);
         $storeIds = [];
         foreach ($storeCodes as $storeCode) {
             if ($storeCode == 'admin') {
@@ -43,18 +44,19 @@ class StoreManagement implements StoreManagementInterface
                 } catch (NoSuchEntityException $exception) {
                     continue;
                 }
-
             }
         }
-
         return $storeIds;
     }
 
     /**
+     * Filter stores passed to import by existed
+     *
      * @param array $storeCodes
+     *
      * @return array
      */
-    private function filterStores(array $storeCodes): array
+    public function filterStoresByStoreCodes(array $storeCodes): array
     {
         $filteredStores = [];
         $allStores = $this->storeRepositoryInterface->getList();
@@ -63,7 +65,25 @@ class StoreManagement implements StoreManagementInterface
                 $filteredStores[] = $storeCode;
             }
         }
+        return $filteredStores;
+    }
 
+    /**
+     * Filter stores passed to import by existed
+     *
+     * @param array $storeIds
+     *
+     * @return array
+     */
+    public function filterStoresByStoreIds(array $storeIds): array
+    {
+        $filteredStores = [];
+        $allStores = $this->storeRepositoryInterface->getList();
+        foreach ($allStores as $store) {
+            if (in_array($store->getId(), $storeIds)) {
+                $filteredStores[] = $store->getId();
+            }
+        }
         return $filteredStores;
     }
 }
