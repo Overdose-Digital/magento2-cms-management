@@ -1,12 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model;
 
 use Magento\Framework\Model\AbstractModel;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
+use Overdose\CMSContent\Model\ResourceModel\ContentVersion as ResourceContentVersion;
 
 class ContentVersion extends AbstractModel implements ContentVersionInterface
 {
+    /**
+     * @inheritdoc
+     */
+    protected function _construct()
+    {
+        $this->_init(ResourceContentVersion::class);
+    }
+
     /**
      * @inheritdoc
      */

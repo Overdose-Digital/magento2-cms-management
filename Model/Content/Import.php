@@ -17,6 +17,7 @@ use Overdose\CMSContent\Api\ContentImportInterface;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\StoreManagementInterface;
 use Overdose\CMSContent\File\FileManagerInterface;
+use Overdose\CMSContent\Model\Config;
 
 class Import implements ContentImportInterface
 {

@@ -1,26 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model;
 
-use Magento\Cms\Api\BlockRepositoryInterface;
+use Exception;
 use Magento\Cms\Api\Data\BlockInterface;
-use Magento\Cms\Api\Data\BlockInterfaceFactory;
 use Magento\Cms\Api\Data\PageInterface;
-use Magento\Cms\Api\Data\PageInterfaceFactory;
-use Magento\Cms\Api\PageRepositoryInterface;
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\Search\FilterGroupBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\ContentVersionRepositoryInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory;
+use Overdose\CMSContent\Api\StoreManagementInterface;
 use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
 use Overdose\CMSContent\Model\Config\Block\Reader as BlocksConfigReader;
 use Overdose\CMSContent\Model\Config\Page\Reader as PagesConfigReader;
 use Overdose\CMSContent\Model\Config\ReaderAbstract;
 use Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorInterface;
+use Overdose\CMSContent\Model\Service\GetCmsEntityItems;
+use Overdose\CMSContent\Model\Service\GetContentVersions;
 use Psr\Log\LoggerInterface;
 
 class ContentVersionManagement implements ContentVersionManagementInterface
@@ -31,53 +30,50 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     private $currentImportItem = [];
 
     /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var FilterBuilder
-     */
-    private $filterBuilder;
-    /**
-     * @var BlockRepositoryInterface
-     */
-    private $blockRepository;
-    /**
-     * @var PageRepositoryInterface
-     */
-    private $pageRepository;
-    /**
      * @var ContentVersionInterfaceFactory
      */
     private $contentVersionFactory;
+
     /**
      * @var ContentVersionRepositoryInterface
      */
     private $contentVersionRepository;
+
     /**
      * @var BlocksConfigReader
      */
     private $blockConfigReader;
+
     /**
      * @var PagesConfigReader
      */
     private $pagesConfigReader;
-    /**
-     * @var FilterGroupBuilder
-     */
-    private $filterGroupBuilder;
-    /**
-     * @var BlockInterfaceFactory
-     */
-    private $blockInterfaceFactory;
+
     /**
      * @var BackupManager
      */
     private $backupManager;
+
     /**
-     * @var PageInterfaceFactory
+     * @var GetContentVersions
      */
-    private $pageInterfaceFactory;
+    private $getContentVersions;
+
+    /**
+     * @var GetCmsEntityItems
+     */
+    private $getCmsEntityItems;
+
+    /**
+     * @var EntityManagement
+     */
+    private $entityManagement;
+
+    /**
+     * @var StoreManagementInterface
+     */
+    private $storeManagement;
+
     /**
      * @var LoggerInterface
      */
@@ -86,81 +82,78 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * ContentVersionManagement constructor.
      *
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param FilterBuilder $filterBuilder
-     * @param FilterGroupBuilder $filterGroupBuilder
-     * @param BlockRepositoryInterface $blockRepository
-     * @param PageRepositoryInterface $pageRepository
-     * @param BlockInterfaceFactory $blockInterfaceFactory
-     * @param PageInterfaceFactory $pageInterfaceFactory
      * @param ContentVersionInterfaceFactory $contentVersionFactory
      * @param ContentVersionRepositoryInterface $contentVersionRepository
      * @param BlocksConfigReader $blockConfigReader
      * @param PagesConfigReader $pagesConfigReader
      * @param BackupManager $backupManager
+     * @param EntityManagement $entityManagement
+     * @param GetContentVersions $getContentVersions
+     * @param GetCmsEntityItems $getCmsEntityItems
+     * @param StoreManagementInterface $storeManagement
      * @param LoggerInterface $logger
      */
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        FilterBuilder $filterBuilder,
-        FilterGroupBuilder $filterGroupBuilder,
-        BlockRepositoryInterface $blockRepository,
-        PageRepositoryInterface $pageRepository,
-        BlockInterfaceFactory $blockInterfaceFactory,
-        PageInterfaceFactory $pageInterfaceFactory,
         ContentVersionInterfaceFactory $contentVersionFactory,
         ContentVersionRepositoryInterface $contentVersionRepository,
         BlocksConfigReader $blockConfigReader,
         PagesConfigReader $pagesConfigReader,
         BackupManager $backupManager,
+        EntityManagement $entityManagement,
+        GetContentVersions $getContentVersions,
+        GetCmsEntityItems $getCmsEntityItems,
+        StoreManagementInterface $storeManagement,
         LoggerInterface $logger
     ) {
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->filterBuilder = $filterBuilder;
-        $this->blockRepository = $blockRepository;
-        $this->pageRepository = $pageRepository;
         $this->contentVersionFactory = $contentVersionFactory;
         $this->contentVersionRepository = $contentVersionRepository;
         $this->blockConfigReader = $blockConfigReader;
         $this->pagesConfigReader = $pagesConfigReader;
-        $this->filterGroupBuilder = $filterGroupBuilder;
-        $this->blockInterfaceFactory = $blockInterfaceFactory;
         $this->backupManager = $backupManager;
-        $this->pageInterfaceFactory = $pageInterfaceFactory;
+        $this->entityManagement = $entityManagement;
+        $this->getContentVersions = $getContentVersions;
+        $this->getCmsEntityItems = $getCmsEntityItems;
+        $this->storeManagement = $storeManagement;
         $this->logger = $logger;
     }
 
     /**
      * @inheritDoc
      */
-    public function processAll()
+    public function processAll(): void
     {
         $this->processBlocks();
         $this->processPages();
-
-        return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function processBlocks($ids = [])
+    public function processBlocks(array $ids = []): void
     {
-        $this->processByType(ContentVersionInterface::TYPE_BLOCK, $ids);
+        try {
+            $this->processByType(ContentVersionInterface::TYPE_BLOCK, $ids);
+        } catch (InvalidXmlImportFilesException | LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 
     /**
      * @inheritDoc
      */
-    public function processPages($ids = [])
+    public function processPages(array $ids = []): void
     {
-        $this->processByType(ContentVersionInterface::TYPE_PAGE, $ids);
+        try {
+            $this->processByType(ContentVersionInterface::TYPE_PAGE, $ids);
+        } catch (InvalidXmlImportFilesException | LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 
     /**
      * @inheritDoc
      */
-    public function processFile(string $filePath)
+    public function processFile(string $filePath): int
     {
         $count = 0;
         try {
@@ -168,17 +161,15 @@ class ContentVersionManagement implements ContentVersionManagementInterface
                 case ContentVersionInterface::TYPE_PAGE:
                     $configItems = $this->getConfigItems($this->pagesConfigReader, [], $filePath);
                     break;
-
                 case ContentVersionInterface::TYPE_BLOCK:
                     $configItems = $this->getConfigItems($this->blockConfigReader, [], $filePath);
                     break;
-
                 default:
                     return $count;
             }
 
             $count = $this->importItems($configItems, $type);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->handleException($type, $e);
         }
 
@@ -188,11 +179,12 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * @param int $cmsType
      * @param array $ids
+     *
      * @throws InvalidXmlImportFilesException
      * @throws LocalizedException
-     * @return $this
+     * @return ContentVersionManagementInterface
      */
-    private function processByType(int $cmsType, array $ids = [])
+    private function processByType(int $cmsType, array $ids = []): ContentVersionManagementInterface
     {
         try {
             $reader = ($cmsType === ContentVersionInterface::TYPE_BLOCK)
@@ -200,7 +192,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
             $configItems = $this->getConfigItems($reader, $ids);
 
             $this->importItems($configItems, $cmsType);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->handleException($cmsType, $e, true);
         }
         return $this;
@@ -209,9 +201,11 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * @param array $configItems
      * @param int $type
+     *
      * @return int
+     * @throws LocalizedException
      */
-    private function importItems(array $configItems, int $type)
+    private function importItems(array $configItems, int $type): int
     {
         $count = 0;
         foreach ($configItems as $configItem) {
@@ -235,13 +229,13 @@ class ContentVersionManagement implements ContentVersionManagementInterface
 
     /**
      * @param int $cmsType
-     * @param \Exception $exception
+     * @param Exception $exception
      * @param bool $toLog
      * @return void
      * @throws InvalidXmlImportFilesException
      * @throws LocalizedException
      */
-    private function handleException(int $cmsType, \Exception $exception, $toLog = false)
+    private function handleException(int $cmsType, Exception $exception, $toLog = false)
     {
         if ($exception instanceof InvalidXmlImportFilesException
             || empty($this->currentImportItem)) {
@@ -272,19 +266,19 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * @inheritDoc
      */
-    public function updateVersion($contentVersion, $configItem)
+    public function updateVersion($contentVersion, $configItem): ContentVersionManagementInterface
     {
         if (version_compare($contentVersion->getVersion(), $configItem[ContentVersionInterface::VERSION], '<')) {
             $storeIdsData = $configItem['store_ids'] ?? 0;
-            $configItem['store_ids'] = $this->prepareStoreIds($storeIdsData);
+            $configItem['store_ids'] = $this->prepareStoreIds((string)$storeIdsData);
 
             /* Update cms block/page or create if not exist */
-            $this->updateCmsEntity($contentVersion->getType(), $configItem);
+            $this->updateCmsEntity((int)$contentVersion->getType(), $configItem);
 
             /* Update content version */
             $contentVersion
                 ->setVersion($configItem[ContentVersionInterface::VERSION])
-                ->setStoreIds($storeIdsData);
+                ->setStoreIds((string)$storeIdsData);
             $this->contentVersionRepository->save($contentVersion);
         }
 
@@ -295,22 +289,23 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      * @inheritDoc
      * @throws LocalizedException
      */
-    public function createVersion($type, $data)
+    public function createVersion(int $type, array $data): ContentVersionManagementInterface
     {
         $version = $data[ContentVersionInterface::VERSION]
             ?? self::DEFAULT_VERSION;
         $storeIdsData = $data['store_ids'] ?? 0;
-        $data['store_ids'] = $this->prepareStoreIds($storeIdsData);
+        $data['store_ids'] = $this->prepareStoreIds((string)$storeIdsData);
 
         /* Create CMS-block */
         $this->updateCmsEntity($type, $data);
 
         /* Create Content Version */
         $dataModel = $this->contentVersionFactory->create()
-            ->setType($type)
-            ->setIdentifier($data[ContentVersionInterface::IDENTIFIER])
+            ->setType((string)$type)
+            ->setIdentifier((string)$data[ContentVersionInterface::IDENTIFIER])
             ->setVersion($version)
-            ->setStoreIds($storeIdsData);
+            ->setStoreIds((string)$storeIdsData);
+
         $this->contentVersionRepository->save($dataModel);
 
         return $this;
@@ -319,7 +314,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentVersion(string $id, int $type, ?string $storeIds)
+    public function getCurrentVersion(string $id, int $type, ?string $storeIds): string
     {
         if ($storeIds !== null && $versionModel = $this->matchContentVersion($id, $type, $storeIds)) {
             return $versionModel->getVersion();
@@ -342,7 +337,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      * @param string $file
      * @return int|null
      */
-    private function defineTypeEntityFromFile(string $file)
+    private function defineTypeEntityFromFile(string $file): ?int
     {
         if (strpos(
             file_get_contents($file, false, null, 0, self::XML_FILE_HEADER_LENGTH),
@@ -351,8 +346,8 @@ class ContentVersionManagement implements ContentVersionManagementInterface
             return ContentVersionInterface::TYPE_PAGE;
         } elseif (strpos(
             file_get_contents($file, false, null, 0, self::XML_FILE_HEADER_LENGTH),
-            CmsEntityGeneratorInterface::BLOCK_SCHEMA_NAME))
-        {
+            CmsEntityGeneratorInterface::BLOCK_SCHEMA_NAME)
+        ) {
             return ContentVersionInterface::TYPE_BLOCK;
         }
 
@@ -362,30 +357,30 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * Updates existing cms-block/-page content,title or creates new one if not exists
      *
-     * @param $type
-     * @param $data
-     * @return $this
-     * @throws \Exception
+     * @param int $type
+     * @param array $data
+     *
+     * @return void
+     * @throws Exception
      */
-    private function updateCmsEntity($type, $data)
+    private function updateCmsEntity(int $type, array $data): void
     {
-        $repository = $this->getCmsRepository($type);
-        $factory = $this->getCmsFactory($type);
+        $type = ($type === ContentVersionInterface::TYPE_BLOCK)
+            ? EntityManagement::TYPE_BLOCK : EntityManagement::TYPE_PAGE;
+
         /* Check if cms-block/-page exists */
-        $searchCriteria = $this->prepareSearchCriteria($data);
-        $items = $repository->getList($searchCriteria)->getItems();
+        $items = $this->getCmsEntityItems->execute($type, $data['identifier'], $data['store_ids']);
         /* Block or page exists */
         if (count($items)) {
             $cmsDataModel = array_shift($items);
-            /* Create backup of cms-block/-page */
             $this->backupManager->createBackup(
                 $this->resolveBackupType($type),
                 $cmsDataModel
             );
-        } else { /* Create new block or page */
-            get_class($factory); // FIX: "PHP Fatal error:  Uncaught Error: Call to a member function create() on null"
-            $cmsDataModel = $factory->create()
-                ->setIdentifier($data['identifier']);
+        } else {
+            $cmsDataModel = $this->entityManagement->getFactory($type);
+
+            $cmsDataModel->setIdentifier($data['identifier']);
         }
 
         $cmsDataModel
@@ -400,13 +395,12 @@ class ContentVersionManagement implements ContentVersionManagementInterface
         if (isset($data['content_heading'])) {
             $cmsDataModel->setData('content_heading', $data['content_heading']);
         }
+
         if (isset($data['page_layout'])) {
             $cmsDataModel->setData('page_layout', $data['page_layout']);
         }
 
-        $repository->save($cmsDataModel);
-
-        return $this;
+        $this->entityManagement->getRepository($type)->save($cmsDataModel);
     }
 
     /**
@@ -415,10 +409,11 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      * @param ReaderAbstract $configReader
      * @param array $filterIds
      * @param null $file
+     *
      * @return array
      * @throws LocalizedException
      */
-    private function getConfigItems(ReaderAbstract $configReader, $filterIds = [], $file = null)
+    private function getConfigItems(ReaderAbstract $configReader, array $filterIds = [], $file = null): array
     {
         if ($file) {
             $config = $configReader->readFromFile($file);
@@ -426,190 +421,78 @@ class ContentVersionManagement implements ContentVersionManagementInterface
             $config = $configReader->read();
         }
 
-        if (empty($filterIds)) {
+        if (!count($filterIds)) {
             return $config;
-        }
-
-        $filteredConfig = [];
-        if (!empty($filterIds)) {
+        } else {
+            $filteredConfig = [];
             foreach ($config as $index => $item) {
                 if (in_array($item['identifier'], $filterIds)) {
                     $filteredConfig[$index] = $item;
                 }
             }
         }
-
         return $filteredConfig;
-    }
-
-    /**
-     * Retrieves all CMS content records from DB based on type (0 - blocks, 1-pages), filtered by identifiers
-     *
-     * @param $type
-     * @param array $filterIds
-     * @return array
-     */
-    private function getContentVersions($type, $filterIds = [])
-    {
-        $result = [];
-        $filtersGroups = [];
-
-        $filterType = $this->filterBuilder
-            ->setField(ContentVersionInterface::TYPE)
-            ->setConditionType('eq')
-            ->setValue($type)
-            ->create();
-        $filterGroup1 = $this->filterGroupBuilder
-            ->setFilters([$filterType])
-            ->create();
-        $filtersGroups[] = $filterGroup1;
-
-        if (!empty($filterIds)) {
-            $filterId = $this->filterBuilder
-                ->setField(ContentVersionInterface::IDENTIFIER)
-                ->setConditionType('in')
-                ->setValue(implode(",", $filterIds))
-                ->create();
-            $filterGroup2 = $this->filterGroupBuilder
-                ->setFilters([$filterId])
-                ->create();
-            $filtersGroups[] = $filterGroup2;
-        }
-
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->setFilterGroups($filtersGroups)
-            ->create();
-
-        try {
-            $result = $this->contentVersionRepository->getList($searchCriteria)->getItemsArray();
-        } catch (LocalizedException $e) {
-            $this->logger->critical(__('Something went wrong during getting content versions'));
-        }
-
-        return $result;
     }
 
     /**
      * Prepare store ids array for cms-block or cms-page
      *
      * @param string $storeIdsString
+     *
      * @return array
      */
-    private function prepareStoreIds(string $storeIdsString)
+    private function prepareStoreIds(string $storeIdsString): array
     {
         if (empty($storeIdsString)) {
             return ['0'];
         } else {
             $storeIds = explode(',', $storeIdsString);
+            $storeIds = $this->storeManagement->filterStoresByStoreIds($storeIds);
+
             if (in_array('0', $storeIds)) {
                 $storeIds = ['0'];
             }
         }
-
         return $storeIds;
-    }
-
-    /**
-     * Prepare search criteria to find matching cms-block or cms-page
-     *
-     * @param $data
-     * @return \Magento\Framework\Api\SearchCriteria
-     */
-    private function prepareSearchCriteria($data)
-    {
-        $filtersGroups = [];
-
-        $filterIdentifier = $this->filterBuilder
-            ->setField('identifier')
-            ->setConditionType('eq')
-            ->setValue($data['identifier'])
-            ->create();
-        $filterGroup1 = $this->filterGroupBuilder
-            ->setFilters([$filterIdentifier])
-            ->create();
-        $filtersGroups[] = $filterGroup1;
-
-        $filterStore = $this->filterBuilder
-            ->setField('store_id')
-            ->setConditionType('in')
-            ->setValue($data['store_ids'])
-            ->create();
-        $filterGroup2 = $this->filterGroupBuilder
-            ->setFilters([$filterStore])
-            ->create();
-        $filtersGroups[] = $filterGroup2;
-
-        return $this->searchCriteriaBuilder
-            ->setFilterGroups($filtersGroups)
-            ->create();
-    }
-
-    /**
-     * Retrieve factory object for cms-block or cms-page
-     *
-     * @param $strategy
-     * @return BlockInterfaceFactory|PageInterfaceFactory
-     */
-    private function getCmsFactory($strategy)
-    {
-        if ($strategy === ContentVersionInterface::TYPE_BLOCK) {
-            return $this->blockInterfaceFactory;
-        } elseif ($strategy === ContentVersionInterface::TYPE_PAGE) {
-            return $this->pageInterfaceFactory;
-        }
-    }
-
-    /**
-     * Retrieve repository for cms-block or cms-page
-     *
-     * @param $strategy
-     * @return BlockRepositoryInterface|PageRepositoryInterface
-     */
-    private function getCmsRepository($strategy)
-    {
-        if ((int)$strategy === ContentVersionInterface::TYPE_BLOCK) {
-            return $this->blockRepository;
-        } elseif ((int)$strategy === ContentVersionInterface::TYPE_PAGE) {
-            return $this->pageRepository;
-        }
     }
 
     /**
      * Retrieve strategy for BackupManager
      *
      * @param $strategy
+     *
      * @return string
      */
-    private function resolveBackupType($strategy)
+    private function resolveBackupType($strategy): string
     {
         if ((int)$strategy === ContentVersionInterface::TYPE_BLOCK) {
             return BackupManager::TYPE_CMS_BLOCK;
-        } elseif ((int)$strategy === ContentVersionInterface::TYPE_PAGE) {
-            return BackupManager::TYPE_CMS_PAGE;
         }
+        return BackupManager::TYPE_CMS_PAGE;
     }
 
     /**
      * @param string $identifier
      * @param int $type
      * @param string|null $storeIds
+     *
      * @return ContentVersionInterface|null
      */
-    private function matchContentVersion(string $identifier, int $type, ?string $storeIds)
+    private function matchContentVersion(string $identifier, int $type, ?string $storeIds): ?ContentVersionInterface
     {
         $searchStoreIdsArr = explode(',', $storeIds ?: '0');
-        $contentVersions = $this->getContentVersions($type, [$identifier]);
+        $contentVersions = $this->getContentVersions->execute($type, [$identifier]);
         foreach ($contentVersions as $contentVersion) {
             if (count(array_intersect(explode(',', $contentVersion->getStoreIds()), $searchStoreIdsArr))) {
                 return $contentVersion;
             }
         }
-
         return null;
     }
 
     /**
      * @param int $cmsType
+     *
      * @return void
      */
     private function clearCurrentItemContent(int $cmsType)

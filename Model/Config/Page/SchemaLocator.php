@@ -2,7 +2,9 @@
 
 namespace Overdose\CMSContent\Model\Config\Page;
 
-class SchemaLocator extends \Overdose\CMSContent\Model\Config\SchemaLocatorAbstract
+use Overdose\CMSContent\Model\Config\SchemaLocatorAbstract;
+
+class SchemaLocator extends SchemaLocatorAbstract
 {
     protected $schemaFile = 'cms_page_data.xsd';
 }

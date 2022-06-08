@@ -41,7 +41,7 @@ abstract class SchemaLocatorAbstract implements SchemaLocatorInterface
     /**
      * @inheritDoc
      */
-    public function getSchema()
+    public function getSchema(): ?string
     {
         return $this->schema;
     }
@@ -49,7 +49,7 @@ abstract class SchemaLocatorAbstract implements SchemaLocatorInterface
     /**
      * @inheritDoc
      */
-    public function getPerFileSchema()
+    public function getPerFileSchema(): ?string
     {
         return $this->perFileSchema;
     }

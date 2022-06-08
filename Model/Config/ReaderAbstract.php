@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Config;
 
 use Magento\Framework\Config\ConverterInterface;

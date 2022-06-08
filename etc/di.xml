@@ -9,8 +9,6 @@
                 type="Overdose\CMSContent\Model\ContentVersionRepository"/>
     <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface"
                 type="Overdose\CMSContent\Model\ContentVersion"/>
-    <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface"
-                type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
     <preference for="Overdose\CMSContent\Api\ContentExportInterface"
                 type="Overdose\CMSContent\Model\Content\Export" />
     <preference for="Overdose\CMSContent\Api\ContentImportInterface"
@@ -68,16 +66,16 @@
             <argument name="backupManager" xsi:type="object">Overdose\CMSContent\Model\BackupManager\Proxy</argument>
             <argument name="blockConfigReader" xsi:type="object">Overdose\CMSContent\Model\Config\Block\Reader\Proxy</argument>
             <argument name="blockInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\BlockInterfaceFactory\Proxy</argument>
-            <argument name="blockRepository" xsi:type="object">Magento\Cms\Api\BlockRepositoryInterface\Proxy</argument>
             <argument name="contentVersionFactory" xsi:type="object">Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory\Proxy</argument>
             <argument name="contentVersionRepository" xsi:type="object">Overdose\CMSContent\Api\ContentVersionRepositoryInterface\Proxy</argument>
-            <argument name="filterBuilder" xsi:type="object">\Magento\Framework\Api\FilterBuilder\Proxy</argument>
-            <argument name="filterGroupBuilder" xsi:type="object">\Magento\Framework\Api\Search\FilterGroupBuilder\Proxy</argument>
             <argument name="logger" xsi:type="object">Overdose\CMSContent\Model\CmsImportLogger</argument>
             <argument name="pageInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\PageInterfaceFactory\Proxy</argument>
-            <argument name="pageRepository" xsi:type="object">Magento\Cms\Api\PageRepositoryInterface\Proxy</argument>
             <argument name="pagesConfigReader" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Reader\Proxy</argument>
-            <argument name="searchCriteriaBuilder" xsi:type="object">Magento\Framework\Api\SearchCriteriaBuilder\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Service\GetContentVersions">
+        <arguments>
+            <argument name="logger" xsi:type="object">Overdose\CMSContent\Model\CmsImportLogger</argument>
         </arguments>
     </type>
     <type name="Overdose\CMSContent\Observer\CmsSaveBefore">
@@ -104,6 +102,19 @@
             <argument name="generators" xsi:type="array">
                 <item name="json" xsi:type="object">Overdose\CMSContent\Model\Content\Generator\Json\Generator\Proxy</item>
                 <item name="xml" xsi:type="object">Overdose\CMSContent\Model\Content\Generator\Xml\Generator\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Overdose\CMSContent\Model\EntityManagement">
+        <arguments>
+            <argument name="repositoryList" xsi:type="array">
+                <item name="block" xsi:type="object">Magento\Cms\Api\BlockRepositoryInterface</item>
+                <item name="page" xsi:type="object">Magento\Cms\Api\PageRepositoryInterface</item>
+            </argument>
+            <argument name="factoryList" xsi:type="array">
+                <item name="block" xsi:type="object">Magento\Cms\Api\Data\BlockInterfaceFactory</item>
+                <item name="page" xsi:type="object">Magento\Cms\Api\Data\PageInterfaceFactory</item>
             </argument>
         </arguments>
     </type>
