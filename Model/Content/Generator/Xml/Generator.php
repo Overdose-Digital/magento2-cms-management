@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model\Content\Generator\Xml;
 
+use DOMCdataSection;
+use DOMDocument;
+use DOMException;
+use DOMText;
 use Magento\Framework\Exception\LocalizedException;
 use Overdose\CMSContent\Api\ContentVersionManagementInterface;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 use Overdose\CMSContent\Api\StoreManagementInterface;
 use Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterInterface;
 use Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorInterface;
-use function Overdose\CMSContent\Model\Generator\Xml\__;
 
 class Generator implements CmsEntityGeneratorInterface
 {
     /**
-     * @var \DOMDocument|null
+     * @var DOMDocument|null
      */
     private $dom = null;
 
     /**
-     * @var \DOMDocument
+     * @var DOMDocument
      */
     private $currentDom;
 
@@ -50,7 +53,7 @@ class Generator implements CmsEntityGeneratorInterface
      * @param array $data
      *
      * @return string
-     * @throws \DOMException
+     * @throws DOMException|LocalizedException
      */
     public function generate(array $data): string
     {
@@ -60,20 +63,26 @@ class Generator implements CmsEntityGeneratorInterface
         return $this->dom->saveXML();
     }
 
+    /**
+     * Init dom
+     *
+     * @return void
+     */
     private function init()
     {
-        $this->dom = new \DOMDocument('1.0');
+        $this->dom = new DOMDocument('1.0');
         $this->dom->formatOutput = true;
         $this->currentDom = $this->dom;
     }
 
     /**
      * @param array $content
+     *
      * @return $this
-     * @throws \DOMException
+     * @throws DOMException
      * @throws LocalizedException
      */
-    private function arrayToXml(array $content)
+    private function arrayToXml(array $content): Generator
     {
         $root = $this->defineRoot($content);
         $this->createConfigNode($root);
@@ -85,17 +94,18 @@ class Generator implements CmsEntityGeneratorInterface
             $this->createEntityNode($key, $item, $root);
             $this->setCurrentDom($node);
         }
-
         return $this;
     }
 
     /**
-     * @param \DOMDocument $node
+     * @param DOMDocument $node
+     *
      * @return $this
      */
-    private function setCurrentDom($node)
+    private function setCurrentDom($node): Generator
     {
         $this->currentDom = $node;
+
         return $this;
     }
 
@@ -103,7 +113,7 @@ class Generator implements CmsEntityGeneratorInterface
      * @param string $root
      *
      * @return void
-     * @throws \DOMException
+     * @throws DOMException
      */
     private function createConfigNode(string $root)
     {
@@ -120,7 +130,7 @@ class Generator implements CmsEntityGeneratorInterface
      * @param string $root
      *
      * @return void
-     * @throws \DOMException
+     * @throws DOMException
      */
     private function createEntityNode(string $key, array $item, string $root)
     {
@@ -139,29 +149,32 @@ class Generator implements CmsEntityGeneratorInterface
     }
 
     /**
-     * @param $_item
+     * @param array $item
      *
      * @return void
-     * @throws \DOMException
+     * @throws DOMException
      */
-    private function createContentNodes($_item)
+    private function createContentNodes(array $item)
     {
-        if (is_array($_item) && array_key_exists(self::MAIN_ENTITY_NODE_NAME, $_item)) {
-            foreach ($_item[self::MAIN_ENTITY_NODE_NAME] as $ind => $value) {
-                $node = $this->dom->createElement('attribute');
-                $node->setAttribute('code', $ind);
-                $node->appendChild($this->createTextNode($ind, $value));
-                $this->currentDom->appendChild($node);
-            }
-
-            $this->setCurrentDom($node);
+        if (!array_key_exists(self::MAIN_ENTITY_NODE_NAME, $item)) {
+            return;
         }
+
+        foreach ($item[self::MAIN_ENTITY_NODE_NAME] as $attribute => $value) {
+            $node = $this->dom->createElement('attribute');
+            $node->setAttribute('code', $attribute);
+            $node->appendChild(
+                $this->createTextNode($attribute, (string)$value)
+            );
+            $this->currentDom->appendChild($node);
+        }
+        $this->setCurrentDom($node);
     }
 
     /**
      * @param $item
      * @return string|null
-     * @throws \DOMException
+     * @throws DOMException
      */
     private function createStoreNodes($item)
     {
@@ -187,7 +200,7 @@ class Generator implements CmsEntityGeneratorInterface
      * @param string $root
      * @param string|null $stores
      * @return void
-     * @throws \DOMException
+     * @throws DOMException
      */
     private function createVersionNodes(string $identifier, string $root, ?string $stores)
     {
@@ -217,10 +230,11 @@ class Generator implements CmsEntityGeneratorInterface
 
     /**
      * @param string $ind
-     * @param string|null $value
-     * @return \DOMCdataSection|\DOMText|false
+     * @param string $value
+     *
+     * @return DOMCdataSection|DOMText|false
      */
-    private function createTextNode(string $ind, ?string $value)
+    private function createTextNode(string $ind, string $value)
     {
         if ($ind === 'content') {
             return $this->dom->createCDATASection($value);

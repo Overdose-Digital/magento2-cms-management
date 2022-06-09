@@ -6,6 +6,8 @@ namespace Overdose\CMSContent\Controller\Adminhtml;
 
 use Magento\Backend\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
 use Magento\Backend\App\Action;
 use Magento\Framework\Stdlib\DateTime\DateTime;
@@ -48,6 +50,7 @@ abstract class AbstractMassExport extends Action
      * @param string $type
      *
      * @return ResponseInterface
+     * @throws FileSystemException|LocalizedException
      */
     protected function formFile(string $fileName, array $convertedBlocks, string $type): ResponseInterface
     {
@@ -71,11 +74,12 @@ abstract class AbstractMassExport extends Action
      * @param string $type
      *
      * @return string
+     * @throws FileSystemException|LocalizedException
      */
     protected function returnZipFile(array $convertedBlocks, string $fileName, string $type): string
     {
-        $fileType = $this->getRequest()->getParam('type', 'json');
-        $isSplit  = $this->getRequest()->getParam('split', false);
+        $fileType = (string)$this->getRequest()->getParam('type', 'json');
+        $isSplit  = (bool)$this->getRequest()->getParam('split', false);
 
         return $this->contentExport->createZipFile(
             $convertedBlocks,

@@ -67,6 +67,10 @@ class BackupManager
      */
     public function createBackup($type, $cmsObject): BackupManager
     {
+        if (!$this->config->isEnabled()) {
+            return $this;
+        }
+
         $this->setCmsObject($cmsObject);
         foreach ($this->prepareStoreIds() as $storeId) {
             $this->file->writeData(

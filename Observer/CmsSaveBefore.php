@@ -49,16 +49,11 @@ class CmsSaveBefore implements ObserverInterface
     }
 
     /**
-     * Execute observer
-     *
-     * @param Observer $observer
-     *
-     * @return void
+     * @inheritDoc
      */
     public function execute(Observer $observer)
     {
         $eventName = $observer->getEvent()->getName();
-
         if (empty($this->eventsTypeMap[$eventName])) {
             return;
         }
@@ -80,7 +75,7 @@ class CmsSaveBefore implements ObserverInterface
     private function hasImportantDataChanges($cmsObject): bool
     {
         foreach ($this->keysToCheck as $key) {
-            if ($cmsObject->getData($key) !== $cmsObject->getOrigData($key)) {
+            if ($cmsObject->getOrigData() && $cmsObject->getData($key) !== $cmsObject->getOrigData($key)) {
                 return true;
             }
         }
