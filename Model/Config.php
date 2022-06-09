@@ -36,15 +36,23 @@ class Config
     public const MONTH = 60 * 60 * 24 * 30;
     public const YEAR = 60 * 60 * 24 * 365;
 
-    const XML_PATH_IS_CRON_ENABLED = 'cms_content/delete_backups_by_cron/cron_enabled';
-    const XML_PATH_DELETE_METHOD_TYPE = 'cms_content/delete_backups_by_cron/delete_methods/method';
-    const XML_PATH_OLDER_THAN_PERIOD_TYPE = 'cms_content/delete_backups_by_cron/delete_methods/period';
-    const XML_PATH_OLDER_THAN_PERIOD_NUMBER = 'cms_content/delete_backups_by_cron/delete_methods/number';
-    const XML_PATH_LOGS = 'cms_content/delete_backups_by_cron/logs/logs_enabled';
+    const XML_PATH_IS_ENABLED = 'cms_content/general/enabled';
 
+    /**
+     * Delete section
+     */
+    const XML_PATH_IS_CRON_ENABLED = 'cms_content/backups/delete/cron_enabled';
+    const XML_PATH_DELETE_METHOD_TYPE = 'cms_content/backups/delete/method';
+    const XML_PATH_OLDER_THAN_PERIOD_TYPE = 'cms_content/backups/delete/period';
+    const XML_PATH_OLDER_THAN_PERIOD_NUMBER = 'cms_content/backups/delete/number';
     const CRON_STRING_PATH = 'crontab/default/jobs/cms_content_delete_backups/schedule/cron_expr';
-    const CRON_ARRAY_PATH_TIME_VALUE = 'groups/delete_backups_by_cron/groups/cron_run_settings/fields/time/value';
-    const CRON_ARRAY_PATH_FREQUENCY_VALUE = 'groups/delete_backups_by_cron/groups/cron_run_settings/fields/frequency/value';
+    const CRON_ARRAY_PATH_TIME_VALUE = 'groups/backups/groups/cron_run_settings/fields/time/value';
+    const CRON_ARRAY_PATH_FREQUENCY_VALUE = 'groups/backups/groups/cron_run_settings/fields/frequency/value';
+
+    /**
+     * Logs section
+     */
+    const XML_PATH_LOGS = 'cms_content/logs/logs_enabled';
 
     /**
      * @var ScopeConfigInterface
@@ -66,6 +74,16 @@ class Config
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->directoryList = $directoryList;
+    }
+
+    /**
+     * Check is functionality enabled
+     *
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_PATH_IS_ENABLED, ScopeInterface::SCOPE_WEBSITE);
     }
 
     /**

@@ -25,6 +25,11 @@ use Psr\Log\LoggerInterface;
 class ContentVersionManagement implements ContentVersionManagementInterface
 {
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @var array
      */
     private $currentImportItem = [];
@@ -82,6 +87,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * ContentVersionManagement constructor.
      *
+     * @param Config $config
      * @param ContentVersionInterfaceFactory $contentVersionFactory
      * @param ContentVersionRepositoryInterface $contentVersionRepository
      * @param BlocksConfigReader $blockConfigReader
@@ -94,6 +100,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      * @param LoggerInterface $logger
      */
     public function __construct(
+        Config $config,
         ContentVersionInterfaceFactory $contentVersionFactory,
         ContentVersionRepositoryInterface $contentVersionRepository,
         BlocksConfigReader $blockConfigReader,
@@ -105,6 +112,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
         StoreManagementInterface $storeManagement,
         LoggerInterface $logger
     ) {
+        $this->config = $config;
         $this->contentVersionFactory = $contentVersionFactory;
         $this->contentVersionRepository = $contentVersionRepository;
         $this->blockConfigReader = $blockConfigReader;
@@ -122,6 +130,10 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      */
     public function processAll(): void
     {
+        if (!$this->config->isEnabled()) {
+            return;
+        }
+
         $this->processBlocks();
         $this->processPages();
     }
@@ -131,6 +143,10 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      */
     public function processBlocks(array $ids = []): void
     {
+        if (!$this->config->isEnabled()) {
+            return;
+        }
+
         try {
             $this->processByType(ContentVersionInterface::TYPE_BLOCK, $ids);
         } catch (InvalidXmlImportFilesException | LocalizedException $e) {
@@ -143,6 +159,10 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      */
     public function processPages(array $ids = []): void
     {
+        if (!$this->config->isEnabled()) {
+            return;
+        }
+
         try {
             $this->processByType(ContentVersionInterface::TYPE_PAGE, $ids);
         } catch (InvalidXmlImportFilesException | LocalizedException $e) {
