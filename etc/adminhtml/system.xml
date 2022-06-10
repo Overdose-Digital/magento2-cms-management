@@ -34,7 +34,7 @@
                     </field>
                     <field id="method" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
                         <label>Delete Method</label>
-                        <source_model>Overdose\CMSContent\Model\Config\Cron\Source\Methods</source_model>
+                        <source_model>Overdose\CMSContent\Model\OptionSource\Methods</source_model>
                         <comment><![CDATA[
                        <p><b>By Periods</b>: Delete files by periods (weeks, months and years). Files younger than one week, excluded.</p>
                        <p><b>Older Than</b>: Delete files older than 'Period' and it number.</p>
@@ -42,7 +42,7 @@
                     </field>
                     <field id="period" translate="label" type="select" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
                         <label>Period</label>
-                        <source_model>Overdose\CMSContent\Model\Config\Cron\Source\Periods</source_model>
+                        <source_model>Overdose\CMSContent\Model\OptionSource\Periods</source_model>
                         <depends>
                             <field id="method">older_than</field>
                         </depends>

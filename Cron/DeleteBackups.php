@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Cron;
 
+use Magento\Framework\Exception\FileSystemException;
 use Overdose\CMSContent\Model\Config;
 use Overdose\CMSContent\Model\Service\ClearCMSHistory;
 
@@ -35,6 +36,7 @@ class DeleteBackups
      * Process getting and deleting old CMS files
      *
      * @return void
+     * @throws FileSystemException
      */
     public function execute(): void
     {

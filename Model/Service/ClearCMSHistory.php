@@ -166,10 +166,7 @@ class ClearCMSHistory
         }
 
         foreach ($filesByPeriod as $files) {
-            usort($files, function ($a, $b) {
-                return filemtime($a) < filemtime($b);
-            });
-            array_shift($files);
+            $files = $this->leftNewestFile($files);
             array_push($filesToDelete, ...$files);
         }
         return $filesToDelete;
@@ -193,6 +190,23 @@ class ClearCMSHistory
                 $files[] = $file;
             }
         }
+        return $this->leftNewestFile($files);
+    }
+
+    /**
+     * Left newest file from array
+     *
+     * @param array $files
+     *
+     * @return array
+     */
+    private function leftNewestFile(array $files): array
+    {
+        usort($files, function ($a, $b) {
+            return filemtime($a) < filemtime($b);
+        });
+        array_shift($files);
+
         return $files;
     }
 

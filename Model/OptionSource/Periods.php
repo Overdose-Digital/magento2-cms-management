@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Config\Cron\Source;
+namespace Overdose\CMSContent\Model\OptionSource;
 
 use Magento\Framework\Data\OptionSourceInterface;
 use Overdose\CMSContent\Model\Config;

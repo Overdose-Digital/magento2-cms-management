@@ -57,7 +57,6 @@ class Reader extends \Magento\Framework\Module\Dir\Reader
                 $directoryRead = $this->readFactory->create($dir);
                 $path = $directoryRead->getRelativePath($dir);
                 if ($directoryRead->isExist($path)) {
-                    $a = $path;
                     $odFiles = array_filter($directoryRead->read($path), function ($file) use ($pattern) {
                         return strpos($file, $pattern) === 0 && substr($file, -4) === '.xml';
                     });

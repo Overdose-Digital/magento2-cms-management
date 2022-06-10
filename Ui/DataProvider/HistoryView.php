@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Ui\HistoryView;
+namespace Overdose\CMSContent\Ui\DataProvider;
 
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
@@ -10,7 +10,7 @@ use Magento\Ui\DataProvider\AbstractDataProvider;
 use Overdose\CMSContent\File\FileManagerInterface;
 use Overdose\CMSContent\Model\BackupManager;
 
-class DataProvider extends AbstractDataProvider
+class HistoryView extends AbstractDataProvider
 {
     /**
      * @var BackupManager
