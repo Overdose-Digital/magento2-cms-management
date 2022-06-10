@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Controller\Adminhtml\Import;
 
 use Magento\Backend\App\Action;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action
@@ -15,9 +18,15 @@ class Index extends Action
      */
     const ADMIN_RESOURCE = 'Overdose_CMSContent::import';
 
-
+    /**
+     * @var PageFactory
+     */
     protected $pageFactory;
 
+    /**
+     * @param Action\Context $context
+     * @param PageFactory $pageFactory
+     */
     public function __construct(
         Action\Context $context,
         PageFactory $pageFactory
@@ -27,6 +36,9 @@ class Index extends Action
         parent::__construct($context);
     }
 
+    /**
+     * @return Page
+     */
     public function execute()
     {
         $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);

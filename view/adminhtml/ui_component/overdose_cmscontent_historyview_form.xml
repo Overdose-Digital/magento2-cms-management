@@ -29,7 +29,7 @@
         <settings>
             <submitUrl path="*/*/save"/>
         </settings>
-        <dataProvider class="Overdose\CMSContent\Ui\HistoryView\DataProvider" name="historyview_form_data_source">
+        <dataProvider class="Overdose\CMSContent\Ui\DataProvider\HistoryView" name="historyview_form_data_source">
             <settings>
                 <requestFieldName>bc_identifier</requestFieldName>
                 <primaryFieldName>bc_identifier</primaryFieldName>

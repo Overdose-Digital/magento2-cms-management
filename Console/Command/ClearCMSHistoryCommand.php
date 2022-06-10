@@ -56,20 +56,28 @@ class ClearCMSHistoryCommand extends Command
     {
         $cmsType = $input->getOption('type');
         if (empty($cmsType)) {
-            throw new \InvalidArgumentException('CMS Entity type OPTION [--type] missed');
+            $output->writeln('<info>CMS Entity type OPTION [--type] missed!</info>');
+
+            return;
         }
 
-        switch ($cmsType) {
-            case 'block':
-            case 'blocks':
-                $count = $this->clearCMSHistory->execute(Config::TYPE_BLOCK);
-                break;
-            case 'page':
-            case 'pages':
-                $count = $this->clearCMSHistory->execute(Config::TYPE_PAGE);
-                break;
-            default:
-                throw new \InvalidArgumentException($cmsType . ' is incorrect CMS entity type');
+        try {
+            switch ($cmsType) {
+                case 'block':
+                case 'blocks':
+                    $count = $this->clearCMSHistory->execute(Config::TYPE_BLOCK);
+                    break;
+                case 'page':
+                case 'pages':
+                    $count = $this->clearCMSHistory->execute(Config::TYPE_PAGE);
+                    break;
+                default:
+                    throw new \InvalidArgumentException($cmsType . ' is incorrect CMS entity type');
+            }
+        } catch (\Exception $e) {
+            $output->writeln($e->getMessage());
+
+            return;
         }
 
         if ($count > 0) {

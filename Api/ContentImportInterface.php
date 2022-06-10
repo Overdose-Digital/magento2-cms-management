@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Api;
 
+use Exception;
+
 interface ContentImportInterface
 {
     const OD_CMS_MODE_UPDATE = 'update';
@@ -17,23 +19,30 @@ interface ContentImportInterface
 
     /**
      * Import contents from zip archive and return number of imported records (-1 on error)
+     *
      * @param string $fileName
      * @param bool $rm
+     *
      * @return int
+     * @throws Exception
      */
     public function importContentFromZipFile(string $fileName, bool $rm): int;
 
     /**
      * Set CMS mode on import
-     * @param $mode
+     *
+     * @param string $mode
+     *
      * @return ContentImportInterface
      */
-    public function setCmsModeOption($mode): ContentImportInterface;
+    public function setCmsModeOption(string $mode): ContentImportInterface;
 
     /**
      * Set media mode on import
-     * @param $mode
+     *
+     * @param string $mode
+     *
      * @return ContentImportInterface
      */
-    public function setMediaModeOption($mode): ContentImportInterface;
+    public function setMediaModeOption(string $mode): ContentImportInterface;
 }

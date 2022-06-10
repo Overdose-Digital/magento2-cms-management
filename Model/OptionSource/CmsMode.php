@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Overdose\CMSContent\Model\Source;
+namespace Overdose\CMSContent\Model\OptionSource;
 
+use Magento\Framework\Data\OptionSourceInterface;
 use Overdose\CMSContent\Api\ContentImportInterface;
 
-class MediaMode
+class CmsMode implements OptionSourceInterface
 {
     /**
      * To option array
@@ -17,16 +18,12 @@ class MediaMode
     {
         return [
             [
-                'label' => __('Do not import'),
-                'value' => ContentImportInterface::OD_MEDIA_MODE_NONE
-            ],
-            [
                 'label' => __('Overwrite existing'),
-                'value' => ContentImportInterface::OD_MEDIA_MODE_UPDATE
+                'value' => ContentImportInterface::OD_CMS_MODE_UPDATE
             ],
             [
                 'label' => __('Skip existing'),
-                'value' => ContentImportInterface::OD_MEDIA_MODE_SKIP
+                'value' => ContentImportInterface::OD_CMS_MODE_SKIP
             ]
         ];
     }
