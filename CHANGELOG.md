@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 14-06-2022
+### Added
+- Automatic deleting an old history files
+- CLI command for clearing history files
+- Simple Unit Test for some thin places
+
+### Changed
+- Refactored code
+- Position of system configs
+- Import form moved to UI instead of direct blocks
+- 
+
+### Fixed
+- Using system configs
+
 ## [1.1.0] - 10-06-2022
 ### Added
 - Possibility to import/export CMS pages or blocks.

@@ -59,7 +59,6 @@ class CmsSaveBefore implements ObserverInterface
         }
 
         $cmsObject = $observer->getEvent()->getData('data_object');
-        /* Original Model::hasDataChanges() not works here, so we added our custom check */
         if ($this->hasImportantDataChanges($cmsObject)) {
             $this->backupManager->createBackup($this->eventsTypeMap[$eventName], $cmsObject);
         }

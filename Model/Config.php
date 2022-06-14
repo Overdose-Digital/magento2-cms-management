@@ -22,7 +22,6 @@ class Config
      */
     const EXPORT_PATH = 'export/export';
     const EXTRACT_PATH = 'export/extract';
-    const UPLOAD_PATH = 'export/extract';
     /**#@-*/
 
     public const CMS_DIR = 'cms';
@@ -175,24 +174,6 @@ class Config
                 . self::CMS_DIR
                 . DIRECTORY_SEPARATOR
                 . self::EXPORT_PATH;
-        } catch (\Exception $e) {
-            return '';
-        }
-    }
-
-    /**
-     * Form Upload path
-     *
-     * @return string
-     */
-    public function getUploadPath(): string
-    {
-        try {
-            return $this->directoryList->getPath(DirectoryList::VAR_DIR)
-                . DIRECTORY_SEPARATOR
-                . self::CMS_DIR
-                . DIRECTORY_SEPARATOR
-                . self::UPLOAD_PATH;
         } catch (\Exception $e) {
             return '';
         }
