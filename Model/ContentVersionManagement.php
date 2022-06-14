@@ -200,11 +200,11 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      * @param int $cmsType
      * @param array $ids
      *
-     * @throws InvalidXmlImportFilesException
+     * @return void
      * @throws LocalizedException
-     * @return ContentVersionManagementInterface
+     * @throws InvalidXmlImportFilesException
      */
-    private function processByType(int $cmsType, array $ids = []): ContentVersionManagementInterface
+    private function processByType(int $cmsType, array $ids = []): void
     {
         try {
             $reader = ($cmsType === ContentVersionInterface::TYPE_BLOCK)
@@ -215,7 +215,6 @@ class ContentVersionManagement implements ContentVersionManagementInterface
         } catch (Exception $e) {
             $this->handleException($cmsType, $e, true);
         }
-        return $this;
     }
 
     /**
@@ -251,11 +250,12 @@ class ContentVersionManagement implements ContentVersionManagementInterface
      * @param int $cmsType
      * @param Exception $exception
      * @param bool $toLog
+     *
      * @return void
      * @throws InvalidXmlImportFilesException
      * @throws LocalizedException
      */
-    private function handleException(int $cmsType, Exception $exception, $toLog = false)
+    private function handleException(int $cmsType, Exception $exception, bool $toLog = false)
     {
         if ($exception instanceof InvalidXmlImportFilesException
             || empty($this->currentImportItem)) {
@@ -339,7 +339,6 @@ class ContentVersionManagement implements ContentVersionManagementInterface
         if ($storeIds !== null && $versionModel = $this->matchContentVersion($id, $type, $storeIds)) {
             return $versionModel->getVersion();
         }
-
         return self::DEFAULT_VERSION;
     }
 
@@ -354,23 +353,27 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     }
 
     /**
+     * Define type entity from file
+     *
      * @param string $file
+     *
      * @return int|null
      */
     private function defineTypeEntityFromFile(string $file): ?int
     {
         if (strpos(
             file_get_contents($file, false, null, 0, self::XML_FILE_HEADER_LENGTH),
-            CmsEntityGeneratorInterface::PAGE_SCHEMA_NAME)
+            CmsEntityGeneratorInterface::PAGE_SCHEMA_NAME
+            )
         ) {
             return ContentVersionInterface::TYPE_PAGE;
         } elseif (strpos(
             file_get_contents($file, false, null, 0, self::XML_FILE_HEADER_LENGTH),
-            CmsEntityGeneratorInterface::BLOCK_SCHEMA_NAME)
+            CmsEntityGeneratorInterface::BLOCK_SCHEMA_NAME
+            )
         ) {
             return ContentVersionInterface::TYPE_BLOCK;
         }
-
         return null;
     }
 
@@ -479,16 +482,13 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     /**
      * Retrieve strategy for BackupManager
      *
-     * @param $strategy
+     * @param string $type
      *
      * @return string
      */
-    private function resolveBackupType($strategy): string
+    private function resolveBackupType(string $type): string
     {
-        if ((int)$strategy === ContentVersionInterface::TYPE_BLOCK) {
-            return BackupManager::TYPE_CMS_BLOCK;
-        }
-        return BackupManager::TYPE_CMS_PAGE;
+        return ($type === EntityManagement::TYPE_BLOCK) ? BackupManager::TYPE_CMS_BLOCK : BackupManager::TYPE_CMS_PAGE;
     }
 
     /**
@@ -502,6 +502,7 @@ class ContentVersionManagement implements ContentVersionManagementInterface
     {
         $searchStoreIdsArr = explode(',', $storeIds ?: '0');
         $contentVersions = $this->getContentVersions->execute($type, [$identifier]);
+
         foreach ($contentVersions as $contentVersion) {
             if (count(array_intersect(explode(',', $contentVersion->getStoreIds()), $searchStoreIdsArr))) {
                 return $contentVersion;

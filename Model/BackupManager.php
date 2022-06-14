@@ -60,12 +60,12 @@ class BackupManager
     /**
      * Creates backup file
      *
-     * @param $type
+     * @param string $type
      * @param $cmsObject
      *
      * @return BackupManager
      */
-    public function createBackup($type, $cmsObject): BackupManager
+    public function createBackup(string $type, $cmsObject): BackupManager
     {
         if (!$this->config->isEnabled()) {
             return $this;
