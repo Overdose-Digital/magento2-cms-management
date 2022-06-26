@@ -16,13 +16,13 @@
    - Create content backups of cms-blocks and cms-pages
    - Review backup history of CMS-Block/Page
    - Create and Update CMS-Blocks/Pages by using of xml-files
-   - Allowing users to import/export CMS pages or blocks
+   - Allowing users to import/export CMS pages or blocks (by json and xml files)
    - Supports multistore and wysiwyg images
 
-## Requirements
-
-   - Magento 2.3 (CE or EE) and higher
-   
+## Support
+Magento 2.3 | Magento 2.4
+:---: | :---:
+ok | ok
 
 ## Example
 
@@ -54,11 +54,13 @@
 ## Specifications
 
  - Observers
-	- cms_block_save_before > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
-	- cms_page_save_before  > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
+    - cms_block_save_before > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
+    - cms_page_save_before  > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
+    - cms_page_delete_commit_after  > Overdose\CMSContent\Observer\DeleteContentVersion
+    - cms_block_delete_commit_after  > Overdose\CMSContent\Observer\DeleteContentVersion
 
  - Model
-	- content_version
+    - content_version
 	
  - Tables
     - od_cmscontent_version > Overdose\CMSContent\Model\ContentVersion
@@ -68,10 +70,12 @@
         - Options:
            - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
            - -i, --identifier=IDENTIFIER  > Comma-separated Identifiers of Block/Page to upgrade
-    
+    - od:cms:history-clear > Will delete old history files, by default will be used: Period option
+      - Options:
+          - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
  - Custom configuration files
-     - cms_block_data.xml > Create or update cms-blocks
-     - cms_page_data.xml > Create or update cms-pages
+     - cms_block_data*.xml > Create or update cms-blocks
+     - cms_page_data*.xml > Create or update cms-pages
     
 	
 ## Description
@@ -91,14 +95,17 @@
 
 ## How to export contents
 
-   Select one or more pages you wish to export from **CMS > Pages** in your Magento Admin and select **Export** from the mass action menù.
+   Select one or more pages you wish to export from **CMS > Pages** in your Magento Admin and select one of the export menu. 
+   "Export JSON", "Export XML" - downloads to a **ZIP file** as single file in JSON/XML format
+   "Export as split JSON files", "Export as split XML files" - downloads to a **ZIP file** 
+   that put each block/page to a separate file in JSON/XML format
 
-   You will download a **ZIP file** containing pages or blocks information. If your pages or blocks contain one or more images,
-   they will be automatically added in the ZIP file.
+   If your pages or blocks contain one or more images, they will be automatically added in the ZIP file.
 
 ## How to import contents
 
    A new option **Import** will appear in your Magento Admin **Content** menu. Click on it to import a previously exported ZIP file.
+   Import supports XML and JSON format for block/page files (single and split as well).
 
 ### CMS import mode
 
@@ -116,19 +123,28 @@
  
 ## Managing by using xml files
    - Main purpose create and update cms-blocks/pages without editing via admin panel. 
-        There are to types: cms_block_data.xml and cms_page_data.xml. Mainly they have same scructure, examples you can 
-        check under Overdose_CMSContent::etc folder.
-        
-        You can put you configuration files into:
-        
-            - MAGENTO_ROOT/app/etc/ (Recomended)
-            
-            - Overdose_CMSContent::etc folder
-            
+        There are two options:
+     1. Single file.
+        Use a single file for all pages/blocks. Block`s content should be placed in cms_block_data.xml, pages in cms_page_data.xml. 
+     You can put your configuration files into:
+        - MAGENTO_ROOT/app/etc/ 
+        - Overdose_CMSContent::etc/ 
+        - Overdose_CMSContent::etc/od_cms/
+     
+     2. Split content by files.
+        Split content by files (by id/store or any other logic). Block`s content should be placed in a few files with strict mask - cms_block_data[your_id].xml,
+        Pages in - cms_page_data[your_id].xml. For example - cms_page_data_home.xml, cms_page_data_no-route.xml. 
+     This kind of configuration files should be placed only in Overdose_CMSContent::etc/od_cms/.
+ 
+   - Configuration files for blocks and pages mainly have the same structure. Examples you can find in:
+     - Overdose_CMSContent::etc/od_cms/cms_block_data.xml.sample
+     - Overdose_CMSContent::etc/od_cms/cms_page_data.xml.sample
+     - Overdose_CMSContent::etc/od_cms/cms_page_data_no-route.xml.sample
+     
    - CASE #1 Create block or page:
    
-        1. Add cms_block_data.xml(cms_page_data.xml) with desired configuration and save in app/etc folder (not forget 
-            to define 'version' attribute)
+        1. Add cms_block_data.xml(cms_page_data.xml) with desired configuration and save in app/etc folder (do not forget 
+            to define the 'version' attribute)
             
         2. Run console command (php bin/magento od:cms:upgrade) or php bin/magento setup:upgrade
         
@@ -142,7 +158,7 @@
    
         1. Update config for desired entities in cms_block_data.xml(cms_page_data.xml)
         
-        2. Set new version (should be greater then old)
+        2. Set new version (should be greater than the previous one)
         
         3. Run console command (php bin/magento od:cms:upgrade) or php bin/magento setup:upgrade
         
@@ -152,7 +168,7 @@
 
 ## Console commands usage
         
-   od:cms:upgrade [options]
+1. **od:cms:upgrade** [options]
    
    - Used to create/update cms-blocks/pages bases on data in `cms_block_data.xml` and `cms_page_data.xml`
    Alternative way: run `php bin/magento setup:upgrade`
@@ -163,10 +179,41 @@
          
          `php bin/magento od:cms:upgrade -t page`           -- will update only Pages (`cms_page_data.xml`)
          
-         `php bin/magento od:cms:upgrade -t page -i home`   -- will update only page with identifier `home`      
-    
-    
-            
+         `php bin/magento od:cms:upgrade -t page -i home`   -- will update only page with identifier `home`
+
+2. **od:cms:history-clear** [options]
+
+- Used to manually clear old cms-blocks/pages which are located in var/cms/history folder
+- Examples:
+
+      `php bin/magento od:cms:history-clear -t block`          -- will delete only history Blocks
+      
+      `php bin/magento od:cms:history-clear -t page`           -- will delete only history Pages
 
 
+## Delete old files by Cron
+   - For use this possibility we need turn on it in admin panel. **"Delete Backups By Cron"**
+   
+### We have 3 settings:
 
+   - Cron Run Settings:
+   
+         1. Frequency - set cron period when will be run cron (Daily, Weekly, Monthly)
+      
+         2. Start Time - set time, when will be run cron. 
+   
+   - Delete Methods:
+   
+         1. Method:
+      
+            a) By Periods - delete files by periods, exclude files younger than week.
+
+            b) Older Than:
+
+               b-1) Period - set period (Days, Weeks, Months or Years). Files older than it will be delete.
+
+               b-2) Number - set quantity of periods.
+   
+   - Logs:
+   
+      Write logs. Which files were deleted.

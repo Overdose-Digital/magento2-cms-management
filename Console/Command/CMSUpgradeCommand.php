@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -19,6 +21,7 @@ class CMSUpgradeCommand extends Command
      * Identifier option
      */
     const OPTION_CMS_IDENTIFIER = 'identifier';
+
     /**
      * @var ContentVersionManagementInterface
      */
@@ -39,7 +42,7 @@ class CMSUpgradeCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function configure()
     {
@@ -65,7 +68,7 @@ class CMSUpgradeCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -76,7 +79,6 @@ class CMSUpgradeCommand extends Command
         }
 
         $cmsType = $input->getOption(self::OPTION_CMS_TYPE);
-
         if (empty($cmsType) && !empty($cmsIdentifier)) {
             throw new \InvalidArgumentException('CMS Entity type OPTION [--type] missed');
         }
@@ -85,23 +87,18 @@ class CMSUpgradeCommand extends Command
             switch ($cmsType) {
                 case 'block':
                 case 'blocks':
-                    $result = $this->contentVersionManagement->processBlocks($identifiers);
+                    $this->contentVersionManagement->processBlocks($identifiers);
                     break;
                 case 'page':
                 case 'pages':
-                    $result = $this->contentVersionManagement->processPages($identifiers);
+                     $this->contentVersionManagement->processPages($identifiers);
                     break;
                 default:
                     throw new \InvalidArgumentException($cmsType . ' is incorrect CMS entity type');
             }
         } else {
-            $result = $this->contentVersionManagement->processAll();
+            $this->contentVersionManagement->processAll();
         }
         $output->writeln('<info>Upgrade Completed!</info>');
-//        $output->writeln('<info>Upgrade Completed! ' . count($result). ' items processed</info>');
-//        foreach ($result as $item) {
-//            $message = $item['type']  . ': ' . $item['identifier'] . ' ' . $item['old_version'] . ' --> ' . $item['new_version'];
-//            $output->writeln('<comment>' . $message . '</comment>');
-//        }
     }
 }

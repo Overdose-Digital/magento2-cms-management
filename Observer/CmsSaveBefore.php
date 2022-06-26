@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Observer;
 
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Overdose\CMSContent\Model\BackupManager;
 
-class CmsSaveBefore implements \Magento\Framework\Event\ObserverInterface
+class CmsSaveBefore implements ObserverInterface
 {
     /**
      * Events map to process
@@ -45,22 +49,16 @@ class CmsSaveBefore implements \Magento\Framework\Event\ObserverInterface
     }
 
     /**
-     * Execute observer
-     *
-     * @param \Magento\Framework\Event\Observer $observer
-     * @return void
+     * @inheritDoc
      */
-    public function execute(
-        \Magento\Framework\Event\Observer $observer
-    ) {
+    public function execute(Observer $observer)
+    {
         $eventName = $observer->getEvent()->getName();
-
         if (empty($this->eventsTypeMap[$eventName])) {
             return;
         }
 
         $cmsObject = $observer->getEvent()->getData('data_object');
-        /* Original Model::hasDataChanges() not works here, so we added our custom check */
         if ($this->hasImportantDataChanges($cmsObject)) {
             $this->backupManager->createBackup($this->eventsTypeMap[$eventName], $cmsObject);
         }
@@ -70,16 +68,16 @@ class CmsSaveBefore implements \Magento\Framework\Event\ObserverInterface
      * Check if cms object was changed
      *
      * @param $cmsObject
+     *
      * @return bool
      */
-    private function hasImportantDataChanges($cmsObject)
+    private function hasImportantDataChanges($cmsObject): bool
     {
         foreach ($this->keysToCheck as $key) {
-            if ($cmsObject->getData($key) !== $cmsObject->getOrigData($key)) {
+            if ($cmsObject->getOrigData() && $cmsObject->getData($key) !== $cmsObject->getOrigData($key)) {
                 return true;
             }
         }
-
         return false;
     }
 }

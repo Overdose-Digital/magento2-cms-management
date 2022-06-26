@@ -13,7 +13,9 @@
                     </item>
                 </item>
             </argument>
-            <block class="Overdose\CMSContent\Block\Adminhtml\Cms\Page\Edit\History" name="overdose.cmscontent.page.history" template="Overdose_CMSContent::cms/backup/history.phtml" />
+            <block class="Overdose\CMSContent\Block\Adminhtml\Cms\Page\Edit\History"
+                   name="overdose.cmscontent.page.history"
+                   template="Overdose_CMSContent::cms/backup/history.phtml" />
         </htmlContent>
     </fieldset>
 </form>

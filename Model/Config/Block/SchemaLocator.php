@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Config\Block;
 
-class SchemaLocator extends \Overdose\CMSContent\Model\Config\SchemaLocatorAbstract
+use Overdose\CMSContent\Model\Config\SchemaLocatorAbstract;
+
+class SchemaLocator extends SchemaLocatorAbstract
 {
     protected $schemaFile = 'cms_block_data.xsd';
 }

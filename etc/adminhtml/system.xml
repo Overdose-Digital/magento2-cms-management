@@ -1,26 +1,87 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
-	<system>
+    <system>
         <tab id="od_core" translate="label" sortOrder="10">
             <label>Overdose</label>
         </tab>
-		<section id="cms_content" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label">
-			<label>CmsContent</label>
+        <section id="cms_content" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label">
+            <label>Cms Content</label>
             <tab>od_core</tab>
-			<resource>Overdose_CMSContent::config_overdose_cmscontent</resource>
-			<group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
-				<label>General</label>
-				<field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
-					<label>Enabled</label>
-					<comment/>
-					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-				</field>
-				<field id="show_menu" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="300" translate="label" type="select">
-					<label>Show Menu</label>
-					<comment/>
-					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-				</field>
-			</group>
-		</section>
-	</system>
+            <resource>Overdose_CMSContent::config_overdose_cmscontent</resource>
+            <group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+                <label>General</label>
+                <field id="enabled" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <comment/>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_menu" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="300" translate="label" type="select">
+                    <label>Show Menu</label>
+                    <comment/>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="backups" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Backups</label>
+                <group id="delete" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+                    <label>Delete Backups</label>
+                    <field id="cron_enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label comment" type="select">
+                        <label>Enabled</label>
+                        <comment>In case enabled: old backups will be deleted by cron according to selected deleting method.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="method" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Delete Method</label>
+                        <source_model>Overdose\CMSContent\Model\OptionSource\Methods</source_model>
+                        <comment><![CDATA[
+                       <p><b>By Periods</b>: Delete files by periods (weeks, months and years). Files younger than one week, excluded.</p>
+                       <p><b>Older Than</b>: Delete files older than 'Period' and it number.</p>
+                       ]]></comment>
+                    </field>
+                    <field id="period" translate="label" type="select" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Period</label>
+                        <source_model>Overdose\CMSContent\Model\OptionSource\Periods</source_model>
+                        <depends>
+                            <field id="method">older_than</field>
+                        </depends>
+                    </field>
+                    <field id="number" translate="label" type="text" sortOrder="30" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Number</label>
+                        <depends>
+                            <field id="method">older_than</field>
+                        </depends>
+                    </field>
+                    <depends>
+                        <field id="cron_enabled">1</field>
+                    </depends>
+                </group>
+                <group id="cron_run_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Cron Run Settings</label>
+                    <field id="frequency" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Frequency</label>
+                        <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
+                        <backend_model>Overdose\CMSContent\Model\Config\Cron\SaveValue</backend_model>
+                    </field>
+                    <field id="time" translate="label" type="time" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Start Time</label>
+                    </field>
+                    <depends>
+                        <field id="cron_enabled">1</field>
+                    </depends>
+                </group>
+            </group>
+
+            <group id="logs" translate="label" type="text" sortOrder="40" showInDefault="1" showInStore="1" showInWebsite="1">
+                <label>Logs</label>
+                <field id="logs_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <depends>
+                    <field id="cron_enabled">1</field>
+                </depends>
+            </group>
+        </section>
+    </system>
 </config>

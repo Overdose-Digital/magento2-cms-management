@@ -12,7 +12,9 @@
                     </item>
                 </item>
             </argument>
-            <block class="Overdose\CMSContent\Block\Adminhtml\Cms\Block\Edit\History" name="overdose.cmscontent.block.history" template="Overdose_CMSContent::cms/backup/history.phtml" />
+            <block class="Overdose\CMSContent\Block\Adminhtml\Cms\Block\Edit\History"
+                   name="overdose.cmscontent.block.history"
+                   template="Overdose_CMSContent::cms/backup/history.phtml" />
         </htmlContent>
     </fieldset>
 </form>

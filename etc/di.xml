@@ -1,23 +1,45 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Overdose\CMSContent\File\FileInterface" type="Overdose\CMSContent\File\HtmlFile" />
+    <preference for="Overdose\CMSContent\File\FileManagerInterface" type="Overdose\CMSContent\File\FileManager" />
     <preference for="Overdose\CMSContent\Api\ContentVersionManagementInterface" type="Overdose\CMSContent\Model\ContentVersionManagement"/>
     <preference for="Overdose\CMSContent\Api\ContentVersionRepositoryInterface" type="Overdose\CMSContent\Model\ContentVersionRepository"/>
-    <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\Data\ContentVersion"/>
-    <preference for="Overdose\CMSContent\Api\Data\ContentVersionSearchResultsInterface" type="Overdose\CMSContent\Model\Data\ContentVersionSearchResults"/>
-    <preference for="Overdose\CMSContent\Api\ContentImportExportInterface" type="Overdose\CMSContent\Model\ImportExport" />
+    <preference for="Overdose\CMSContent\Api\Data\ContentVersionInterface" type="Overdose\CMSContent\Model\ContentVersion"/>
+    <preference for="Overdose\CMSContent\Api\ContentExportInterface" type="Overdose\CMSContent\Model\Content\Export" />
+    <preference for="Overdose\CMSContent\Api\ContentImportInterface" type="Overdose\CMSContent\Model\Content\Import" />
+    <preference for="Overdose\CMSContent\Api\CmsEntityConverterManagerInterface" type="Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterManager" />
+    <preference for="Overdose\CMSContent\Api\CmsEntityGeneratorManagerInterface" type="Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorManager" />
+    <preference for="Overdose\CMSContent\Api\StoreManagementInterface" type="Overdose\CMSContent\Model\StoreManagement" />
+
     <type name="Overdose\CMSContent\Model\Config\Page\Reader">
         <arguments>
-            <argument name="fileName" xsi:type="string">cms_page_data.xml</argument>
             <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Converter</argument>
             <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Page\SchemaLocator</argument>
         </arguments>
     </type>
+
+    <!-- Logger init -->
+    <virtualType name="Overdose\CMSContent\Model\Debug" type="Magento\Framework\Logger\Handler\Exception">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/od_cms_import.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Overdose\CMSContent\Model\CmsImportLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers"  xsi:type="array">
+                <item name="debug" xsi:type="object">Overdose\CMSContent\Model\Debug</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <type name="Overdose\CMSContent\Model\Config\Block\Reader">
         <arguments>
-            <argument name="fileName" xsi:type="string">cms_block_data.xml</argument>
             <argument name="converter" xsi:type="object">Overdose\CMSContent\Model\Config\Block\Converter</argument>
             <argument name="schemaLocator" xsi:type="object">Overdose\CMSContent\Model\Config\Block\SchemaLocator</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Config\ReaderAbstract">
+        <arguments>
+            <argument name="logger" xsi:type="object">Overdose\CMSContent\Model\CmsImportLogger</argument>
         </arguments>
     </type>
     <type name="Magento\Framework\Console\CommandList">
@@ -25,6 +47,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="od_cms_upgrade_command" xsi:type="object">Overdose\CMSContent\Console\Command\CMSUpgradeCommand</item>
                 <item name="import_page" xsi:type="object">Overdose\CMSContent\Console\Command\ImportContent</item>
+                <item name="od_cms_delete_command" xsi:type="object">Overdose\CMSContent\Console\Command\ClearCMSHistoryCommand</item>
             </argument>
         </arguments>
     </type>
@@ -33,21 +56,56 @@
             <argument name="backupManager" xsi:type="object">Overdose\CMSContent\Model\BackupManager\Proxy</argument>
             <argument name="blockConfigReader" xsi:type="object">Overdose\CMSContent\Model\Config\Block\Reader\Proxy</argument>
             <argument name="blockInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\BlockInterfaceFactory\Proxy</argument>
-            <argument name="blockRepository" xsi:type="object">Magento\Cms\Api\BlockRepositoryInterface\Proxy</argument>
             <argument name="contentVersionFactory" xsi:type="object">Overdose\CMSContent\Api\Data\ContentVersionInterfaceFactory\Proxy</argument>
-            <argument name="contentVersionRepository" xsi:type="object">\Overdose\CMSContent\Api\ContentVersionRepositoryInterface\Proxy</argument>
-            <argument name="filterBuilder" xsi:type="object">\Magento\Framework\Api\FilterBuilder\Proxy</argument>
-            <argument name="filterGroupBuilder" xsi:type="object">\Magento\Framework\Api\Search\FilterGroupBuilder\Proxy</argument>
-            <argument name="logger" xsi:type="object">Psr\Log\LoggerInterface\Proxy</argument>
+            <argument name="contentVersionRepository" xsi:type="object">Overdose\CMSContent\Api\ContentVersionRepositoryInterface\Proxy</argument>
+            <argument name="logger" xsi:type="object">Overdose\CMSContent\Model\CmsImportLogger</argument>
             <argument name="pageInterfaceFactory" xsi:type="object">Magento\Cms\Api\Data\PageInterfaceFactory\Proxy</argument>
-            <argument name="pageRepository" xsi:type="object">Magento\Cms\Api\PageRepositoryInterface\Proxy</argument>
             <argument name="pagesConfigReader" xsi:type="object">Overdose\CMSContent\Model\Config\Page\Reader\Proxy</argument>
-            <argument name="searchCriteriaBuilder" xsi:type="object">Magento\Framework\Api\SearchCriteriaBuilder\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Service\GetContentVersions">
+        <arguments>
+            <argument name="logger" xsi:type="object">Overdose\CMSContent\Model\CmsImportLogger</argument>
         </arguments>
     </type>
     <type name="Overdose\CMSContent\Observer\CmsSaveBefore">
         <arguments>
             <argument name="backupManager" xsi:type="object">\Overdose\CMSContent\Model\BackupManager\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Observer\DeleteContentVersion">
+        <arguments>
+            <argument name="contentVersionManagement"
+                      xsi:type="object">\Overdose\CMSContent\Api\ContentVersionManagementInterface\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Content\Converter\CmsEntityConverterManager">
+        <arguments>
+            <argument name="converters" xsi:type="array">
+                <item name="pages" xsi:type="object">Overdose\CMSContent\Model\Content\Converter\Page\Converter\Proxy</item>
+                <item name="blocks" xsi:type="object">Overdose\CMSContent\Model\Content\Converter\Block\Converter\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Overdose\CMSContent\Model\Content\Generator\CmsEntityGeneratorManager">
+        <arguments>
+            <argument name="generators" xsi:type="array">
+                <item name="json" xsi:type="object">Overdose\CMSContent\Model\Content\Generator\Json\Generator\Proxy</item>
+                <item name="xml" xsi:type="object">Overdose\CMSContent\Model\Content\Generator\Xml\Generator\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Overdose\CMSContent\Model\EntityManagement">
+        <arguments>
+            <argument name="repositoryList" xsi:type="array">
+                <item name="block" xsi:type="object">Magento\Cms\Api\BlockRepositoryInterface</item>
+                <item name="page" xsi:type="object">Magento\Cms\Api\PageRepositoryInterface</item>
+            </argument>
+            <argument name="factoryList" xsi:type="array">
+                <item name="block" xsi:type="object">Magento\Cms\Api\Data\BlockInterfaceFactory</item>
+                <item name="page" xsi:type="object">Magento\Cms\Api\Data\PageInterfaceFactory</item>
+            </argument>
         </arguments>
     </type>
 </config>

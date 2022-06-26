@@ -1,48 +1,67 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\Config;
 
-use Magento\Framework\Config\FileResolverInterface;
 use Magento\Framework\Config\ConverterInterface;
 use Magento\Framework\Config\SchemaLocatorInterface;
 use Magento\Framework\Config\ValidationStateInterface;
 use Magento\Framework\Config\Reader\Filesystem;
+use Magento\Framework\Exception\LocalizedException;
+use Overdose\CMSContent\Api\Data\ContentVersionInterface;
+use Overdose\CMSContent\Exception\InvalidXmlImportFilesException;
+use Overdose\CMSContent\Model\Config\App\FileResolver;
+use Overdose\CMSContent\Model\Config\Block\Reader as BlockReader;
+use Psr\Log\LoggerInterface;
 
 abstract class ReaderAbstract extends Filesystem
 {
     const SCOPE_GLOBAL = 'global';
     const SCOPE_PRIMARY = 'primary';
+    const FILE_NAME = '';
+    const OD_CONFIG_DIR_NAME = 'od_cms';
 
+    /**
+     * @var array
+     */
     protected $_idAttributes = [];
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * Reader constructor.
      *
-     * @param FileResolverInterface $fileResolver
+     * @param FileResolver $fileResolver
      * @param ConverterInterface $converter
      * @param SchemaLocatorInterface $schemaLocator
      * @param ValidationStateInterface $validationState
-     * @param string $fileName
      * @param array $idAttributes
      * @param string $domDocumentClass
      * @param string $defaultScope
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        FileResolverInterface $fileResolver,
+        FileResolver $fileResolver,
         ConverterInterface $converter,
         SchemaLocatorInterface $schemaLocator,
         ValidationStateInterface $validationState,
-        $fileName = null,
+        LoggerInterface $logger,
         $idAttributes = [],
         $domDocumentClass = \Magento\Framework\Config\Dom::class,
         $defaultScope = 'primary'
     ) {
+        $this->logger = $logger;
+
         parent::__construct(
             $fileResolver,
             $converter,
             $schemaLocator,
             $validationState,
-            $fileName,
+            static::FILE_NAME,
             $idAttributes,
             $domDocumentClass,
             $defaultScope
@@ -54,7 +73,7 @@ abstract class ReaderAbstract extends Filesystem
      *
      * @param null $scope
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function read($scope = null)
     {
@@ -63,6 +82,56 @@ abstract class ReaderAbstract extends Filesystem
         $fileListPrimary = $this->_fileResolver->get($this->_fileName, self::SCOPE_PRIMARY);
         $fileListPrimary = count($fileListPrimary) ? $fileListPrimary->toArray() : [];
 
-        return $this->_readFiles(array_merge($fileListGlobal, $fileListPrimary));
+        $configGlobal = $this->_readFiles($fileListGlobal);
+        $configPrimary = $this->_readFiles($fileListPrimary);
+
+        if ($duplicateItems = array_intersect_key($configGlobal, $configPrimary)) {
+            $listOfImportFiles = array_merge(array_keys($fileListGlobal), array_keys($fileListPrimary));
+            $this->handleDuplicationError($duplicateItems, $listOfImportFiles);
+        }
+
+        return array_merge($configGlobal, $configPrimary);
+    }
+
+    /**
+     * @param string $file
+     * @return array
+     * @throws LocalizedException
+     */
+    public function readFromFile(string $file)
+    {
+        return $this->_readFiles([$file => file_get_contents($file)]);
+    }
+
+    /**
+     * @param array $duplicateItems
+     * @param array $listOfImportFiles
+     * @return mixed
+     * @throws InvalidXmlImportFilesException
+     */
+    private function handleDuplicationError(array $duplicateItems, array $listOfImportFiles)
+    {
+        $entityName = $this->_fileName === BlockReader::FILE_NAME ? 'block' : 'page';
+        $duplicates = '';
+        foreach ($duplicateItems as $item) {
+            $duplicates .= sprintf(
+                "%s identifier \"%s\" for the store id - %s, ",
+                $entityName,
+                $item[ContentVersionInterface::IDENTIFIER],
+                $item[ContentVersionInterface::STORE_IDS] ?: '0'
+            );
+        }
+        $errorMessage = __(
+            "CMS import failed. You have duplicate %1s. "
+            . 'Please check your import files. List of duplicates - %2.',
+            $entityName,
+            $duplicates
+        );
+        $this->logger->critical(__(
+            $errorMessage . "\n List of import files for the duplication check - %1",
+            implode(', ', $listOfImportFiles)
+        ));
+
+        throw new InvalidXmlImportFilesException($errorMessage);
     }
 }
