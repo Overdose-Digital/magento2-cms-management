@@ -19,11 +19,6 @@
    - Allowing users to import/export CMS pages or blocks (by json and xml files)
    - Supports multistore and wysiwyg images
 
-## Support
-Magento 2.3 | Magento 2.4
-:---: | :---:
-ok | ok
-
 ## Example
 
    Approach to use this extension:
@@ -53,29 +48,29 @@ ok | ok
 
 ## Specifications
 
- - Observers
-    - cms_block_save_before > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
-    - cms_page_save_before  > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
-    - cms_page_delete_commit_after  > Overdose\CMSContent\Observer\DeleteContentVersion
-    - cms_block_delete_commit_after  > Overdose\CMSContent\Observer\DeleteContentVersion
+#### Observers
+- cms_block_save_before > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
+- cms_page_save_before  > Overdose\CMSContent\Observer\Cms\CmsSaveBefore
+- cms_page_delete_commit_after  > Overdose\CMSContent\Observer\DeleteContentVersion
+- cms_block_delete_commit_after  > Overdose\CMSContent\Observer\DeleteContentVersion
 
- - Model
-    - content_version
+#### Model
+- content_version
 	
- - Tables
-    - od_cmscontent_version > Overdose\CMSContent\Model\ContentVersion
+#### Tables
+- od_cmscontent_version > Overdose\CMSContent\Model\ContentVersion
     
- - Console commands
-    - od:cms:upgrade >  Upgrade configuration of CMS page/blocks
-        - Options:
-           - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
-           - -i, --identifier=IDENTIFIER  > Comma-separated Identifiers of Block/Page to upgrade
-    - od:cms:history-clear > Will delete old history files, by default will be used: Period option
-      - Options:
-          - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
- - Custom configuration files
-     - cms_block_data*.xml > Create or update cms-blocks
-     - cms_page_data*.xml > Create or update cms-pages
+#### Console commands
+- od:cms:upgrade >  Upgrade configuration of CMS page/blocks
+    - Options:
+       - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
+       - -i, --identifier=IDENTIFIER  > Comma-separated Identifiers of Block/Page to upgrade
+- od:cms:history-clear > Will delete old history files, by default will be used: Period option
+  - Options:
+      - -t, --type=TYPE              > CMS-type to upgrade: [block|blocks|page|pages]
+#### Custom configuration files
+- cms_block_data*.xml > Create or update cms-blocks
+- cms_page_data*.xml > Create or update cms-pages
     
 	
 ## Description
@@ -217,3 +212,9 @@ ok | ok
    - Logs:
    
       Write logs. Which files were deleted.
+
+## Support
+Magento 2.3 | Magento 2.4
+:---: | :---:
+ok | ok
+
