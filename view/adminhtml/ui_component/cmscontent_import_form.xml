@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">cmscontent_import_form.cmscontent_import_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">CMS Content Import</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <namespace>cmscontent_import_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>cmscontent_import_form.cmscontent_import_form_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="save" class="Overdose\CMSContent\Block\Adminhtml\Import\Button\Import"/>
+        </buttons>
+    </settings>
+
+    <dataSource name="cmscontent_import_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/import"/>
+        </settings>
+        <dataProvider class="Overdose\CMSContent\Ui\DataProvider\Import" name="cmscontent_import_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General</label>
+        </settings>
+        <field name="upload" formElement="fileUploader">
+            <settings>
+                <label translate="true">Upload (.zip)</label>
+            </settings>
+            <formElements>
+                <fileUploader>
+                    <settings>
+                        <required>true</required>
+                        <allowedExtensions>zip</allowedExtensions>
+                        <uploaderConfig>
+                            <param xsi:type="url" name="url" path="*/*/upload"/>
+                            <param xsi:type="boolean" name="disableImageLoad">true</param>
+                        </uploaderConfig>
+                    </settings>
+                </fileUploader>
+            </formElements>
+        </field>
+        <field name="cms_import_mode" formElement="select" sortOrder="90">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">CMS Import Mode</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Overdose\CMSContent\Model\OptionSource\CmsMode"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="media_import_mode" formElement="select" sortOrder="90">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Media Import Mode</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Overdose\CMSContent\Model\OptionSource\MediaMode"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

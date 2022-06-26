@@ -1,13 +1,13 @@
 <?xml version="1.0" ?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-	<table comment="od_cmscontent_version Table" engine="innodb" name="od_cmscontent_version" resource="default">
-		<column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
-		<constraint referenceId="PRIMARY" xsi:type="primary">
-			<column name="id"/>
-		</constraint>
-		<column name="type" nullable="false" xsi:type="smallint"/>
-		<column length="255" name="identifier" nullable="false" xsi:type="varchar"/>
-		<column default="0.0.0" length="255" name="version" nullable="false" xsi:type="varchar"/>
-		<column default="0" length="255" name="store_ids" nullable="false" xsi:type="varchar"/>
-	</table>
+    <table comment="od_cmscontent_version Table" engine="innodb" name="od_cmscontent_version" resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <column name="type" nullable="false" xsi:type="smallint"/>
+        <column name="identifier" length="255" nullable="false" xsi:type="varchar"/>
+        <column name="version" default="1.0.0" length="255" nullable="false" xsi:type="varchar"/>
+        <column name="store_ids" default="0" length="255" nullable="false" xsi:type="varchar"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+    </table>
 </schema>

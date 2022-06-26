@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Console\Command;
 
-use Magento\Framework\ObjectManagerInterface;
-use Overdose\CMSContent\Api\ContentImportExportInterface;
+use Overdose\CMSContent\Api\ContentImportInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,24 +13,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ImportContent extends Command
 {
     /**
-     * @var ObjectManagerInterface
+     * @var ContentImportInterface
      */
-    private $objectManager;
+    private $contentImport;
 
     /**
      * ImportContent constructor.
-     * @param ObjectManagerInterface $objectManager
+     *
+     * @param ContentImportInterface $contentImport
      */
     public function __construct(
-        ObjectManagerInterface $objectManager
+        ContentImportInterface $contentImport
     ) {
-        $this->objectManager = $objectManager;
+        $this->contentImport = $contentImport;
         parent::__construct();
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function configure()
     {
-        $this->setName('cms:import');
+        $this->setName('od:cms:import');
         $this->setDescription('Import CMS zip file');
         $this->addArgument('zipfile', InputArgument::REQUIRED, __('Zip file containing CMS information'));
 
@@ -37,20 +42,16 @@ class ImportContent extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int|null|void
-     * @throws \Exception
+     * @inheritdoc
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $contentImportInterface = $this->objectManager->get(ContentImportExportInterface::class);
-
         $zipFile = $input->getArgument('zipfile');
-        if ($contentImportInterface->importContentFromZipFile($zipFile, false) == 0) {
-            throw new \Exception(__('Archive is empty'));
-        }
+        if ($this->contentImport->importContentFromZipFile($zipFile, false) == 0) {
+            $output->writeln('Archive is empty.');
 
+            return;
+        }
         $output->writeln('Done.');
     }
 }

@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Block\Adminhtml\Cms;
 
+use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Api\Data\PageInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Cms\Api\BlockRepositoryInterface;
@@ -9,22 +13,26 @@ use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Backend\Model\UrlInterface;
 use Overdose\CMSContent\Model\BackupManager;
 
-class CmsAbstract extends \Magento\Framework\View\Element\Template
+class CmsAbstract extends Template
 {
     protected $urlParamId = 'id';
     protected $bcType = null;
+
     /**
      * @var PageRepositoryInterface
      */
     private $pageRepository;
+
     /**
      * @var BackupManager
      */
     private $backupManager;
+
     /**
      * @var BlockRepositoryInterface
      */
     private $blockRepository;
+
     /**
      * @var UrlInterface
      */
@@ -59,9 +67,9 @@ class CmsAbstract extends \Magento\Framework\View\Element\Template
      * Prepare backups list
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function getBackups()
+    public function getBackups(): array
     {
         $id = $this->getRequest()->getParam($this->urlParamId);
         $cmsObject = $this->getCmsObject($id);
@@ -75,13 +83,15 @@ class CmsAbstract extends \Magento\Framework\View\Element\Template
      * @param $backup
      * @return string
      */
-    public function getBackupUrl($backup) {
+    public function getBackupUrl($backup)
+    {
         return $this->backendUrl->getUrl(
             'cmscontent/history/view',
             [
                 'bc_type' => $this->bcType,
                 'bc_identifier' => $backup['identifier'],
                 'item' => $backup['name'],
+                'store_id' => $backup['store_id']
             ]
         );
     }
@@ -90,7 +100,8 @@ class CmsAbstract extends \Magento\Framework\View\Element\Template
      * Retrieve cms block or cms page by identifier
      *
      * @param $id
-     * @return \Magento\Cms\Api\Data\BlockInterface|\Magento\Cms\Api\Data\PageInterface|null
+     *
+     * @return BlockInterface|PageInterface|null
      */
     public function getCmsObject($id)
     {

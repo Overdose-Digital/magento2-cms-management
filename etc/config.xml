@@ -1,11 +1,18 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
-	<default>
-		<cms_content>
-			<general>
-				<enabled>0</enabled>
-				<show_menu>0</show_menu>
-			</general>
-		</cms_content>
-	</default>
+    <default>
+        <cms_content>
+            <general>
+                <enabled>0</enabled>
+                <show_menu>0</show_menu>
+            </general>
+            <backups>
+                <delete>
+                    <cron_enabled>0</cron_enabled>
+                    <method>older_than</method>
+                    <number>5</number>
+                </delete>
+            </backups>
+        </cms_content>
+    </default>
 </config>

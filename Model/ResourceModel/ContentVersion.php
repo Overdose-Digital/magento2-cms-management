@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Overdose\CMSContent\Model\ResourceModel;
 
+use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Overdose\CMSContent\Api\Data\ContentVersionInterface;
 
-class ContentVersion extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+class ContentVersion extends AbstractDb
 {
     /**
      * Define resource model
@@ -19,10 +23,10 @@ class ContentVersion extends \Magento\Framework\Model\ResourceModel\Db\AbstractD
     /**
      * @inheritDoc
      */
-    protected function _beforeSave(\Magento\Framework\Model\AbstractModel $object)
+    protected function _beforeSave(AbstractModel $object)
     {
         if (empty($storeIds = $object->getData(ContentVersionInterface::STORE_IDS))) {
-                $storeIds = '0';
+            $storeIds = '0';
         } else {
             $storeIdsArray = explode(',', $storeIds);
             if (in_array('0', $storeIdsArray)) {
