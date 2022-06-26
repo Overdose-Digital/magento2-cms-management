@@ -8,12 +8,6 @@
         <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>
-<!--        <buttons>-->
-<!--            <button class="Overdose\CMSContent\Block\Adminhtml\HistoryView\Edit\BackButton" name="back"/>-->
-<!--            <button class="Overdose\CMSContent\Block\Adminhtml\HistoryView\Edit\DeleteButton" name="delete"/>-->
-<!--            <button class="Overdose\CMSContent\Block\Adminhtml\HistoryView\Edit\SaveButton" name="save"/>-->
-<!--            <button class="Overdose\CMSContent\Block\Adminhtml\HistoryView\Edit\SaveAndContinueButton" name="save_and_continue"/>-->
-<!--        </buttons>-->
         <namespace>overdose_cmscontent_historyview_form</namespace>
         <dataScope>data</dataScope>
         <deps>
