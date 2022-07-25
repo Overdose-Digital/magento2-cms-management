@@ -19,24 +19,6 @@ class Index extends Action
     const ADMIN_RESOURCE = 'Overdose_CMSContent::import';
 
     /**
-     * @var PageFactory
-     */
-    protected $pageFactory;
-
-    /**
-     * @param Action\Context $context
-     * @param PageFactory $pageFactory
-     */
-    public function __construct(
-        Action\Context $context,
-        PageFactory $pageFactory
-    ) {
-        $this->pageFactory = $pageFactory;
-
-        parent::__construct($context);
-    }
-
-    /**
      * @return Page
      */
     public function execute()
