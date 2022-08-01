@@ -45,9 +45,8 @@
         
         - for page: cms/pages/history/{identifier}/{backup_name}
     
-   - Added new section "History" to CMS-Block and CMS-Page editing page. Here you will be able to see backup records
-    list. Each record is represented as link with name in format Y_m_d_h_i_s_{store_ids}. By clicking the link a popup
-    window with backup's content will appear.
+   - Added new section "History" to CMS-Block and CMS-Page editing page. Here, you will be able to see the backup records list.
+    Each record is represented as a link with a name in format Y_m_d_h_i_s_{store_ids}. By clicking the link, a popup window with backup's content will appear.
     
    - Added two configuration xml-files cms_block_data.xml and cms_page_data.xml for creating and updating cms-blocks or pages.
 
@@ -59,7 +58,7 @@
    - In etc directory you can create cms_page_data.xml and cms_page_data.xml files (examples of these files https://github.com/Overdose-Digital/magento2-cms-management/blob/master/etc/cms_block_data.xml.sample and https://github.com/Overdose-Digital/magento2-cms-management/blob/master/etc/cms_page_data.xml.sample). In these files developer can create/update CMS block or page and push it to git.
    - Such files can be created for any extension.
    
-   The advantage of this approach is that no need to update UpdateData.php with a lot of conditions. You can easily update xml file and specify new version of CMS data. Also, extension creates a backup of previous CMS data.
+   The advantage of this approach is that there is no need to update UpdateData.php with a lot of conditions. You can easily update xml file and specify new version of CMS data. Also, extension creates a backup of previous CMS data.
 
 ## How to
 
@@ -92,7 +91,7 @@
    **Skip existing**: If an image with same name exists it will **NOT** be overwritten with version in the ZIP file.
  
 ### Managing by using xml files
-   - Main purpose create and update cms-blocks/pages without editing via admin panel. 
+   - Main purpose: create and update cms-blocks/pages without editing via admin panel. 
         There are two options:
      1. Single file.
         Use a single file for all pages/blocks. Block`s content should be placed in cms_block_data.xml, pages in cms_page_data.xml. 
@@ -211,7 +210,7 @@
    
    - Logs:
    
-      Write logs. Which files were deleted.
+      Write logs. What files were deleted.
 
 ## Support
 Magento 2.3 | Magento 2.4
