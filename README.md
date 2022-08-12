@@ -38,8 +38,8 @@
   -- Supports multistore and wysiwyg images
   
 ### Fetaures details
-   - Before saving of cms-block or page if the one was changed it's content will be saved to backup file (currently used 
-    html-format). Following directory tree will be created under 'var' folder:
+   - Before saving of cms-block or page if the one was changed it's identifier, title and content will be saved to backup file (currently used 
+    json-format). Following directory tree will be created under 'var' folder:
     
         - for block: cms/blocks/history/{identifier}/{backup_name}
         

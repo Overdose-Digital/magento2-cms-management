@@ -60,7 +60,7 @@ class FileManager implements FileManagerInterface
         try {
             $path = $this->getFolder($path);
             $this->fileIo->open(['path' => $path]);
-            $this->fileIo->write($fileName . self::FILE_EXTENSION, $content, 0666);
+            $this->fileIo->write($fileName . $fileExtension, $content, 0666);
         } catch (\Exception $e) {
             $this->logger->critical(__('Something went wrong while saving file'));
         }
