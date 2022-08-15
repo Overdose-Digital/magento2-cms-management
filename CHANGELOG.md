@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.0.2] - 15-08-2022
+### Added
+- added Apply button with confirm popup to recover page builder content and save block/page content
+
 ## [2.0.1] - 12-08-2022
 ### Added
 - Backup preview now show title and identifier
