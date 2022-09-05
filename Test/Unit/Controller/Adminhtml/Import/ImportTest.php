@@ -41,6 +41,9 @@ class ImportTest extends TestCase
      */
     private $contextMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->requestMock = $this->getMockBuilder(RequestInterface::class)

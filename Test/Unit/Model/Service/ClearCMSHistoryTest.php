@@ -47,6 +47,9 @@ class ClearCMSHistoryTest extends TestCase
      */
     private $loggerInterfaceMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->fileMock = $this->getMockBuilder(File::class)
@@ -70,6 +73,11 @@ class ClearCMSHistoryTest extends TestCase
         );
     }
 
+    /**
+     * Test clear action by providing two files in mock objects and expecting count of two returned in result.
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
     public function testExecute()
     {
         $outerDirs = ['parentOne', 'parentTwo'];

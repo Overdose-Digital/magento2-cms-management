@@ -25,6 +25,9 @@ class StoreManagementTest extends TestCase
      */
     private $model;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->storeRepositoryMock = $this->getMockBuilder(StoreRepositoryInterface::class)
@@ -38,6 +41,9 @@ class StoreManagementTest extends TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testGetStoreIdsByCodes()
     {
         $storeCodes = ['admin', 'nz'];
@@ -60,6 +66,9 @@ class StoreManagementTest extends TestCase
         $this->assertEquals($expectedResult, $this->model->getStoreIdsByCodes($storeCodes));
     }
 
+    /**
+     * @return void
+     */
     public function testFilterStoresByStoreCodes()
     {
         $storeCodes = ['admin', 'nz'];
@@ -67,10 +76,12 @@ class StoreManagementTest extends TestCase
             ->method('getList')
             ->willReturn(['admin' => 'adminStore', 'nz' => 'nzStore']);
 
-
         $this->assertSame($storeCodes, $this->model->filterStoresByStoreCodes($storeCodes));
     }
 
+    /**
+     * @return void
+     */
     public function testFilterStoresByStoreIds()
     {
         $storeIds = [1, 2];
