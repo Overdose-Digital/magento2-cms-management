@@ -38,6 +38,9 @@ class FileResolverTest extends TestCase
      */
     private $sutObject;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->readerMock = $this->getMockBuilder(Reader::class)
@@ -70,6 +73,8 @@ class FileResolverTest extends TestCase
 
     /**
      * @dataProvider dataProviderForGet
+     * @param string $filename
+     * @param string $scope
      */
     public function testGet($filename, $scope)
     {
@@ -98,12 +103,16 @@ class FileResolverTest extends TestCase
         $this->assertSame($this->fileIteratorMock, $this->sutObject->get($filename, $scope));
     }
 
+    /**
+     * Data provider for get method.
+     * @return string[][]
+     */
     public function dataProviderForGet(): array
     {
         return [
-            ['fileOne', ''],
-            ['fileTwo', 'primary'],
-            ['fileThree', 'global'],
+            'case_1_no_scope' => ['fileOne', ''],
+            'case_2_primary_scope' => ['fileTwo', 'primary'],
+            'case_3_global_scope' => ['fileThree', 'global']
         ];
     }
 }

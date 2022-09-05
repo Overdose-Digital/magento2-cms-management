@@ -10,6 +10,7 @@ use Magento\Cms\Api\Data\BlockInterface;
 use Magento\Cms\Api\Data\PageInterface;
 use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Element\Template\Context;
 use Overdose\CMSContent\Block\Adminhtml\Cms\Block\Edit\History as BlockHistory;
 use Overdose\CMSContent\Block\Adminhtml\Cms\CmsAbstract;
@@ -54,6 +55,9 @@ class CmsAbstractTest extends TestCase
      */
     private $urlMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->requestMock = $this->getMockBuilder(RequestInterface::class)
@@ -80,8 +84,11 @@ class CmsAbstractTest extends TestCase
 
     /**
      * @dataProvider getBackupsDataProvider
+     * @param string $urlParamId
+     * @param string $cmsTypeId
+     * @throws LocalizedException
      */
-    public function testGetBackups($urlParamId, $cmsTypeId)
+    public function testGetBackups(string $urlParamId, string $cmsTypeId)
     {
         $id = 1;
         $this->requestMock->expects($this->atLeastOnce())
@@ -137,18 +144,25 @@ class CmsAbstractTest extends TestCase
         }
     }
 
+    /**
+     * Data provider for testGetBackups. Exception cases are not included.
+     * @return string[][]
+     */
     public function getBackupsDataProvider(): array
     {
         return [
-            ['block_id', 'cms_block'],
-            ['page_id', 'cms_page']
+            'case_1_block_success' => ['block_id', 'cms_block'],
+            'case_2_page_success' => ['page_id', 'cms_page']
         ];
     }
 
     /**
+     * Test if the return object is an instance of Block or Page interface.
      * @dataProvider getCmsObjectDataProvider
+     * @param int $id
+     * @param string $bcType
      */
-    public function testGetCmsObject($id, $bcType)
+    public function testGetCmsObject(int $id, string $bcType)
     {
         if ($bcType == BackupManager::TYPE_CMS_BLOCK) {
             $this->blockRepositoryMock->expects($this->atLeastOnce())
@@ -179,14 +193,21 @@ class CmsAbstractTest extends TestCase
         }
     }
 
+    /**
+     * @return array[]
+     */
     public function getCmsObjectDataProvider()
     {
         return [
-            [1, 'cms_block'],
-            [1, 'cms_page']
+            'case_1_block' => [1, 'cms_block'],
+            'case_2_page' => [1, 'cms_page']
         ];
     }
 
+    /**
+     * Test
+     * @return void
+     */
     public function testGetBackupUrl()
     {
         $backup = [
@@ -217,6 +238,6 @@ class CmsAbstractTest extends TestCase
         $reflection_property->setAccessible(true);
         $reflection_property->setValue($cmsAbstract, 'cms_block');
 
-        $this->assertIsString($cmsAbstract->getBackupUrl($backup));
+        $this->assertSame('somestring', $cmsAbstract->getBackupUrl($backup));
     }
 }
