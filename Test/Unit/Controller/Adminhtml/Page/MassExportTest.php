@@ -72,6 +72,9 @@ class MassExportTest extends TestCase
      */
     private $requestMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->filterMock = $this->getMockBuilder(Filter::class)
@@ -115,6 +118,10 @@ class MassExportTest extends TestCase
             ->getMockForAbstractClass();
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function testExecute()
     {
         $items = [$this->cmsPageModelMock, $this->cmsPageModelMock];
