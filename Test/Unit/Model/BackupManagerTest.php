@@ -41,6 +41,9 @@ class BackupManagerTest extends TestCase
      */
     private $model;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->configMock = $this->getMockBuilder(Config::class)
@@ -69,6 +72,9 @@ class BackupManagerTest extends TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testCreateBackupWithBlock()
     {
         $this->configMock->expects($this->once())
@@ -92,9 +98,15 @@ class BackupManagerTest extends TestCase
             ->willReturn('Lorem Ipsum Dolor Sit Amet.');
 
         $this->model->setCmsObject($this->cmsBlockModelMock);
-        $this->model->createBackup('cms_block', $this->cmsBlockModelMock);
+        $this->assertSame(
+            $this->model,
+            $this->model->createBackup('cms_block', $this->cmsBlockModelMock)
+        );
     }
 
+    /**
+     * @return void
+     */
     public function testCreateBackupWithPage()
     {
         $this->configMock->expects($this->once())
@@ -118,6 +130,9 @@ class BackupManagerTest extends TestCase
             ->willReturn('Lorem Ipsum Dolor Sit Amet.');
 
         $this->model->setCmsObject($this->cmsPageModelMock);
-        $this->model->createBackup('cms_page', $this->cmsPageModelMock);
+        $this->assertSame(
+            $this->model,
+            $this->model->createBackup('cms_page', $this->cmsPageModelMock)
+        );
     }
 }

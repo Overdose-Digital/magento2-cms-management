@@ -41,6 +41,9 @@ class UploadTest extends TestCase
      */
     private $uploaderMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->resultJsonFactoryMock = $this->getMockBuilder(JsonFactory::class)
@@ -63,6 +66,9 @@ class UploadTest extends TestCase
             ->getMockForAbstractClass();
     }
 
+    /**
+     * @return void
+     */
     public function testExecute()
     {
         $backupDir = '';

@@ -61,6 +61,9 @@ class ContentVersionRepositoryTest extends TestCase
      */
     private $searchResultsMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->resourceMock = $this->getMockBuilder(ResourceModel::class)
@@ -103,6 +106,10 @@ class ContentVersionRepositoryTest extends TestCase
         );
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function testSave()
     {
         $id = '1';
@@ -123,6 +130,10 @@ class ContentVersionRepositoryTest extends TestCase
         $this->assertEquals($this->contentVersionMock, $this->repository->save($this->contentVersionMock));
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function testGet()
     {
         $id = '1';
@@ -140,6 +151,10 @@ class ContentVersionRepositoryTest extends TestCase
         $this->assertEquals($this->contentVersionMock, $this->repository->get($id));
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function testGetList()
     {
         $items = [$this->contentVersionMock, $this->contentVersionMock];
@@ -170,6 +185,10 @@ class ContentVersionRepositoryTest extends TestCase
         $this->assertSame($this->searchResultsMock, $this->repository->getList($this->searchCriteriaMock));
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function testDelete()
     {
         $this->contentVersionFactoryMock->expects($this->once())

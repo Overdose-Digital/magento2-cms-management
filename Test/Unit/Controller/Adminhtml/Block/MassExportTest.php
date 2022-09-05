@@ -12,6 +12,7 @@ use Magento\Cms\Model\ResourceModel\Block\CollectionFactory;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Ui\Component\MassAction\Filter;
 use Overdose\CMSContent\Api\CmsEntityConverterManagerInterface;
@@ -76,6 +77,9 @@ class MassExportTest extends TestCase
      */
     private $requestMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->filterMock = $this->getMockBuilder(Filter::class)
@@ -120,6 +124,11 @@ class MassExportTest extends TestCase
             ->getMockForAbstractClass();
     }
 
+    /**
+     * Test execute function to see if the returned object is an instance of responseMock
+     * @return void
+     * @throws LocalizedException
+     */
     public function testExecute()
     {
         $items = [$this->cmsBlockModelMock, $this->cmsBlockModelMock];

@@ -36,6 +36,9 @@ class ViewTest extends TestCase
      */
     private $pageMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->resultFactoryMock = $this->getMockBuilder(ResultFactory::class)

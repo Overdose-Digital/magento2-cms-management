@@ -36,6 +36,9 @@ class IndexTest extends TestCase
      */
     private $contextMock;
 
+    /**
+     * Initialize test
+     */
     public function setUp(): void
     {
         $this->resultFactoryMock = $this->getMockBuilder(ResultFactory::class)
@@ -55,6 +58,9 @@ class IndexTest extends TestCase
             ->getMock();
     }
 
+    /**
+     * @return void
+     */
     public function testExecute()
     {
         $this->resultFactoryMock->expects($this->once())
