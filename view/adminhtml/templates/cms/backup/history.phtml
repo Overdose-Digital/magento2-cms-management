@@ -12,9 +12,39 @@
     </div>
 <?php else: ?>
     <?php foreach ($backups as $backup) : ?>
-        <a href="#" onclick="popWin('<?= $block->getBackupUrl($backup) ?>','backupHistory','width=930,height=760,resizable=yes,scrollbars=yes')" style="display: block">
+    <div class="backup-item">
+        <a href="#" onclick="popWin('<?= $block->getBackupUrl($backup) ?>','backupHistory','width=930,height=760,resizable=yes,scrollbars=yes')">
             <?= $backup['label']; ?>
         </a>
+        <a href="#" class="apply_backup" data-url="<?= $block->getBackupApplyUrl($backup) ?>"><button class="action-default"><?=__('Apply')?></button></a>
+    </div>
     <?php endforeach; ?>
 </div>
+<div class="restore-message-content" style="display: none">
+    <?=__('This Action will rewrite existing content of the page/block from backup.')?>
+    <?=__('Do you want to proceed?')?>
+</div>
+<script>
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/confirm'
+    ], function ($, confirmation) {
+        'use strict';
+
+        $(".apply_backup").on( "click", function() {
+            let url = $(this).attr('data-url');
+            $('.restore-message-content').confirm({
+                title: $.mage.__('Restore backup content?'),
+                actions: {
+                    confirm: function(){
+                        window.location.assign(url);
+                    },
+                    cancel: function(){
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+    });
+</script>
 <?php endif; ?>

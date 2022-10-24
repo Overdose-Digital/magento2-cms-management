@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Model;
 
+use Laminas\Json\Json;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\Store;
@@ -14,6 +15,7 @@ class BackupManager
 {
     const TYPE_CMS_BLOCK = 'cms_block';
     const TYPE_CMS_PAGE = 'cms_page';
+    const FILE_JSON_EXTENSION = '.json';
 
     private $cmsObject = null;
 
@@ -38,22 +40,31 @@ class BackupManager
     private $config;
 
     /**
+     * @var Json
+     */
+    private $jsonFormatter;
+
+    /**
      * BackupManager constructor.
      *
      * @param File $fileDriver
      * @param FileManagerInterface $file
      * @param Config $config
+     * @param Json $jsonFormatter
      * @param LoggerInterface $logger
      */
     public function __construct(
-        File $fileDriver,
+        File                 $fileDriver,
         FileManagerInterface $file,
-        Config $config,
-        LoggerInterface $logger
-    ) {
+        Config               $config,
+        Json                 $jsonFormatter,
+        LoggerInterface      $logger
+    )
+    {
         $this->config = $config;
         $this->file = $file;
         $this->logger = $logger;
+        $this->jsonFormatter = $jsonFormatter;
         $this->fileDriver = $fileDriver;
     }
 
@@ -76,7 +87,8 @@ class BackupManager
             $this->file->writeData(
                 $this->getBackupPathByStoreId($type, $this->cmsObject->getIdentifier(), (int)$storeId),
                 $this->generateBackupName((int)$storeId),
-                $this->prepareBackupContent()
+                $this->prepareJsonFile(),
+                self::FILE_JSON_EXTENSION
             );
         }
         return $this;
@@ -95,7 +107,7 @@ class BackupManager
     }
 
     /**
-     * Generates path to backup file
+     * Generates path to back up file
      *
      * @param string $type
      * @param string $identifier
@@ -106,8 +118,9 @@ class BackupManager
     public function getBackupPathByStoreId(
         string $type,
         string $identifier = '',
-        int $storeId = Store::DEFAULT_STORE_ID
-    ): ?string {
+        int    $storeId = Store::DEFAULT_STORE_ID
+    ): ?string
+    {
         try {
             $identifier = $identifier ?: $this->cmsObject->getIdentifier();
 
@@ -144,13 +157,34 @@ class BackupManager
     }
 
     /**
-     * Generates content to be written to backup fie
+     * Generates content to be written to back up file
      *
      * @return mixed
      */
     public function prepareBackupContent()
     {
         return $this->cmsObject->getOrigData('content');
+    }
+
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return string
+     */
+    public function prepareJsonFile(): string
+    {
+        $jsonBody = '';
+
+        if ($this->cmsObject->getIdentifier()) {
+            $jsonBody = [
+                'identifier' => $this->cmsObject->getIdentifier(),
+                'title' => $this->cmsObject->getOrigData('title'),
+                'content' => $this->prepareBackupContent()
+            ];
+        }
+
+        return $this->jsonFormatter->encode($jsonBody, true);
     }
 
     /**
@@ -226,11 +260,11 @@ class BackupManager
             $backups = $this->fileDriver->readDirectory($backupsDir);
             foreach ($backups as $backup) {
                 $result[] = [
-                    'name'       => basename($backup),
-                    'label'      => (!is_null($storeId))
+                    'name' => basename($backup),
+                    'label' => (!is_null($storeId))
                         ? 'store_' . $storeId . '/' . basename($backup) : basename($backup),
                     'identifier' => $this->cmsObject->getIdentifier(),
-                    'store_id'   => $storeId
+                    'store_id' => $storeId
                 ];
             }
         } catch (FileSystemException $e) {

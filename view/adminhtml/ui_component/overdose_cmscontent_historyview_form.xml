@@ -34,6 +34,28 @@
         <settings>
             <label>General</label>
         </settings>
+        <field name="identifier" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Identifier</item>
+                    <item name="source" xsi:type="string">block</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>identifier</dataScope>
+            </settings>
+        </field>
+        <field name="title" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Title</item>
+                    <item name="source" xsi:type="string">block</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>title</dataScope>
+            </settings>
+        </field>
         <field formElement="wysiwyg" name="content" sortOrder="10">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
