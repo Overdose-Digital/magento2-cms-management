@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Ui\DataProvider;
 
+use Laminas\Json\Json;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -28,6 +29,11 @@ class HistoryView extends AbstractDataProvider
     private $request;
 
     /**
+     * @var Json
+     */
+    private $jsonFormatter;
+
+    /**
      * Constructor
      *
      * @param string $name
@@ -35,6 +41,7 @@ class HistoryView extends AbstractDataProvider
      * @param string $requestFieldName
      * @param RequestInterface $request
      * @param BackupManager $backupManager
+     * @param Json $jsonFormatter
      * @param FileManagerInterface $file
      * @param array $meta
      * @param array $data
@@ -45,10 +52,12 @@ class HistoryView extends AbstractDataProvider
         $requestFieldName,
         RequestInterface $request,
         BackupManager $backupManager,
+        Json $jsonFormatter,
         FileManagerInterface $file,
         array $meta = [],
         array $data = []
-    ) {
+    )
+    {
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -57,6 +66,7 @@ class HistoryView extends AbstractDataProvider
             $data
         );
         $this->backupManager = $backupManager;
+        $this->jsonFormatter = $jsonFormatter;
         $this->file = $file;
         $this->request = $request;
     }
@@ -70,7 +80,12 @@ class HistoryView extends AbstractDataProvider
     {
         $data = [];
         if ($backupItemIdentifier = $this->request->getParam('bc_identifier')) {
-            $data[$backupItemIdentifier]['content'] = $this->getBackupContent();
+            $parsedArray = $this->jsonFormatter->decode($this->getBackupContent(), true);
+            $data[$backupItemIdentifier] = [
+                'identifier' => $parsedArray['identifier'] ?? '',
+                'title' => $parsedArray['title'] ?? '',
+                'content' => $parsedArray['content'] ?? ''
+            ];
         }
 
         return $data;
@@ -84,9 +99,9 @@ class HistoryView extends AbstractDataProvider
     public function getBackupContent()
     {
         $itemIdentifier = $this->request->getParam('bc_identifier');
-        $itemName       = $this->request->getParam('item');
-        $itemType       = $this->request->getParam('bc_type');
-        $storeId        = $this->request->getParam('store_id');
+        $itemName = $this->request->getParam('item');
+        $itemType = $this->request->getParam('bc_type');
+        $storeId = $this->request->getParam('store_id');
 
         if (!is_null($storeId)) {
             $path = $this->backupManager->getBackupPathByStoreId($itemType, $itemIdentifier, (int)$storeId)
