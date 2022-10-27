@@ -18,6 +18,7 @@ use Overdose\CMSContent\Block\Adminhtml\Cms\Page\Edit\History as PageHistory;
 use Overdose\CMSContent\Model\BackupManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
 class CmsAbstractTest extends TestCase
@@ -157,74 +158,169 @@ class CmsAbstractTest extends TestCase
     }
 
     /**
-     * Test if the return object is an instance of Block or Page interface.
+     * Test to verify that block and page cms object is returned for respective bcType value.
      * @dataProvider getCmsObjectDataProvider
      * @param int $id
+     * @param string $historyClass
      * @param string $bcType
+     * @param $cmsRepositoryMock
+     * @param $expectedResult
      */
-    public function testGetCmsObject(int $id, string $bcType)
+    public function testGetCmsObject(int $id, string $historyClass, string $bcType, $cmsRepositoryMock, $expectedResult)
     {
-        if ($bcType == BackupManager::TYPE_CMS_BLOCK) {
-            $this->blockRepositoryMock->expects($this->atLeastOnce())
-                ->method('getById')
-                ->with($id)
-                ->willReturn($this->blockModelMock);
-            $blockHistory = new BlockHistory(
-                $this->contextMock,
-                $this->blockRepositoryMock,
-                $this->pageRepositoryMock,
-                $this->backupManagerMock,
-                $this->urlMock
-            );
-            $this->assertInstanceOf(BlockInterface::class, $blockHistory->getCmsObject($id));
-        } elseif ($bcType == BackupManager::TYPE_CMS_PAGE) {
-            $this->pageRepositoryMock->expects($this->atLeastOnce())
-                ->method('getById')
-                ->with($id)
-                ->willReturn($this->pageModelMock);
-            $pageHistory = new PageHistory(
-                $this->contextMock,
-                $this->blockRepositoryMock,
-                $this->pageRepositoryMock,
-                $this->backupManagerMock,
-                $this->urlMock
-            );
-            $this->assertInstanceOf(PageInterface::class, $pageHistory->getCmsObject($id));
+        $cmsRepositoryMock->expects($this->atLeastOnce())
+            ->method('getById')
+            ->with($id)
+            ->willReturn($expectedResult);
+
+        if ($bcType == "cms_block") {
+            $blockRepositoryMock = $cmsRepositoryMock;
+        } else {
+            $pageRepositoryMock = $cmsRepositoryMock;
         }
+
+        $history = new $historyClass(
+            $this->contextMock,
+            $blockRepositoryMock ?? $this->blockRepositoryMock,
+            $pageRepositoryMock ?? $this->pageRepositoryMock,
+            $this->backupManagerMock,
+            $this->urlMock
+        );
+
+        $this->assertEquals($expectedResult, $history->getCmsObject($id));
     }
 
     /**
      * @return array[]
      */
-    public function getCmsObjectDataProvider()
+    public function getCmsObjectDataProvider(): array
     {
+        $blockRepositoryMock = $this->getMockBuilder(BlockRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $pageRepositoryMock = $this->getMockBuilder(PageRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $blockModelMock = $this->getMockBuilder(BlockInterface::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $pageModelMock = $this->getMockBuilder(PageInterface::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
         return [
-            'case_1_block' => [1, 'cms_block'],
-            'case_2_page' => [1, 'cms_page']
+            'case_1_block_entity' => [
+                'id' => 1,
+                'historyClass' => 'Overdose\CMSContent\Block\Adminhtml\Cms\Block\Edit\History',
+                'bcType' => 'cms_block',
+                'cmsRepositoryMock' => $blockRepositoryMock,
+                'expectedResult' => $blockModelMock
+            ],
+            'case_2_page_entity' => [
+                'id' => 1,
+                'historyClass' => 'Overdose\CMSContent\Block\Adminhtml\Cms\Page\Edit\History',
+                'bcType' => 'cms_page',
+                'cmsRepositoryMock' => $pageRepositoryMock,
+                'expectedResult' => $pageModelMock
+            ]
         ];
     }
 
     /**
-     * Test
+     * Test to verify exception case for getCmsObject method.
+     * @dataProvider getCmsObjectExceptionCaseDataProvider
+     * @param int $id
+     * @param string $historyClass
+     * @param string $bcType
+     * @param $cmsRepositoryMock
+     */
+    public function testGetCmsObjectException(
+        int $id,
+        string $historyClass,
+        string $bcType,
+        $cmsRepositoryMock
+    ) {
+        $cmsRepositoryMock->expects($this->atLeastOnce())
+            ->method('getById')
+            ->with($id)
+            ->willThrowException(new LocalizedException(__('message')));
+
+        if ($bcType == "cms_block") {
+            $blockRepositoryMock = $cmsRepositoryMock;
+        } else {
+            $pageRepositoryMock = $cmsRepositoryMock;
+        }
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())
+            ->method('critical');
+
+        $this->contextMock->expects($this->atLeastOnce())
+            ->method('getLogger')
+            ->willReturn($loggerMock);
+
+        $history = new $historyClass(
+            $this->contextMock,
+            $blockRepositoryMock ?? $this->blockRepositoryMock,
+            $pageRepositoryMock ?? $this->pageRepositoryMock,
+            $this->backupManagerMock,
+            $this->urlMock
+        );
+
+        $this->assertNull($history->getCmsObject($id));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getCmsObjectExceptionCaseDataProvider(): array
+    {
+        $blockRepositoryMock = $this->getMockBuilder(BlockRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $pageRepositoryMock = $this->getMockBuilder(PageRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        return [
+            'case_1_block_exception' => [
+                'id' => 1,
+                'historyClass' => 'Overdose\CMSContent\Block\Adminhtml\Cms\Block\Edit\History',
+                'bcType' => 'cms_block',
+                'cmsRepositoryMock' => $blockRepositoryMock
+            ],
+            'case_2_page_exception' => [
+                'id' => 1,
+                'historyClass' => 'Overdose\CMSContent\Block\Adminhtml\Cms\Page\Edit\History',
+                'bcType' => 'cms_page',
+                'cmsRepositoryMock' => $pageRepositoryMock
+            ]
+        ];
+    }
+    /**
+     * @dataProvider dataProviderForGetBackupUrl
+     * @param array $backup
+     * @param string $bcType
+     * @param string $result
      * @return void
      */
-    public function testGetBackupUrl()
+    public function testGetBackupUrl(array $backup, string $bcType, string $result)
     {
-        $backup = [
-            'identifier' => '1',
-            'name' => 'TestBackup',
-            'store_id' => '0'
-        ];
+        $this->assertArrayHasKey('identifier', $backup);
+        $this->assertArrayHasKey('name', $backup);
+        $this->assertArrayHasKey('store_id', $backup);
+
         $requestData = [
-            'bc_type' => 'cms_block',
+            'bc_type' => $bcType,
             'bc_identifier' => $backup['identifier'],
             'item' => $backup['name'],
             'store_id' => $backup['store_id']
         ];
+
         $this->urlMock->expects($this->atLeastOnce())
             ->method('getUrl')
             ->with('cmscontent/history/view', $requestData)
-            ->willReturn('somestring');
+            ->willReturn($result);
 
         $cmsAbstract = new CmsAbstract(
             $this->contextMock,
@@ -233,11 +329,37 @@ class CmsAbstractTest extends TestCase
             $this->backupManagerMock,
             $this->urlMock
         );
+
         $reflectionClass = new ReflectionClass($cmsAbstract);
         $reflection_property = $reflectionClass->getProperty('bcType');
         $reflection_property->setAccessible(true);
-        $reflection_property->setValue($cmsAbstract, 'cms_block');
+        $reflection_property->setValue($cmsAbstract, $bcType);
 
-        $this->assertSame('somestring', $cmsAbstract->getBackupUrl($backup));
+        $this->assertSame($result, $cmsAbstract->getBackupUrl($backup));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function dataProviderForGetBackupUrl(): array
+    {
+        $backup = [
+            'identifier' => '1',
+            'name' => 'TestBackup',
+            'store_id' => '0'
+        ];
+
+        return [
+            'case_1_block' => [
+                'backup' => $backup,
+                'bcType' => 'cms_block',
+                'result' => 'blockBackupUrl'
+            ],
+            'case_2_page' => [
+                'backup' => $backup,
+                'bcType' => 'cms_page',
+                'result' => 'pageBackupUrl'
+            ]
+        ];
     }
 }
