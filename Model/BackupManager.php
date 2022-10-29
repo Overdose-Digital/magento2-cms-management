@@ -59,8 +59,7 @@ class BackupManager
         Config               $config,
         Json                 $jsonFormatter,
         LoggerInterface      $logger
-    )
-    {
+    ) {
         $this->config = $config;
         $this->file = $file;
         $this->logger = $logger;
@@ -260,11 +259,11 @@ class BackupManager
             $backups = $this->fileDriver->readDirectory($backupsDir);
             foreach ($backups as $backup) {
                 $result[] = [
-                    'name' => basename($backup),
+                    'name'  => basename($backup),
                     'label' => (!is_null($storeId))
                         ? 'store_' . $storeId . '/' . basename($backup) : basename($backup),
                     'identifier' => $this->cmsObject->getIdentifier(),
-                    'store_id' => $storeId
+                    'store_id'   => $storeId
                 ];
             }
         } catch (FileSystemException $e) {
