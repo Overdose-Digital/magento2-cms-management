@@ -30,10 +30,10 @@
 ## Functionalities
 
 ### Main features
-- Create content backups of cms-blocks and cms-pages
+- Create content backups of cms-blocks and cms-pages.
 - Review backup history of CMS-Block/Page
-- Restore history content of each backup file
-- Create and Update CMS-Blocks/Pages by using of xml-files
+- Restore history content from any backup.
+- Create and Update CMS-Blocks/Pages by using of xml-files.
 - Allowing users to import/export CMS pages or blocks:  
   -- (by json and xml files)  
   -- Supports multistore and wysiwyg images

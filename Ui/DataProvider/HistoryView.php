@@ -56,8 +56,7 @@ class HistoryView extends AbstractDataProvider
         FileManagerInterface $file,
         array $meta = [],
         array $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -101,7 +100,7 @@ class HistoryView extends AbstractDataProvider
         $itemIdentifier = $this->request->getParam('bc_identifier');
         $itemName = $this->request->getParam('item');
         $itemType = $this->request->getParam('bc_type');
-        $storeId = $this->request->getParam('store_id');
+        $storeId  = $this->request->getParam('store_id');
 
         if (!is_null($storeId)) {
             $path = $this->backupManager->getBackupPathByStoreId($itemType, $itemIdentifier, (int)$storeId)

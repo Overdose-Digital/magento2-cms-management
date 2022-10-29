@@ -70,8 +70,7 @@ class Apply extends Action implements HttpGetActionInterface
         BackupManager            $backupManager,
         FileManagerInterface     $file,
         Json                     $jsonFormatter
-    )
-    {
+    ) {
         $this->importExportInterface = $importExportInterface;
         $this->redirectFactory = $redirectFactory;
         $this->pageRepository = $pageRepository;
@@ -89,17 +88,15 @@ class Apply extends Action implements HttpGetActionInterface
     public function execute()
     {
         $identifier = $this->getRequest()->getParam('bc_identifier');
-        $itemId = $this->getRequest()->getParam('item_id');
-        $file = $this->getRequest()->getParam('item');
+        $itemId  = $this->getRequest()->getParam('item_id');
+        $file    = $this->getRequest()->getParam('item');
         $cmsType = $this->getRequest()->getParam('bc_type');
         $storeId = $this->getRequest()->getParam('store_id');
         try {
             if (!is_null($storeId)) {
-                $path = $this->backupManager->getBackupPathByStoreId($cmsType, $identifier, (int)$storeId)
-                    . DIRECTORY_SEPARATOR . $file;
+                $path = $this->backupManager->getBackupPathByStoreId($cmsType, $identifier, (int)$storeId) . DIRECTORY_SEPARATOR . $file;
             } else {
-                $path = $this->backupManager->getBackupPath($cmsType, $identifier)
-                    . DIRECTORY_SEPARATOR . $file;
+                $path = $this->backupManager->getBackupPath($cmsType, $identifier) . DIRECTORY_SEPARATOR . $file;
             }
             $backupFile = $this->file->readData($path);
             $jsonBackup = $this->jsonFormatter->decode($backupFile, true);

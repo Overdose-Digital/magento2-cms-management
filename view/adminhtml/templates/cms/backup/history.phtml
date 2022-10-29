@@ -31,7 +31,7 @@
     ], function ($, confirmation) {
         'use strict';
 
-        $(".apply_backup").on( "click", function() {
+        $('.apply_backup').on('click', function() {
             let url = $(this).attr('data-url');
             $('.restore-message-content').confirm({
                 title: $.mage.__('Restore backup content?'),
