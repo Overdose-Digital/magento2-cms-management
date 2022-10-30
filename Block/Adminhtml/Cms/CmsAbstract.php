@@ -97,6 +97,26 @@ class CmsAbstract extends Template
     }
 
     /**
+     * Retrieve url for viewing of backup content
+     *
+     * @param $backup
+     * @return string
+     */
+    public function getBackupApplyUrl($backup)
+    {
+        return $this->backendUrl->getUrl(
+            'cmscontent/history/apply',
+            [
+                'item_id' => $this->getRequest()->getParam($this->urlParamId),
+                'bc_type' => $this->bcType,
+                'bc_identifier' => $backup['identifier'],
+                'item' => $backup['name'],
+                'store_id' => $backup['store_id']
+            ]
+        );
+    }
+
+    /**
      * Retrieve cms block or cms page by identifier
      *
      * @param $id
