@@ -15,11 +15,6 @@
                     <comment/>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="show_menu" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="300" translate="label" type="select">
-                    <label>Show Menu</label>
-                    <comment/>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
             </group>
 
             <group id="backups" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -35,7 +30,11 @@
                         <label>Delete Method</label>
                         <source_model>Overdose\CMSContent\Model\OptionSource\Methods</source_model>
                         <comment><![CDATA[
-                       <p><b>By Periods</b>: Delete files by periods (weeks, months and years). Files younger than one week, excluded.</p>
+                       <p><b>By Periods</b>: Left one file per a period (weeks, months and years):<br/>
+                           - One history item per year for older than year.<br/>
+                           - One history item per month for older than month but yonger 12m.<br/>
+                           - One history item per week for older than week but yonger one month.<br/>
+                           Files younger than one week, excluded.</p>
                        <p><b>Older Than</b>: Delete files older than 'Period' and it number.</p>
                        ]]></comment>
                     </field>
@@ -65,6 +64,9 @@
                     </field>
                     <field id="time" translate="label" type="time" sortOrder="20" showInDefault="1" showInStore="1" showInWebsite="1">
                         <label>Start Time</label>
+                        <comment><![CDATA[
+                        Hour : Minute : Second
+                       ]]></comment>
                     </field>
                     <depends>
                         <field id="cron_enabled">1</field>
