@@ -37,19 +37,28 @@
 - Allowing users to import/export CMS pages or blocks:  
   -- (by json and xml files)  
   -- Supports multistore and wysiwyg images
+- Clear old backups.
   
 ### Fetaures details
-   - Before saving of cms-block or page if the one was changed it's identifier, title and content will be saved to backup file (currently used 
+- Before saving of cms-block or page if the one was changed it's identifier, title and content will be saved to backup file (currently used 
     json-format). Following directory tree will be created under 'var' folder:
     
         - for block: cms/blocks/history/{identifier}/{backup_name}
         
         - for page: cms/pages/history/{identifier}/{backup_name}
     
-   - Added new section "History" to CMS-Block and CMS-Page editing page. Here, you will be able to see the backup records list.
+- Added new section "History" to CMS-Block and CMS-Page editing page. Here, you will be able to see the backup records list.
     Each record is represented as a link with a name in format Y_m_d_h_i_s_{store_ids}. By clicking the link, a popup window with backup's content will appear.
     
-   - Added two configuration xml-files cms_block_data.xml and cms_page_data.xml for creating and updating cms-blocks or pages.
+- Added two configuration xml-files cms_block_data.xml and cms_page_data.xml for creating and updating cms-blocks or pages.
+
+- Clear history methods:  
+  - **By Periods:** Left one file per a period (weeks, months and years):  
+    -- One history item per year for older than year.  
+    -- One history item per month for older than month but yonger 12m.  
+    -- One history item per week for older than week but yonger one month.  
+    Files younger than one week, excluded.  
+  - **Older Than:** Delete files older than 'Period' and it number.
 
 
 ## Example

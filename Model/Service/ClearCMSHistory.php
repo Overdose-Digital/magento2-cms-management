@@ -35,6 +35,8 @@ class ClearCMSHistory
      */
     private $fileManger;
 
+    private $count = 0;
+
     /**
      * @param DateTime $dateTime
      * @param Config $config
@@ -63,7 +65,6 @@ class ClearCMSHistory
      */
     public function execute(string $type): int
     {
-        $count = 0;
         foreach ($this->getItemsByType($type) as $folder) {
             $items = $this->getFilesList($folder);
             if (!count($items)) {
@@ -71,47 +72,43 @@ class ClearCMSHistory
             }
 
             if ($this->fileManger->isFile($items[0])) {
-                $count = $this->clear($folder, $count);
+                $this->clear($folder);
             } else {
                 foreach ($items as $item) {
-                    $count = $this->clear($item, $count);
+                    $this->clear($item);
                 }
             }
         }
-        return $count;
+        return $this->count;
     }
 
     /**
-     * Clear folders
+     * Clear folders. Update counter param.
      *
      * @param string $folder
-     * @param int $count
-     *
-     * @return int
+     * @return void
      */
-    private function clear(string $folder, int $count): int
+    private function clear(string $folder): int
     {
         switch ($this->config->getMethodType()) {
             case Config::PERIOD:
-                $count += $this->clearByPeriod($folder, $count);
+                $this->count += $this->clearByPeriod($folder);
                 break;
             case Config::OLDER_THAN:
-                $count += $this->clearOlderThan($folder, $count);
+                $this->count += $this->clearOlderThan($folder);
                 break;
         }
-        return $count;
     }
 
     /**
      * Delete files by periods
      *
      * @param string $folder
-     * @param int $count
-     *
      * @return int
      */
-    private function clearByPeriod(string $folder, int $count): int
+    private function clearByPeriod(string $folder): int
     {
+        $count = 0;
         $filesByPeriods = $this->formFilesByPeriods($folder);
         if (count($filesByPeriods)) {
             $count = $this->deleteFiles($filesByPeriods, Config::PERIOD);
@@ -123,12 +120,11 @@ class ClearCMSHistory
      * Delete files older than some period
      *
      * @param string $folder
-     * @param int $count
-     *
      * @return int
      */
-    private function clearOlderThan(string $folder, int $count): int
+    private function clearOlderThan(string $folder): int
     {
+        $count = 0;
         $filesOlderThan = $this->findFilesOlderThan($folder);
         if (count($filesOlderThan)) {
             $count = $this->deleteFiles($filesOlderThan, Config::OLDER_THAN);
@@ -140,7 +136,6 @@ class ClearCMSHistory
      * Form list of files by periods
      *
      * @param string $item
-     *
      * @return array
      */
     private function formFilesByPeriods(string $item): array
