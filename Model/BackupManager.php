@@ -167,8 +167,6 @@ class BackupManager
 
 
     /**
-     * @param string $key
-     * @param string $value
      * @return string
      */
     public function prepareJsonFile(): string

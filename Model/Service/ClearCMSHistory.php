@@ -88,7 +88,7 @@ class ClearCMSHistory
      * @param string $folder
      * @return void
      */
-    private function clear(string $folder): int
+    private function clear(string $folder): void
     {
         switch ($this->config->getMethodType()) {
             case Config::PERIOD:
