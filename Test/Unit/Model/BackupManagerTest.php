@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Overdose\CMSContent\Test\Unit\Model;
 
+use Laminas\Json\Json;
 use Magento\Cms\Model\Block;
 use Magento\Cms\Model\Page;
 use Magento\Framework\Filesystem\Driver\File;
@@ -40,6 +41,10 @@ class BackupManagerTest extends TestCase
      * @var BackupManager
      */
     private $model;
+    /**
+     * @var Json
+     */
+    private Json $json;
 
     /**
      * Initialize test
@@ -64,10 +69,13 @@ class BackupManagerTest extends TestCase
         $this->cmsPageModelMock = $this->getMockBuilder(Page::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->json = new Json();
+
         $this->model = new BackupManager(
             $this->fileDriverMock,
             $this->fileMock,
             $this->configMock,
+            $this->json,
             $this->loggerMock
         );
     }
@@ -79,7 +87,7 @@ class BackupManagerTest extends TestCase
     {
         $this->configMock->expects($this->once())
             ->method('isEnabled')
-        ->willReturn(true);
+            ->willReturn(true);
 
         $this->fileMock->expects($this->once())
             ->method('writeData');
@@ -94,8 +102,8 @@ class BackupManagerTest extends TestCase
 
         $this->cmsBlockModelMock->expects($this->atLeastOnce())
             ->method('getOrigData')
-            ->with('content')
-            ->willReturn('Lorem Ipsum Dolor Sit Amet.');
+            ->withConsecutive(['title'], ['content'])
+            ->willReturnOnConsecutiveCalls('Lorem Ipsum Dolor Sit Amet.');
 
         $this->model->setCmsObject($this->cmsBlockModelMock);
         $this->assertSame(
@@ -111,7 +119,7 @@ class BackupManagerTest extends TestCase
     {
         $this->configMock->expects($this->once())
             ->method('isEnabled')
-        ->willReturn(true);
+            ->willReturn(true);
 
         $this->fileMock->expects($this->once())
             ->method('writeData');
@@ -126,8 +134,8 @@ class BackupManagerTest extends TestCase
 
         $this->cmsPageModelMock->expects($this->atLeastOnce())
             ->method('getOrigData')
-            ->with('content')
-            ->willReturn('Lorem Ipsum Dolor Sit Amet.');
+            ->withConsecutive(['title'], ['content'])
+            ->willReturnOnConsecutiveCalls('Lorem Ipsum Dolor Sit Amet.');
 
         $this->model->setCmsObject($this->cmsPageModelMock);
         $this->assertSame(
