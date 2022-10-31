@@ -198,7 +198,7 @@ class ClearCMSHistory
     private function leftNewestFile(array $files): array
     {
         usort($files, function ($a, $b) {
-            return filemtime($a) < filemtime($b);
+            return filemtime($a) <=> filemtime($b);
         });
         array_shift($files);
 
