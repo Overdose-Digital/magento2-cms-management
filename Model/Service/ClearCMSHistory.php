@@ -88,7 +88,7 @@ class ClearCMSHistory
      * @param string $folder
      * @return void
      */
-    private function clear(string $folder): int
+    private function clear(string $folder): void
     {
         switch ($this->config->getMethodType()) {
             case Config::PERIOD:
@@ -198,7 +198,7 @@ class ClearCMSHistory
     private function leftNewestFile(array $files): array
     {
         usort($files, function ($a, $b) {
-            return filemtime($a) < filemtime($b);
+            return filemtime($a) <=> filemtime($b);
         });
         array_shift($files);
 
