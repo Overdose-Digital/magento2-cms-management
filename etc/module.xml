@@ -3,6 +3,7 @@
     <module name="Overdose_CMSContent">
         <sequence>
             <module name="Magento_Cms"/>
+            <module name="Overdose_Core" />
         </sequence>
     </module>
 </config>
