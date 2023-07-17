@@ -36,7 +36,7 @@ class ImportContent extends Command
     {
         $this->setName('od:cms:import');
         $this->setDescription('Import CMS zip file');
-        $this->addArgument('zipfile', InputArgument::REQUIRED, __('Zip file containing CMS information'));
+        $this->addArgument('zipfile', InputArgument::REQUIRED, __('Zip file containing CMS information')->render());
 
         parent::configure();
     }
