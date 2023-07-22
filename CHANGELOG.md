@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.0.4] - 17-07-2023
-### Changed
-- Made a change to fix the issue with the argument type
+### Fix
+- Fix the issue with the argument type in `Console\Command\ImportContent`.
 
 ## [2.0.3] - 09-01-2023
 ### Changed
