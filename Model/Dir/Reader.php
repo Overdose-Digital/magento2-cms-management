@@ -12,6 +12,13 @@ use Overdose\CMSContent\Model\Config\ReaderAbstract;
 class Reader extends \Magento\Framework\Module\Dir\Reader
 {
     /**
+     * Found configuration files grouped by configuration types (filename).
+     *
+     * @var array
+     */
+    private $fileIterators = [];
+    
+    /**
      * @inheridoc
      */
     public function getConfigurationFiles($filename)

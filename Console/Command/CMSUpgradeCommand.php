@@ -100,5 +100,7 @@ class CMSUpgradeCommand extends Command
             $this->contentVersionManagement->processAll();
         }
         $output->writeln('<info>Upgrade Completed!</info>');
+
+        return 0;
     }
 }

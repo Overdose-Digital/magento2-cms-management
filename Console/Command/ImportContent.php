@@ -53,5 +53,6 @@ class ImportContent extends Command
             return;
         }
         $output->writeln('Done.');
+        return 0;
     }
 }
