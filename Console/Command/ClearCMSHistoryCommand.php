@@ -57,8 +57,7 @@ class ClearCMSHistoryCommand extends Command
         $cmsType = $input->getOption('type');
         if (empty($cmsType)) {
             $output->writeln('<info>CMS Entity type OPTION [--type] missed!</info>');
-
-            return;
+            return 0;
         }
 
         try {
@@ -76,8 +75,7 @@ class ClearCMSHistoryCommand extends Command
             }
         } catch (\Exception $e) {
             $output->writeln($e->getMessage());
-
-            return;
+            return 0;
         }
 
         if ($count > 0) {
@@ -85,5 +83,6 @@ class ClearCMSHistoryCommand extends Command
         } else {
             $output->writeln('<info>All backups are actual!</info>');
         }
+        return 0;
     }
 }
