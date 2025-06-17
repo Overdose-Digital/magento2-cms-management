@@ -189,7 +189,7 @@ class Import implements ContentImportInterface
      * @return int
      * @throws Exception
      */
-    public function importContentFromArray(array $payload, string $archivePath = null): int
+    public function importContentFromArray(array $payload, ?string $archivePath = null): int
     {
         if (isset($payload['config'])) {
             $payload = $payload['config'];
